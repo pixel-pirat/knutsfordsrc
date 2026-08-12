@@ -1,9 +1,12 @@
 import Image from "next/image";
+import Link from "next/link";
 import { quickLinks, campusNews } from "@/data/site";
 
 export function Footer() {
+  const preview = campusNews.slice(0, 3);
+
   return (
-    <section id="about" className="bg-cream">
+    <section className="bg-cream">
       <div className="mx-auto grid max-w-7xl gap-8 px-6 py-20 lg:grid-cols-2 lg:px-8 lg:py-24">
         <div className="flex flex-col gap-8 rounded-2xl bg-cream-dark/60 p-8 sm:flex-row sm:items-center sm:gap-10">
           <Image
@@ -29,34 +32,34 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-            <a
-              href="#about"
+            <Link
+              href="/about"
               className="mt-6 inline-block rounded-md bg-ink px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-neutral-800"
             >
               Learn More
-            </a>
+            </Link>
           </div>
         </div>
 
-        <div id="news" className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-7">
+        <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-7">
           <div className="mb-5 flex items-center justify-between">
             <h2 className="text-lg font-extrabold tracking-tight text-ink sm:text-xl">
               LATEST CAMPUS NEWS
             </h2>
-            <a
-              href="#news"
+            <Link
+              href="/news"
               className="text-sm font-semibold text-gold-dark hover:underline"
             >
               view all
-            </a>
+            </Link>
           </div>
 
           <div className="space-y-5">
-            {campusNews.map((item) =>
+            {preview.map((item) =>
               item.featured ? (
-                <a
+                <Link
                   key={item.title}
-                  href="#news"
+                  href="/news"
                   className="flex gap-4 border-b border-black/5 pb-5"
                 >
                   <div className="relative h-24 w-28 shrink-0 overflow-hidden rounded-xl bg-neutral-200 sm:h-28 sm:w-32">
@@ -80,11 +83,11 @@ export function Footer() {
                       {item.time}
                     </p>
                   </div>
-                </a>
+                </Link>
               ) : (
-                <a
+                <Link
                   key={item.title}
-                  href="#news"
+                  href="/news"
                   className="flex items-center gap-3"
                 >
                   <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-neutral-200">
@@ -103,7 +106,7 @@ export function Footer() {
                       {item.time}
                     </span>
                   </div>
-                </a>
+                </Link>
               )
             )}
           </div>

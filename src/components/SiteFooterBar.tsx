@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { footerColumns } from "@/data/site";
 
 const socials = [
@@ -14,7 +15,7 @@ export function SiteFooterBar() {
       <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
-            <div className="flex items-center gap-2.5">
+            <Link href="/" className="flex items-center gap-2.5">
               <Image
                 src="/logo.png"
                 alt="Knutsford University crest"
@@ -25,7 +26,7 @@ export function SiteFooterBar() {
               <span className="text-base font-bold text-white">
                 KNUTSFORD UNIVERSITY
               </span>
-            </div>
+            </Link>
             <p className="mt-4 max-w-xs text-sm leading-6">
               The Lord is Our Strength. Empowering students with the digital
               tools to thrive academically, socially and professionally.
@@ -53,13 +54,13 @@ export function SiteFooterBar() {
               </h3>
               <ul className="mt-4 space-y-2.5">
                 {col.links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href="#"
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
                       className="text-sm transition-colors hover:text-gold-light"
                     >
-                      {link}
-                    </a>
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>

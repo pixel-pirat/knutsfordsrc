@@ -1,22 +1,19 @@
 import Image from "next/image";
-import { upcomingEvents, trendingProducts } from "@/data/site";
+import Link from "next/link";
+import { upcomingEvents, marketProducts } from "@/data/site";
 import { StarIcon } from "./icons";
 
 export function EventsMarket() {
+  const featuredProducts = marketProducts.slice(0, 3);
+
   return (
-    <section id="market" className="bg-white">
+    <section className="bg-white">
       <div className="mx-auto grid max-w-7xl gap-8 px-6 py-20 lg:grid-cols-5 lg:px-8 lg:py-24">
         <div className="rounded-2xl bg-neutral-50 p-6 ring-1 ring-black/5 lg:col-span-2 sm:p-7">
           <div className="mb-5 flex items-center justify-between">
             <h2 className="text-lg font-extrabold tracking-tight text-ink sm:text-xl">
               UPCOMING EVENTS
             </h2>
-            <a
-              href="#events"
-              className="text-sm font-semibold text-gold-dark hover:underline"
-            >
-              view all
-            </a>
           </div>
 
           <ul className="divide-y divide-black/5">
@@ -59,16 +56,16 @@ export function EventsMarket() {
             <h2 className="text-lg font-extrabold tracking-tight text-ink sm:text-xl">
               TRENDING IN THE MARKETPLACE
             </h2>
-            <a
-              href="#market"
+            <Link
+              href="/market"
               className="text-sm font-semibold text-gold-dark hover:underline"
             >
               view all
-            </a>
+            </Link>
           </div>
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5">
-            {trendingProducts.map((product, i) => (
+            {featuredProducts.map((product, i) => (
               <div key={product.name + i}>
                 <div className="relative aspect-square overflow-hidden rounded-2xl bg-neutral-200 ring-1 ring-black/5">
                   <Image

@@ -77,6 +77,36 @@ const icons: Record<string, ReactElement> = {
       strokeLinejoin="round"
     />
   ),
+  users: (
+    <path
+      d="M8.5 11a3 3 0 100-6 3 3 0 000 6zM3 20c0-3 2.5-5.5 5.5-5.5S14 17 14 20M16 11a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM15 14.5c2.4.3 4 2.4 4 5.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  ),
+  trophy: (
+    <path
+      d="M7 4h10v5a5 5 0 01-10 0V4zM7 6H4v1a3 3 0 003 3M17 6h3v1a3 3 0 01-3 3M12 14v3M9 20h6M9.5 20c0-1.7.7-2.5 1.2-3h2.6c.5.5 1.2 1.3 1.2 3"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  ),
+  gamepad: (
+    <path
+      d="M7 8h10a4.5 4.5 0 014.4 5.5l-.6 2.6a2.2 2.2 0 01-3.9.8L15.5 15h-7l-1.4 1.9a2.2 2.2 0 01-3.9-.8l-.6-2.6A4.5 4.5 0 017 8zM7.5 11v3M6 12.5h3M15.5 11.2h.01M17.5 12.8h.01"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  ),
 };
 
 export function HubIcon({
