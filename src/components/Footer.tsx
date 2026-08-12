@@ -1,13 +1,18 @@
 import Image from "next/image";
 import { quickLinks, campusNews } from "@/data/site";
-import { SrcCrest } from "./icons";
 
 export function Footer() {
   return (
     <section id="about" className="bg-cream">
       <div className="mx-auto grid max-w-7xl gap-8 px-6 py-20 lg:grid-cols-2 lg:px-8 lg:py-24">
         <div className="flex flex-col gap-8 rounded-2xl bg-cream-dark/60 p-8 sm:flex-row sm:items-center sm:gap-10">
-          <SrcCrest className="h-36 w-auto shrink-0 sm:h-40" />
+          <Image
+            src="/logo.png"
+            alt="Knutsford University crest"
+            width={440}
+            height={398}
+            className="h-36 w-auto shrink-0 sm:h-40"
+          />
           <div>
             <h2 className="text-lg font-extrabold tracking-wide text-ink">
               QUICK LINKS

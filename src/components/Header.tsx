@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CrestIcon } from "./icons";
+import Image from "next/image";
 import { navLinks } from "@/data/site";
 
 export function Header() {
@@ -11,7 +11,14 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-black/5 bg-white/90 backdrop-blur">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-8">
         <a href="#home" className="flex items-center gap-2.5">
-          <CrestIcon className="h-9 w-9 shrink-0" />
+          <Image
+            src="/logo.png"
+            alt="Knutsford University crest"
+            width={440}
+            height={398}
+            priority
+            className="h-12 w-auto shrink-0"
+          />
           <span className="text-lg font-bold tracking-tight sm:text-xl">
             <span className="text-gold-dark">KNUTSFORD</span>{" "}
             <span className="text-ink">UNIVERSITY</span>

@@ -16,6 +16,10 @@ export const metadata: Metadata = {
   title: "Knutsford University | Student Digital Hub",
   description:
     "From academics to entrepreneurship, from campus life to career growth — Knutsford University's Student Digital Hub brings everything you need into one place.",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

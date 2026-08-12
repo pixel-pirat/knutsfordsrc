@@ -1,4 +1,4 @@
-import { CrestIcon } from "./icons";
+import Image from "next/image";
 import { footerColumns } from "@/data/site";
 
 const socials = [
@@ -15,7 +15,13 @@ export function SiteFooterBar() {
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2.5">
-              <CrestIcon className="h-8 w-8" />
+              <Image
+                src="/logo.png"
+                alt="Knutsford University crest"
+                width={440}
+                height={398}
+                className="h-10 w-auto"
+              />
               <span className="text-base font-bold text-white">
                 KNUTSFORD UNIVERSITY
               </span>
