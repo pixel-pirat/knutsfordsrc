@@ -9,7 +9,7 @@ export function EventsMarket() {
   return (
     <section className="bg-white">
       <div className="mx-auto grid max-w-7xl gap-8 px-6 py-20 lg:grid-cols-5 lg:px-8 lg:py-24">
-        <div className="rounded-2xl bg-neutral-50 p-6 ring-1 ring-black/5 lg:col-span-2 sm:p-7">
+        <div className="min-w-0 rounded-2xl bg-neutral-50 p-6 ring-1 ring-black/5 lg:col-span-2 sm:p-7">
           <div className="mb-5 flex items-center justify-between">
             <h2 className="text-lg font-extrabold tracking-tight text-ink sm:text-xl">
               UPCOMING EVENTS
@@ -51,7 +51,7 @@ export function EventsMarket() {
           </ul>
         </div>
 
-        <div className="lg:col-span-3">
+        <div className="min-w-0 lg:col-span-3">
           <div className="mb-5 flex items-center justify-between">
             <h2 className="text-lg font-extrabold tracking-tight text-ink sm:text-xl">
               TRENDING IN THE MARKETPLACE

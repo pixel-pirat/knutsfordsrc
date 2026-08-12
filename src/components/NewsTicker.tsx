@@ -11,7 +11,7 @@ export function NewsTicker() {
         </svg>
         LATEST
       </div>
-      <div className="relative flex flex-1 items-center overflow-hidden">
+      <div className="relative flex min-w-0 flex-1 items-center overflow-hidden">
         <div className="animate-marquee flex w-max shrink-0 items-center gap-10 py-3.5 pl-8 whitespace-nowrap">
           {items.map((headline, i) => (
             <span

@@ -2,13 +2,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { quickLinks, campusNews } from "@/data/site";
 
+const quickLinkHrefs: Record<string, string> = {
+  "Create Account": "/signup",
+  "Pay Dues": "/dashboard/dues",
+  "Visit the Market": "/market",
+  "Tournament of Power": "/games",
+};
+
 export function Footer() {
   const preview = campusNews.slice(0, 3);
 
   return (
     <section className="bg-cream">
       <div className="mx-auto grid max-w-7xl gap-8 px-6 py-20 lg:grid-cols-2 lg:px-8 lg:py-24">
-        <div className="flex flex-col gap-8 rounded-2xl bg-cream-dark/60 p-8 sm:flex-row sm:items-center sm:gap-10">
+        <div className="flex min-w-0 flex-col gap-8 rounded-2xl bg-cream-dark/60 p-8 sm:flex-row sm:items-center sm:gap-10">
           <Image
             src="/logo.png"
             alt="Knutsford University crest"
@@ -23,12 +30,12 @@ export function Footer() {
             <ul className="mt-4 space-y-2.5">
               {quickLinks.map((link) => (
                 <li key={link}>
-                  <a
-                    href="#"
+                  <Link
+                    href={quickLinkHrefs[link] ?? "#"}
                     className="text-sm text-neutral-700 transition-colors hover:text-gold-dark sm:text-base"
                   >
                     {link}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -41,7 +48,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-7">
+        <div className="min-w-0 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-7">
           <div className="mb-5 flex items-center justify-between">
             <h2 className="text-lg font-extrabold tracking-tight text-ink sm:text-xl">
               LATEST CAMPUS NEWS

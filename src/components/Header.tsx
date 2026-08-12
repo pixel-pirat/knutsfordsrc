@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -8,7 +8,19 @@ import { navLinks } from "@/data/site";
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const [authed, setAuthed] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/me")
+      .then((res) => res.json())
+      .then((data) => (active ? setAuthed(Boolean(data?.student)) : undefined))
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 border-b border-black/5 bg-white/90 backdrop-blur">
@@ -52,12 +64,12 @@ export function Header() {
         </nav>
 
         <div className="hidden lg:block">
-          <a
-            href="#login"
+          <Link
+            href={authed ? "/dashboard" : "/login"}
             className="rounded-md bg-neutral-100 px-6 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-ink hover:text-white"
           >
-            Login
-          </a>
+            {authed ? "Dashboard" : "Login"}
+          </Link>
         </div>
 
         <button
@@ -100,13 +112,13 @@ export function Header() {
                 </Link>
               );
             })}
-            <a
-              href="#login"
+            <Link
+              href={authed ? "/dashboard" : "/login"}
               onClick={() => setOpen(false)}
               className="mt-2 rounded-md bg-ink px-3 py-2.5 text-center text-sm font-medium text-white"
             >
-              Login
-            </a>
+              {authed ? "Dashboard" : "Login"}
+            </Link>
           </nav>
         </div>
       )}

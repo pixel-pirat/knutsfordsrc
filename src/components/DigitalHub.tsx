@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { hubFeatures } from "@/data/site";
 import { HubIcon } from "./icons";
 
@@ -16,12 +17,12 @@ export function DigitalHub() {
             From academics to entrepreneurship, from campus life to career
             growth &mdash; we&rsquo;ve got you covered.
           </p>
-          <a
-            href="#login"
+          <Link
+            href="/login"
             className="mt-8 inline-block rounded-md bg-ink px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-neutral-800"
           >
             Login
-          </a>
+          </Link>
         </div>
 
         <div className="grid grid-cols-2 gap-4 sm:gap-5">
