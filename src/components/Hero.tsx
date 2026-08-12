@@ -16,9 +16,6 @@ export function Hero() {
       </div>
 
       <div className="mx-auto flex min-h-[560px] max-w-7xl flex-col justify-center px-6 py-24 sm:min-h-[640px] lg:px-8">
-        <span className="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-gold-light/40 bg-white/10 px-4 py-1.5 text-xs font-semibold tracking-wide text-gold-light backdrop-blur-sm">
-          KNUTSFORD UNIVERSITY &middot; STUDENT DIGITAL HUB
-        </span>
         <h1 className="max-w-2xl text-4xl font-extrabold leading-[1.08] text-white sm:text-5xl lg:text-6xl">
           Your Whole Campus Life, In One Place
         </h1>
