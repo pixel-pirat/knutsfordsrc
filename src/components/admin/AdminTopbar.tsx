@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { UserAvatar } from "@/components/UserAvatar";
+import { HubIcon } from "@/components/icons";
 import type { PublicAdmin } from "@/lib/types";
 
 export function AdminTopbar({
@@ -31,13 +34,6 @@ export function AdminTopbar({
     router.refresh();
   }
 
-  const initials = admin.name
-    .split(" ")
-    .map((p) => p[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-
   return (
     <header className="flex h-16 items-center gap-3 border-b border-black/5 bg-white px-4 sm:px-6">
       <button
@@ -62,9 +58,7 @@ export function AdminTopbar({
             onClick={() => setMenuOpen((v) => !v)}
             className="flex items-center gap-2 rounded-full"
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gold text-sm font-semibold text-ink">
-              {initials}
-            </span>
+            <UserAvatar name={admin.name} avatarUrl={admin.avatarUrl} />
           </button>
 
           {menuOpen && (
@@ -77,10 +71,18 @@ export function AdminTopbar({
                   {admin.email}
                 </p>
               </div>
+              <Link
+                href="/admin/settings"
+                onClick={() => setMenuOpen(false)}
+                className="mt-1 flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-neutral-700 hover:bg-black/5"
+              >
+                <HubIcon name="gear" className="h-4 w-4" />
+                Settings
+              </Link>
               <button
                 type="button"
                 onClick={handleLogout}
-                className="mt-1 block w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+                className="block w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
               >
                 Log out
               </button>

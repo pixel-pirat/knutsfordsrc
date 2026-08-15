@@ -17,6 +17,7 @@ export const permitStatusEnum = pgEnum("permit_status", [
   "revoked",
   "expired",
 ]);
+export const cardStatusEnum = pgEnum("card_status", ["pending", "active"]);
 
 export const adminUsers = pgTable("admin_users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -26,6 +27,7 @@ export const adminUsers = pgTable("admin_users", {
   role: adminRoleEnum("role").notNull().default("admin"),
   permissions: text("permissions").array().notNull().default([]),
   active: boolean("active").notNull().default(true),
+  avatarUrl: text("avatar_url"),
   createdBy: uuid("created_by"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
@@ -47,6 +49,7 @@ export const students = pgTable("students", {
   level: text("level"),
   studyMode: studyModeEnum("study_mode"),
   profileCompleted: boolean("profile_completed").notNull().default(false),
+  avatarUrl: text("avatar_url"),
   createdByAdminId: uuid("created_by_admin_id").references(
     () => adminUsers.id
   ),
@@ -66,6 +69,7 @@ export const permits = pgTable("permits", {
   permitType: text("permit_type").notNull().default("Permit"),
   referenceNumber: text("reference_number").notNull().unique(),
   status: permitStatusEnum("status").notNull().default("active"),
+  cardStatus: cardStatusEnum("card_status").notNull().default("pending"),
   amount: numeric("amount", { precision: 10, scale: 2 }),
   notes: text("notes"),
   issuedBy: uuid("issued_by")
@@ -75,6 +79,7 @@ export const permits = pgTable("permits", {
     .notNull()
     .defaultNow(),
   expiresAt: timestamp("expires_at", { withTimezone: true }),
+  emailSentAt: timestamp("email_sent_at", { withTimezone: true }),
 });
 
 export const auditLogs = pgTable("audit_logs", {

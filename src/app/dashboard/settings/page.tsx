@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentStudent } from "@/db/queries";
 import { SettingsForm } from "./SettingsForm";
+import { StudentAvatarSection } from "./StudentAvatarSection";
 
 export default async function SettingsPage() {
   const student = await getCurrentStudent();
@@ -22,7 +23,13 @@ export default async function SettingsPage() {
           <h2 className="text-sm font-bold tracking-wide text-neutral-400">
             ACCOUNT
           </h2>
-          <dl className="mt-4 space-y-4 text-sm">
+          <div className="mt-4">
+            <StudentAvatarSection
+              name={`${student.firstName} ${student.lastName}`}
+              avatarUrl={student.avatarUrl}
+            />
+          </div>
+          <dl className="mt-5 space-y-4 text-sm">
             <div>
               <dt className="text-neutral-400">Index Number</dt>
               <dd className="mt-0.5 font-semibold text-ink">

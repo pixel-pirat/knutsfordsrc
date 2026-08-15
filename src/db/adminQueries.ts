@@ -39,7 +39,9 @@ export function listAdmins() {
 
 export function updateAdmin(
   id: string,
-  values: Partial<Pick<NewAdminUser, "permissions" | "active" | "name">>
+  values: Partial<
+    Pick<NewAdminUser, "permissions" | "active" | "name" | "avatarUrl">
+  >
 ) {
   return db
     .update(adminUsers)
@@ -167,13 +169,16 @@ export async function totalRevenue() {
 }
 
 export async function getPermitStatusBreakdown() {
+  const notExpired = sql`(${permits.expiresAt} IS NULL OR ${permits.expiresAt} > now())`;
+  const expired = sql`(${permits.expiresAt} IS NOT NULL AND ${permits.expiresAt} <= now())`;
   const [row] = await db
     .select({
-      active: sql<number>`count(*) FILTER (WHERE ${permits.expiresAt} IS NULL OR ${permits.expiresAt} > now())::int`,
-      expired: sql<number>`count(*) FILTER (WHERE ${permits.expiresAt} IS NOT NULL AND ${permits.expiresAt} <= now())::int`,
+      active: sql<number>`count(*) FILTER (WHERE ${notExpired} AND ${permits.cardStatus} = 'active')::int`,
+      pending: sql<number>`count(*) FILTER (WHERE ${notExpired} AND ${permits.cardStatus} = 'pending')::int`,
+      expired: sql<number>`count(*) FILTER (WHERE ${expired})::int`,
     })
     .from(permits);
-  return row ?? { active: 0, expired: 0 };
+  return row ?? { active: 0, pending: 0, expired: 0 };
 }
 
 export function listStudents({ limit = 50, offset = 0 } = {}) {
@@ -182,4 +187,30 @@ export function listStudents({ limit = 50, offset = 0 } = {}) {
     limit,
     offset,
   });
+}
+
+export function getPermitById(id: string) {
+  return db.query.permits.findFirst({
+    where: eq(permits.id, id),
+    with: {
+      student: true,
+      issuer: { columns: { id: true, name: true } },
+    },
+  });
+}
+
+export function updatePermitCardStatus(id: string, cardStatus: "pending" | "active") {
+  return db
+    .update(permits)
+    .set({ cardStatus })
+    .where(eq(permits.id, id))
+    .returning();
+}
+
+export function markPermitEmailSent(id: string) {
+  return db
+    .update(permits)
+    .set({ emailSentAt: new Date() })
+    .where(eq(permits.id, id))
+    .returning();
 }

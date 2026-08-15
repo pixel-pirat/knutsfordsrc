@@ -66,6 +66,7 @@ export default async function AdminOverviewPage() {
           <div className="mt-5">
             <StatusBreakdownBar
               active={statusBreakdown.active}
+              pending={statusBreakdown.pending}
               expired={statusBreakdown.expired}
             />
           </div>

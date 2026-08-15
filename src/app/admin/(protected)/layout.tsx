@@ -20,6 +20,7 @@ export default async function AdminProtectedLayout({
     email: admin.email,
     role: admin.role,
     permissions: admin.permissions,
+    avatarUrl: admin.avatarUrl,
   };
 
   return <AdminShell admin={publicAdmin}>{children}</AdminShell>;

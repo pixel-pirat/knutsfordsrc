@@ -64,6 +64,24 @@ export const adminStudentCreateSchema = z.object({
   indexNumber: indexNumberSchema,
   firstName: z.string().trim().min(1, "First name is required"),
   lastName: z.string().trim().min(1, "Last name is required"),
+  email: z.email("Enter a valid email address").optional().or(z.literal("")),
+  phone: z.string().trim().max(20).optional().or(z.literal("")),
+  program: z.string().trim().max(120).optional().or(z.literal("")),
+  level: z.enum(["100", "200", "300", "400"]).optional().or(z.literal("")),
+  studyMode: studyModeSchema.optional().or(z.literal("")),
+  avatarUrl: z.url().optional().or(z.literal("")),
+});
+
+export const adminStudentUpdateSchema = z.object({
+  indexNumber: indexNumberSchema,
+  firstName: z.string().trim().min(1, "First name is required"),
+  lastName: z.string().trim().min(1, "Last name is required"),
+  email: z.email("Enter a valid email address").optional().or(z.literal("")),
+  phone: z.string().trim().max(20).optional().or(z.literal("")),
+  program: z.string().trim().max(120).optional().or(z.literal("")),
+  level: z.enum(["100", "200", "300", "400"]).optional().or(z.literal("")),
+  studyMode: studyModeSchema.optional().or(z.literal("")),
+  avatarUrl: z.url().optional().or(z.literal("")),
 });
 
 export const permitIssueSchema = z.object({
@@ -73,5 +91,12 @@ export const permitIssueSchema = z.object({
     .positive("Enter the amount paid")
     .max(1_000_000, "Enter a valid amount"),
   expiresAt: z.string().min(1, "Expiry date is required"),
-  notes: z.string().trim().max(500).optional().or(z.literal("")),
+});
+
+export const avatarUpdateSchema = z.object({
+  avatarUrl: z.url("Invalid image URL"),
+});
+
+export const adminProfileUpdateSchema = z.object({
+  name: z.string().trim().min(1, "Name is required"),
 });

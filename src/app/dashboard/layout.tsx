@@ -26,6 +26,7 @@ export default async function DashboardLayout({
     level: student.level,
     studyMode: student.studyMode,
     profileCompleted: student.profileCompleted,
+    avatarUrl: student.avatarUrl,
   };
 
   return (

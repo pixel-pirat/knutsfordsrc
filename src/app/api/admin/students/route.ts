@@ -18,7 +18,8 @@ export async function POST(request: Request) {
     );
   }
 
-  const { indexNumber, firstName, lastName } = parsed.data;
+  const { indexNumber, firstName, lastName, email, phone, program, level, studyMode, avatarUrl } =
+    parsed.data;
 
   const existing = await getStudentByIndexNumber(indexNumber);
   if (existing) {
@@ -30,12 +31,20 @@ export async function POST(request: Request) {
 
   const temporaryPassword = generateTempPassword();
   const passwordHash = await hashPassword(temporaryPassword);
+  const profileCompleted = Boolean(email && phone && program && level && studyMode);
 
   const [student] = await createStudent({
     indexNumber,
     firstName,
     lastName,
     passwordHash,
+    email: email || null,
+    phone: phone || null,
+    program: program || null,
+    level: level || null,
+    studyMode: studyMode || null,
+    avatarUrl: avatarUrl || null,
+    profileCompleted,
     createdByAdminId: admin.id,
   });
 

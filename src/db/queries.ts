@@ -32,6 +32,52 @@ export function updateStudentProfile(
     .returning();
 }
 
+export function updateStudentAvatar(id: string, avatarUrl: string) {
+  return db
+    .update(students)
+    .set({ avatarUrl, updatedAt: new Date() })
+    .where(eq(students.id, id))
+    .returning();
+}
+
+export function updateStudentByAdmin(
+  id: string,
+  values: Partial<
+    Pick<
+      NewStudent,
+      | "indexNumber"
+      | "firstName"
+      | "lastName"
+      | "email"
+      | "phone"
+      | "program"
+      | "level"
+      | "studyMode"
+      | "avatarUrl"
+    >
+  >
+) {
+  return db
+    .update(students)
+    .set({ ...values, updatedAt: new Date() })
+    .where(eq(students.id, id))
+    .returning();
+}
+
+export function getStudentWithPermits(id: string) {
+  return db.query.students.findFirst({
+    where: eq(students.id, id),
+    with: {
+      permits: {
+        orderBy: (permits, { desc }) => desc(permits.issuedAt),
+        with: {
+          issuer: { columns: { id: true, name: true } },
+        },
+      },
+    },
+  });
+}
+
 export async function getCurrentStudent() {
   const session = await getSession();
   if (!session) return null;

@@ -2,7 +2,13 @@ import { NextResponse } from "next/server";
 import { permitIssueSchema } from "@/lib/validation";
 import { requireAdmin } from "@/lib/adminGuard";
 import { getStudentById } from "@/db/queries";
-import { createPermit, generatePermitReference, logAudit } from "@/db/adminQueries";
+import {
+  createPermit,
+  generatePermitReference,
+  markPermitEmailSent,
+  logAudit,
+} from "@/db/adminQueries";
+import { sendPermitEmail, isEmailConfigured } from "@/lib/email";
 
 export async function POST(request: Request) {
   const { admin, error } = await requireAdmin("issue_permit");
@@ -17,7 +23,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { studentId, amount, expiresAt, notes } = parsed.data;
+  const { studentId, amount, expiresAt } = parsed.data;
 
   const student = await getStudentById(studentId);
   if (!student) {
@@ -35,7 +41,6 @@ export async function POST(request: Request) {
     permitType: "Permit",
     referenceNumber,
     amount: amount.toFixed(2),
-    notes: notes || null,
     issuedBy: admin.id,
     expiresAt: expiresAtDate,
   });
@@ -52,6 +57,22 @@ export async function POST(request: Request) {
     },
   });
 
+  let emailSent = false;
+  if (isEmailConfigured() && student.email) {
+    const result = await sendPermitEmail({
+      to: student.email,
+      studentName: `${student.firstName} ${student.lastName}`,
+      referenceNumber,
+      amount: permit.amount,
+      issuedAt: permit.issuedAt,
+      expiresAt: permit.expiresAt,
+    });
+    if (result.sent) {
+      await markPermitEmailSent(permit.id);
+      emailSent = true;
+    }
+  }
+
   return NextResponse.json({
     student: {
       id: student.id,
@@ -65,6 +86,8 @@ export async function POST(request: Request) {
       amount: permit.amount,
       expiresAt: permit.expiresAt,
       issuedAt: permit.issuedAt,
+      cardStatus: permit.cardStatus,
     },
+    emailSent,
   });
 }

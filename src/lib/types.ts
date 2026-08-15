@@ -9,6 +9,7 @@ export type PublicStudent = {
   level: string | null;
   studyMode: "regular" | "weekend" | null;
   profileCompleted: boolean;
+  avatarUrl: string | null;
 };
 
 export type PublicAdmin = {
@@ -17,4 +18,5 @@ export type PublicAdmin = {
   email: string;
   role: "super_admin" | "admin";
   permissions: string[];
+  avatarUrl: string | null;
 };
