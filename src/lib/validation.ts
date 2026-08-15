@@ -41,3 +41,33 @@ export const profileSchema = z.object({
 export type SignupInput = z.infer<typeof signupSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type ProfileInput = z.infer<typeof profileSchema>;
+
+export const adminLoginSchema = z.object({
+  email: z.email("Enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
+export const adminBootstrapSchema = z.object({
+  name: z.string().trim().min(1, "Name is required"),
+  email: z.email("Enter a valid email address"),
+  password: passwordSchema,
+});
+
+export const adminCreateSchema = z.object({
+  name: z.string().trim().min(1, "Name is required"),
+  email: z.email("Enter a valid email address"),
+  password: passwordSchema,
+  permissions: z.array(z.string()).default([]),
+});
+
+export const permitStudentSchema = z.object({
+  indexNumber: indexNumberSchema,
+  firstName: z.string().trim().min(1, "First name is required"),
+  lastName: z.string().trim().min(1, "Last name is required"),
+});
+
+export const permitIssueSchema = z.object({
+  student: permitStudentSchema,
+  permitType: z.string().trim().min(1, "Permit type is required"),
+  notes: z.string().trim().max(500).optional().or(z.literal("")),
+});

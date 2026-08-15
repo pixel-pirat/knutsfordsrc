@@ -1,25 +1,11 @@
-import bcrypt from "bcryptjs";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { getSecretKey, hashPassword, verifyPassword } from "./crypto";
 
 const SESSION_COOKIE = "kn_session";
 const SESSION_DURATION_SECONDS = 60 * 60 * 24 * 30; // 30 days
 
-function getSecretKey() {
-  const secret = process.env.AUTH_SECRET;
-  if (!secret) {
-    throw new Error("AUTH_SECRET environment variable is not set");
-  }
-  return new TextEncoder().encode(secret);
-}
-
-export function hashPassword(password: string) {
-  return bcrypt.hash(password, 10);
-}
-
-export function verifyPassword(password: string, hash: string) {
-  return bcrypt.compare(password, hash);
-}
+export { hashPassword, verifyPassword };
 
 export type SessionPayload = {
   studentId: string;

@@ -1,0 +1,164 @@
+import { desc, eq, ilike, or, sql } from "drizzle-orm";
+import { db } from "./index";
+import {
+  adminUsers,
+  students,
+  permits,
+  auditLogs,
+  type NewAdminUser,
+  type NewPermit,
+} from "./schema";
+import { getAdminSession } from "@/lib/adminAuth";
+
+export function getAdminByEmail(email: string) {
+  return db.query.adminUsers.findFirst({
+    where: eq(adminUsers.email, email),
+  });
+}
+
+export function getAdminById(id: string) {
+  return db.query.adminUsers.findFirst({
+    where: eq(adminUsers.id, id),
+  });
+}
+
+export async function countAdmins() {
+  const [row] = await db.select({ count: sql<number>`count(*)::int` }).from(adminUsers);
+  return row?.count ?? 0;
+}
+
+export function createAdmin(values: NewAdminUser) {
+  return db.insert(adminUsers).values(values).returning();
+}
+
+export function listAdmins() {
+  return db.query.adminUsers.findMany({
+    orderBy: desc(adminUsers.createdAt),
+  });
+}
+
+export function updateAdmin(
+  id: string,
+  values: Partial<Pick<NewAdminUser, "permissions" | "active" | "name">>
+) {
+  return db
+    .update(adminUsers)
+    .set({ ...values, updatedAt: new Date() })
+    .where(eq(adminUsers.id, id))
+    .returning();
+}
+
+export async function getCurrentAdmin() {
+  const session = await getAdminSession();
+  if (!session) return null;
+  const admin = await getAdminById(session.adminId);
+  if (!admin || !admin.active) return null;
+  return admin;
+}
+
+export function logAudit(entry: {
+  actorId: string;
+  action: string;
+  targetType: string;
+  targetId?: string | null;
+  metadata?: Record<string, unknown>;
+}) {
+  return db.insert(auditLogs).values({
+    actorId: entry.actorId,
+    action: entry.action,
+    targetType: entry.targetType,
+    targetId: entry.targetId ?? null,
+    metadata: entry.metadata ?? null,
+  });
+}
+
+export function listAuditLogs({ limit = 50, offset = 0 } = {}) {
+  return db.query.auditLogs.findMany({
+    orderBy: desc(auditLogs.createdAt),
+    limit,
+    offset,
+    with: {
+      actor: { columns: { id: true, name: true, email: true } },
+    },
+  });
+}
+
+export async function countAuditLogs() {
+  const [row] = await db.select({ count: sql<number>`count(*)::int` }).from(auditLogs);
+  return row?.count ?? 0;
+}
+
+export function generatePermitReference() {
+  const year = new Date().getFullYear();
+  const suffix = Date.now().toString(36).toUpperCase();
+  return `PMT-${year}-${suffix}`;
+}
+
+export function createPermit(values: NewPermit) {
+  return db.insert(permits).values(values).returning();
+}
+
+export function listPermits({ limit = 50, offset = 0 } = {}) {
+  return db.query.permits.findMany({
+    orderBy: desc(permits.issuedAt),
+    limit,
+    offset,
+    with: {
+      student: {
+        columns: { id: true, indexNumber: true, firstName: true, lastName: true },
+      },
+      issuer: { columns: { id: true, name: true } },
+    },
+  });
+}
+
+export async function countPermits() {
+  const [row] = await db.select({ count: sql<number>`count(*)::int` }).from(permits);
+  return row?.count ?? 0;
+}
+
+export async function countStudents() {
+  const [row] = await db.select({ count: sql<number>`count(*)::int` }).from(students);
+  return row?.count ?? 0;
+}
+
+export function searchStudents(query: string, { limit = 50 } = {}) {
+  const like = `%${query}%`;
+  return db.query.students.findMany({
+    where: or(
+      ilike(students.indexNumber, like),
+      ilike(students.firstName, like),
+      ilike(students.lastName, like),
+      ilike(students.email, like)
+    ),
+    orderBy: desc(students.createdAt),
+    limit,
+  });
+}
+
+export async function permitsIssuedLast7Days() {
+  const rows = await db.execute<{ day: string; count: number }>(sql`
+    SELECT to_char(d.day, 'Dy') AS day, COUNT(p.id)::int AS count
+    FROM generate_series(current_date - interval '6 days', current_date, interval '1 day') AS d(day)
+    LEFT JOIN ${permits} p ON date_trunc('day', p.issued_at) = d.day
+    GROUP BY d.day
+    ORDER BY d.day
+  `);
+  return rows.rows as { day: string; count: number }[];
+}
+
+export async function countPermitsThisMonth() {
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(permits)
+    .where(sql`date_trunc('month', ${permits.issuedAt}) = date_trunc('month', now())`);
+  return row?.count ?? 0;
+}
+
+export function listStudents({ limit = 50, offset = 0 } = {}) {
+  return db.query.students.findMany({
+    orderBy: desc(students.createdAt),
+    limit,
+    offset,
+  });
+}

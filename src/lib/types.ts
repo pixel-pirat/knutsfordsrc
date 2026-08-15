@@ -10,3 +10,11 @@ export type PublicStudent = {
   studyMode: "regular" | "weekend" | null;
   profileCompleted: boolean;
 };
+
+export type PublicAdmin = {
+  id: string;
+  name: string;
+  email: string;
+  role: "super_admin" | "admin";
+  permissions: string[];
+};
