@@ -37,7 +37,7 @@ export function AdminSidebar({
             Knutsford SRC
           </p>
           <p className="text-xs leading-tight text-neutral-500">
-            Staff Portal
+            Executive Portal
           </p>
         </div>
       </div>

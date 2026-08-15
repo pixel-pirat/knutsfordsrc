@@ -25,9 +25,9 @@ export function describeAuditEntry(entry: AuditEntry): string {
         m.indexNumber ?? ""
       })${m.viaPermitIssuance ? " while issuing a permit" : ""}`;
     case "permit.issue":
-      return `Issued a ${m.permitType ?? "permit"} (${m.referenceNumber ?? ""}) to ${
-        m.studentIndexNumber ?? "a student"
-      }`;
+      return `Issued permit ${m.referenceNumber ?? ""}${
+        m.amount ? ` for GHS ${m.amount}` : ""
+      } to ${m.studentIndexNumber ?? "a student"}`;
     default:
       return `${entry.action} — ${entry.targetType}`;
   }

@@ -1,6 +1,7 @@
 import { getCurrentAdmin, listStudents, searchStudents } from "@/db/adminQueries";
 import { hasPermission } from "@/lib/permissions";
 import { AccessRestricted } from "@/components/admin/AccessRestricted";
+import { CreateStudentPanel } from "./CreateStudentPanel";
 
 export default async function StudentsPage({
   searchParams,
@@ -23,6 +24,8 @@ export default async function StudentsPage({
           Search the student directory by index number, name or email
         </p>
       </div>
+
+      {hasPermission(admin, "create_student") && <CreateStudentPanel />}
 
       <form method="GET" className="mb-5">
         <input

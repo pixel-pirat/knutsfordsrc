@@ -2,10 +2,10 @@ import Link from "next/link";
 import { getCurrentAdmin, listPermits } from "@/db/adminQueries";
 import { hasPermission } from "@/lib/permissions";
 import { AccessRestricted } from "@/components/admin/AccessRestricted";
+import { getPermitStatus, formatCurrency } from "@/lib/permits";
 
 const statusStyles: Record<string, string> = {
   active: "bg-green-50 text-green-700",
-  revoked: "bg-red-50 text-red-600",
   expired: "bg-neutral-100 text-neutral-500",
 };
 
@@ -43,9 +43,9 @@ export default async function PermitsPage() {
               <tr className="border-b border-black/10 bg-neutral-50 text-xs font-semibold uppercase tracking-wide text-neutral-500">
                 <th className="px-5 py-3">Reference</th>
                 <th className="px-5 py-3">Student</th>
-                <th className="px-5 py-3">Type</th>
+                <th className="px-5 py-3">Amount</th>
                 <th className="px-5 py-3">Issued By</th>
-                <th className="px-5 py-3">Date</th>
+                <th className="px-5 py-3">Expires</th>
                 <th className="px-5 py-3">Status</th>
               </tr>
             </thead>
@@ -57,35 +57,40 @@ export default async function PermitsPage() {
                   </td>
                 </tr>
               )}
-              {permits.map((p) => (
-                <tr key={p.id} className="border-b border-black/5 last:border-0">
-                  <td className="px-5 py-3.5 font-medium text-ink">{p.referenceNumber}</td>
-                  <td className="px-5 py-3.5 text-neutral-700">
-                    {p.student?.firstName} {p.student?.lastName}
-                    <span className="ml-1.5 text-xs text-neutral-400">
-                      {p.student?.indexNumber}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3.5 text-neutral-700">{p.permitType}</td>
-                  <td className="px-5 py-3.5 text-neutral-700">{p.issuer?.name}</td>
-                  <td className="px-5 py-3.5 text-neutral-500">
-                    {new Date(p.issuedAt).toLocaleDateString("en-GB", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <span
-                      className={`rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${
-                        statusStyles[p.status] ?? "bg-neutral-100 text-neutral-500"
-                      }`}
-                    >
-                      {p.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+              {permits.map((p) => {
+                const status = getPermitStatus(p.expiresAt);
+                return (
+                  <tr key={p.id} className="border-b border-black/5 last:border-0">
+                    <td className="px-5 py-3.5 font-medium text-ink">{p.referenceNumber}</td>
+                    <td className="px-5 py-3.5 text-neutral-700">
+                      {p.student?.firstName} {p.student?.lastName}
+                      <span className="ml-1.5 text-xs text-neutral-400">
+                        {p.student?.indexNumber}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5 text-neutral-700">
+                      {formatCurrency(p.amount)}
+                    </td>
+                    <td className="px-5 py-3.5 text-neutral-700">{p.issuer?.name}</td>
+                    <td className="px-5 py-3.5 text-neutral-500">
+                      {p.expiresAt
+                        ? new Date(p.expiresAt).toLocaleDateString("en-GB", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })
+                        : "—"}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${statusStyles[status]}`}
+                      >
+                        {status}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

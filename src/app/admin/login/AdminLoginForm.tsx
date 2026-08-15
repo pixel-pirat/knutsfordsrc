@@ -110,7 +110,7 @@ export function AdminLoginForm() {
 
   if (checking) {
     return (
-      <AuthCard eyebrow="SRC STAFF PORTAL" title="Loading…" subtitle="" footer={null}>
+      <AuthCard eyebrow="SRC EXECUTIVE PORTAL" title="Loading…" subtitle="" footer={null}>
         <div />
       </AuthCard>
     );
@@ -119,7 +119,7 @@ export function AdminLoginForm() {
   if (needsBootstrap) {
     return (
       <AuthCard
-        eyebrow="SRC STAFF PORTAL · FIRST-TIME SETUP"
+        eyebrow="SRC EXECUTIVE PORTAL · FIRST-TIME SETUP"
         title="Create the Super Admin Account"
         subtitle="No admin account exists yet. Set one up now — it will have full control of the system."
         footer={null}
@@ -192,9 +192,9 @@ export function AdminLoginForm() {
 
   return (
     <AuthCard
-      eyebrow="SRC STAFF PORTAL"
+      eyebrow="SRC EXECUTIVE PORTAL"
       title="Admin Sign In"
-      subtitle="Sign in with your staff email and password."
+      subtitle="Sign in with your executive email and password."
       footer={null}
     >
       <form onSubmit={handleLogin} noValidate className="space-y-5">

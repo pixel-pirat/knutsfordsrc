@@ -16,12 +16,3 @@ export const adminNav: AdminNavItem[] = [
   { label: "Audit Trail", href: "/admin/audit", icon: "flag", permission: "view_audit_log" },
   { label: "Admins", href: "/admin/admins", icon: "gear", superAdminOnly: true },
 ];
-
-export const PERMIT_TYPES = [
-  "Hostel Permit",
-  "Exeat Permit",
-  "Campus Access Permit",
-  "Library Access Permit",
-  "Event Permit",
-  "Other",
-];

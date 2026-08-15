@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import { permitIssueSchema } from "@/lib/validation";
 import { requireAdmin } from "@/lib/adminGuard";
-import { hasPermission } from "@/lib/permissions";
-import { hashPassword, generateTempPassword } from "@/lib/crypto";
-import { getStudentByIndexNumber, createStudent } from "@/db/queries";
+import { getStudentById } from "@/db/queries";
 import { createPermit, generatePermitReference, logAudit } from "@/db/adminQueries";
 
 export async function POST(request: Request) {
@@ -19,55 +17,27 @@ export async function POST(request: Request) {
     );
   }
 
-  const { student: studentInput, permitType, notes } = parsed.data;
+  const { studentId, amount, expiresAt, notes } = parsed.data;
 
-  let student = await getStudentByIndexNumber(studentInput.indexNumber);
-  let temporaryPassword: string | null = null;
-
+  const student = await getStudentById(studentId);
   if (!student) {
-    if (!hasPermission(admin, "create_student")) {
-      return NextResponse.json(
-        {
-          error:
-            "This student isn't registered yet, and you don't have permission to create student records.",
-        },
-        { status: 403 }
-      );
-    }
+    return NextResponse.json({ error: "Student not found" }, { status: 404 });
+  }
 
-    temporaryPassword = generateTempPassword();
-    const passwordHash = await hashPassword(temporaryPassword);
-
-    const [created] = await createStudent({
-      indexNumber: studentInput.indexNumber,
-      firstName: studentInput.firstName,
-      lastName: studentInput.lastName,
-      passwordHash,
-      createdByAdminId: admin.id,
-    });
-    student = created;
-
-    await logAudit({
-      actorId: admin.id,
-      action: "student.create",
-      targetType: "student",
-      targetId: student.id,
-      metadata: {
-        indexNumber: student.indexNumber,
-        firstName: student.firstName,
-        lastName: student.lastName,
-        viaPermitIssuance: true,
-      },
-    });
+  const expiresAtDate = new Date(expiresAt);
+  if (Number.isNaN(expiresAtDate.getTime())) {
+    return NextResponse.json({ error: "Invalid expiry date" }, { status: 400 });
   }
 
   const referenceNumber = generatePermitReference();
   const [permit] = await createPermit({
     studentId: student.id,
-    permitType,
+    permitType: "Permit",
     referenceNumber,
+    amount: amount.toFixed(2),
     notes: notes || null,
     issuedBy: admin.id,
+    expiresAt: expiresAtDate,
   });
 
   await logAudit({
@@ -77,7 +47,7 @@ export async function POST(request: Request) {
     targetId: permit.id,
     metadata: {
       referenceNumber,
-      permitType,
+      amount: amount.toFixed(2),
       studentIndexNumber: student.indexNumber,
     },
   });
@@ -92,10 +62,9 @@ export async function POST(request: Request) {
     permit: {
       id: permit.id,
       referenceNumber: permit.referenceNumber,
-      permitType: permit.permitType,
-      status: permit.status,
+      amount: permit.amount,
+      expiresAt: permit.expiresAt,
       issuedAt: permit.issuedAt,
     },
-    temporaryPassword,
   });
 }

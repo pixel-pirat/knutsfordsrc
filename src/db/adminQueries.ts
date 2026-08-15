@@ -129,22 +129,26 @@ export function searchStudents(query: string, { limit = 50 } = {}) {
       ilike(students.indexNumber, like),
       ilike(students.firstName, like),
       ilike(students.lastName, like),
-      ilike(students.email, like)
+      ilike(students.email, like),
+      ilike(sql`${students.firstName} || ' ' || ${students.lastName}`, like)
     ),
     orderBy: desc(students.createdAt),
     limit,
   });
 }
 
-export async function permitsIssuedLast7Days() {
-  const rows = await db.execute<{ day: string; count: number }>(sql`
-    SELECT to_char(d.day, 'Dy') AS day, COUNT(p.id)::int AS count
-    FROM generate_series(current_date - interval '6 days', current_date, interval '1 day') AS d(day)
+export async function permitsIssuedLast14Days() {
+  const rows = await db.execute<{ day: string; count: number; revenue: string }>(sql`
+    SELECT
+      to_char(d.day, 'DD Mon') AS day,
+      COUNT(p.id)::int AS count,
+      COALESCE(SUM(p.amount), 0)::text AS revenue
+    FROM generate_series(current_date - interval '13 days', current_date, interval '1 day') AS d(day)
     LEFT JOIN ${permits} p ON date_trunc('day', p.issued_at) = d.day
     GROUP BY d.day
     ORDER BY d.day
   `);
-  return rows.rows as { day: string; count: number }[];
+  return rows.rows as { day: string; count: number; revenue: string }[];
 }
 
 export async function countPermitsThisMonth() {
@@ -153,6 +157,23 @@ export async function countPermitsThisMonth() {
     .from(permits)
     .where(sql`date_trunc('month', ${permits.issuedAt}) = date_trunc('month', now())`);
   return row?.count ?? 0;
+}
+
+export async function totalRevenue() {
+  const [row] = await db
+    .select({ total: sql<string>`COALESCE(SUM(${permits.amount}), 0)::text` })
+    .from(permits);
+  return row?.total ?? "0";
+}
+
+export async function getPermitStatusBreakdown() {
+  const [row] = await db
+    .select({
+      active: sql<number>`count(*) FILTER (WHERE ${permits.expiresAt} IS NULL OR ${permits.expiresAt} > now())::int`,
+      expired: sql<number>`count(*) FILTER (WHERE ${permits.expiresAt} IS NOT NULL AND ${permits.expiresAt} <= now())::int`,
+    })
+    .from(permits);
+  return row ?? { active: 0, expired: 0 };
 }
 
 export function listStudents({ limit = 50, offset = 0 } = {}) {

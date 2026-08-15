@@ -21,7 +21,7 @@ export default async function AuditPage() {
           Audit Trail
         </h1>
         <p className="mt-1 text-sm text-neutral-500">
-          Every record-affecting action taken by admin staff ({total} total)
+          Every record-affecting action taken by SRC executives ({total} total)
         </p>
       </div>
 

@@ -60,14 +60,18 @@ export const adminCreateSchema = z.object({
   permissions: z.array(z.string()).default([]),
 });
 
-export const permitStudentSchema = z.object({
+export const adminStudentCreateSchema = z.object({
   indexNumber: indexNumberSchema,
   firstName: z.string().trim().min(1, "First name is required"),
   lastName: z.string().trim().min(1, "Last name is required"),
 });
 
 export const permitIssueSchema = z.object({
-  student: permitStudentSchema,
-  permitType: z.string().trim().min(1, "Permit type is required"),
+  studentId: z.uuid("Select a student first"),
+  amount: z.coerce
+    .number()
+    .positive("Enter the amount paid")
+    .max(1_000_000, "Enter a valid amount"),
+  expiresAt: z.string().min(1, "Expiry date is required"),
   notes: z.string().trim().max(500).optional().or(z.literal("")),
 });

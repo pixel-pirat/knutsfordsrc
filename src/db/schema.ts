@@ -6,6 +6,7 @@ import {
   timestamp,
   pgEnum,
   jsonb,
+  numeric,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -62,9 +63,10 @@ export const permits = pgTable("permits", {
   studentId: uuid("student_id")
     .notNull()
     .references(() => students.id),
-  permitType: text("permit_type").notNull(),
+  permitType: text("permit_type").notNull().default("Permit"),
   referenceNumber: text("reference_number").notNull().unique(),
   status: permitStatusEnum("status").notNull().default("active"),
+  amount: numeric("amount", { precision: 10, scale: 2 }),
   notes: text("notes"),
   issuedBy: uuid("issued_by")
     .notNull()
