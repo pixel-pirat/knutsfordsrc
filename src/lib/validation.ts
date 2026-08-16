@@ -100,3 +100,7 @@ export const avatarUpdateSchema = z.object({
 export const adminProfileUpdateSchema = z.object({
   name: z.string().trim().min(1, "Name is required"),
 });
+
+export const programCreateSchema = z.object({
+  name: z.string().trim().min(1, "Programme name is required").max(120),
+});

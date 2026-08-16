@@ -37,12 +37,6 @@ export function StudentsTable({
   const router = useRouter();
   const [query, setQuery] = useState(initialQuery);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-
-  function openStudent(id: string | null) {
-    setSelectedId(id);
-    setDialogOpen(true);
-  }
 
   function handleSuccess() {
     router.refresh();
@@ -65,9 +59,7 @@ export function StudentsTable({
             placeholder="Search by index number, name or email…"
           />
         </form>
-        {canCreate && (
-          <Button onClick={() => openStudent(null)}>Create Student</Button>
-        )}
+        {canCreate && <Button onClick={() => setDialogOpen(true)}>Create Student</Button>}
       </div>
 
       <div className="rounded-2xl bg-white ring-1 ring-black/5">
@@ -94,7 +86,7 @@ export function StudentsTable({
               <TableRow
                 key={s.id}
                 className="cursor-pointer"
-                onClick={() => openStudent(s.id)}
+                onClick={() => router.push(`/admin/students/${s.id}`)}
               >
                 <TableCell className="font-medium text-ink">{s.indexNumber}</TableCell>
                 <TableCell className="text-neutral-700">
@@ -111,7 +103,7 @@ export function StudentsTable({
       </div>
 
       <StudentDialog
-        studentId={selectedId}
+        studentId={null}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         onSuccess={handleSuccess}

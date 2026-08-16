@@ -5,6 +5,7 @@ import {
   students,
   permits,
   auditLogs,
+  programs,
   type NewAdminUser,
   type NewPermit,
 } from "./schema";
@@ -213,4 +214,25 @@ export function markPermitEmailSent(id: string) {
     .set({ emailSentAt: new Date() })
     .where(eq(permits.id, id))
     .returning();
+}
+
+export function listPrograms() {
+  return db.query.programs.findMany({
+    orderBy: (programs, { asc }) => asc(programs.name),
+  });
+}
+
+export function listActivePrograms() {
+  return db.query.programs.findMany({
+    where: eq(programs.active, true),
+    orderBy: (programs, { asc }) => asc(programs.name),
+  });
+}
+
+export function createProgram(name: string) {
+  return db.insert(programs).values({ name }).returning();
+}
+
+export function deleteProgram(id: string) {
+  return db.delete(programs).where(eq(programs.id, id)).returning();
 }

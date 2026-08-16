@@ -84,3 +84,25 @@ export async function getCurrentStudent() {
   const student = await getStudentById(session.studentId);
   return student ?? null;
 }
+
+export function getStudentPublicSnapshot(id: string) {
+  return db.query.students.findFirst({
+    where: eq(students.id, id),
+    columns: {
+      id: true,
+      indexNumber: true,
+      firstName: true,
+      lastName: true,
+      program: true,
+      level: true,
+      avatarUrl: true,
+    },
+    with: {
+      permits: {
+        orderBy: (permits, { desc }) => desc(permits.issuedAt),
+        limit: 1,
+        columns: { cardStatus: true, expiresAt: true },
+      },
+    },
+  });
+}

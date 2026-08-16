@@ -19,36 +19,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { AvatarUpload } from "@/components/AvatarUpload";
-import { UserAvatar } from "@/components/UserAvatar";
 import { adminStudentCreateSchema, adminStudentUpdateSchema } from "@/lib/validation";
-import { formatCurrency, getPermitStatus, permitStatusBadge } from "@/lib/permits";
 
-type Mode = "create" | "view" | "edit";
-
-type StudentDetail = {
-  id: string;
-  indexNumber: string;
-  firstName: string;
-  lastName: string;
-  email: string | null;
-  phone: string | null;
-  program: string | null;
-  level: string | null;
-  studyMode: string | null;
-  profileCompleted: boolean;
-  avatarUrl: string | null;
-  permits: {
-    id: string;
-    referenceNumber: string;
-    amount: string | null;
-    cardStatus: string;
-    issuedAt: string;
-    expiresAt: string | null;
-    issuer: { id: string; name: string } | null;
-  }[];
-};
+type Mode = "create" | "edit";
 
 type FormState = {
   indexNumber: string;
@@ -85,14 +59,14 @@ export function StudentDialog({
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
 }) {
-  const [mode, setMode] = useState<Mode>(studentId ? "view" : "create");
+  const mode: Mode = studentId ? "edit" : "create";
   const [loading, setLoading] = useState(false);
-  const [detail, setDetail] = useState<StudentDetail | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [tempPassword, setTempPassword] = useState<string | null>(null);
+  const [programs, setPrograms] = useState<{ id: string; name: string }[]>([]);
 
   // Reset transient UI state when the dialog opens for a (possibly new) student,
   // following React's "adjust state during render" pattern rather than an effect.
@@ -105,22 +79,26 @@ export function StudentDialog({
       setFieldErrors({});
       setTempPassword(null);
       if (studentId) {
-        setMode("view");
         setLoading(true);
       } else {
-        setMode("create");
-        setDetail(null);
         setForm(emptyForm);
       }
     }
   }
 
   useEffect(() => {
+    if (!open) return;
+    fetch("/api/programs")
+      .then((res) => res.json())
+      .then((data) => setPrograms(data.programs ?? []))
+      .catch(() => {});
+  }, [open]);
+
+  useEffect(() => {
     if (!open || !studentId) return;
     fetch(`/api/admin/students/${studentId}`)
       .then((res) => res.json())
       .then((data) => {
-        setDetail(data.student);
         setForm({
           indexNumber: data.student.indexNumber,
           firstName: data.student.firstName,
@@ -207,9 +185,8 @@ export function StudentDialog({
         setFormError(data.error ?? "Something went wrong. Please try again.");
         return;
       }
-      setDetail((d) => (d ? { ...d, ...data.student } : d));
-      setMode("view");
       onSuccess?.();
+      onOpenChange(false);
     } catch {
       setFormError("Something went wrong. Please try again.");
     } finally {
@@ -237,6 +214,7 @@ export function StudentDialog({
                 form={form}
                 setField={setField}
                 fieldErrors={fieldErrors}
+                programs={programs}
                 showAvatar
               />
               {formError && (
@@ -278,135 +256,37 @@ export function StudentDialog({
           </>
         )}
 
-        {mode === "view" && (
-          <>
-            <DialogHeader>
-              <DialogTitle>Student Details</DialogTitle>
-            </DialogHeader>
-            {loading || !detail ? (
-              <p className="py-8 text-center text-sm text-neutral-400">Loading…</p>
-            ) : (
-              <div className="space-y-5">
-                <div className="flex items-center gap-4">
-                  <UserAvatar
-                    name={`${detail.firstName} ${detail.lastName}`}
-                    avatarUrl={detail.avatarUrl}
-                    className="h-16 w-16"
-                  />
-                  <div>
-                    <p className="text-base font-semibold text-ink">
-                      {detail.firstName} {detail.lastName}
-                    </p>
-                    <p className="text-sm text-neutral-500">{detail.indexNumber}</p>
-                    <Badge
-                      variant="outline"
-                      className={
-                        detail.profileCompleted
-                          ? "mt-1 border-green-200 bg-green-50 text-green-700"
-                          : "mt-1 border-gold/30 bg-gold/15 text-gold-dark"
-                      }
-                    >
-                      {detail.profileCompleted ? "Profile Complete" : "Profile Incomplete"}
-                    </Badge>
-                  </div>
-                </div>
-
-                <dl className="grid grid-cols-2 gap-4 rounded-xl bg-neutral-50 p-4 text-sm">
-                  <div>
-                    <dt className="text-xs text-neutral-400">Email</dt>
-                    <dd className="text-neutral-700">{detail.email ?? "—"}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-neutral-400">Phone</dt>
-                    <dd className="text-neutral-700">{detail.phone ?? "—"}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-neutral-400">Programme</dt>
-                    <dd className="text-neutral-700">{detail.program ?? "—"}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-neutral-400">Level</dt>
-                    <dd className="text-neutral-700">
-                      {detail.level ? `Level ${detail.level}` : "—"}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs text-neutral-400">Study Mode</dt>
-                    <dd className="capitalize text-neutral-700">
-                      {detail.studyMode ?? "—"}
-                    </dd>
-                  </div>
-                </dl>
-
-                <div>
-                  <h3 className="mb-2 text-sm font-semibold text-ink">
-                    Permits ({detail.permits.length})
-                  </h3>
-                  {detail.permits.length === 0 ? (
-                    <p className="text-sm text-neutral-400">No permits issued yet.</p>
-                  ) : (
-                    <ul className="divide-y divide-black/5 rounded-xl ring-1 ring-black/5">
-                      {detail.permits.map((p) => {
-                        const status = getPermitStatus(p);
-                        return (
-                          <li key={p.id} className="flex items-center justify-between gap-3 px-4 py-3">
-                            <div className="min-w-0">
-                              <p className="truncate text-sm font-medium text-ink">
-                                {p.referenceNumber}
-                              </p>
-                              <p className="text-xs text-neutral-400">
-                                {formatCurrency(p.amount)} &middot;{" "}
-                                {p.issuer ? p.issuer.name : "Self"}
-                              </p>
-                            </div>
-                            <Badge variant="outline" className={`shrink-0 capitalize ${permitStatusBadge[status]}`}>
-                              {status}
-                            </Badge>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-                </div>
-              </div>
-            )}
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={close}>
-                Close
-              </Button>
-              <Button type="button" onClick={() => setMode("edit")} disabled={loading}>
-                Edit Details
-              </Button>
-            </DialogFooter>
-          </>
-        )}
-
         {mode === "edit" && (
           <>
             <DialogHeader>
               <DialogTitle>Edit Student</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleEdit} className="space-y-4">
-              <StudentFormFields
-                form={form}
-                setField={setField}
-                fieldErrors={fieldErrors}
-                showAvatar
-              />
-              {formError && (
-                <p className="rounded-md bg-red-50 px-3.5 py-2.5 text-sm text-red-600">
-                  {formError}
-                </p>
-              )}
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setMode("view")}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={submitting}>
-                  {submitting ? "Saving…" : "Save Changes"}
-                </Button>
-              </DialogFooter>
-            </form>
+            {loading ? (
+              <p className="py-8 text-center text-sm text-neutral-400">Loading…</p>
+            ) : (
+              <form onSubmit={handleEdit} className="space-y-4">
+                <StudentFormFields
+                  form={form}
+                  setField={setField}
+                  fieldErrors={fieldErrors}
+                  programs={programs}
+                  showAvatar
+                />
+                {formError && (
+                  <p className="rounded-md bg-red-50 px-3.5 py-2.5 text-sm text-red-600">
+                    {formError}
+                  </p>
+                )}
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={close}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={submitting}>
+                    {submitting ? "Saving…" : "Save Changes"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            )}
           </>
         )}
       </DialogContent>
@@ -418,11 +298,13 @@ function StudentFormFields({
   form,
   setField,
   fieldErrors,
+  programs,
   showAvatar,
 }: {
   form: FormState;
   setField: <K extends keyof FormState>(key: K, value: FormState[K]) => void;
   fieldErrors: Record<string, string>;
+  programs: { id: string; name: string }[];
   showAvatar?: boolean;
 }) {
   return (
@@ -502,14 +384,24 @@ function StudentFormFields({
       </div>
 
       <div>
-        <Label htmlFor="sf-program">Programme</Label>
-        <Input
-          id="sf-program"
-          className="mt-1.5"
-          placeholder="e.g. BSc Computer Science"
-          value={form.program}
-          onChange={(e) => setField("program", e.target.value)}
-        />
+        <Label>Programme</Label>
+        <Select value={form.program} onValueChange={(v) => setField("program", v ?? "")}>
+          <SelectTrigger className="mt-1.5 w-full">
+            <SelectValue placeholder="Select programme" />
+          </SelectTrigger>
+          <SelectContent>
+            {programs.length === 0 && (
+              <p className="px-3 py-2 text-xs text-neutral-400">
+                No programmes configured yet
+              </p>
+            )}
+            {programs.map((p) => (
+              <SelectItem key={p.id} value={p.name}>
+                {p.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="grid grid-cols-2 gap-3">

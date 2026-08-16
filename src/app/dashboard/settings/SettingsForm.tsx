@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { FormField, inputClass } from "@/components/FormField";
 import { profileSchema } from "@/lib/validation";
@@ -24,6 +24,14 @@ export function SettingsForm({ initial }: { initial: InitialValues }) {
   const [formError, setFormError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [programs, setPrograms] = useState<{ id: string; name: string }[]>([]);
+
+  useEffect(() => {
+    fetch("/api/programs")
+      .then((res) => res.json())
+      .then((data) => setPrograms(data.programs ?? []))
+      .catch(() => {});
+  }, []);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -105,14 +113,22 @@ export function SettingsForm({ initial }: { initial: InitialValues }) {
       </div>
 
       <FormField label="Programme" htmlFor="program" error={fieldErrors.program}>
-        <input
+        <select
           id="program"
           name="program"
-          placeholder="e.g. BSc Computer Science"
           value={program}
           onChange={(e) => setProgram(e.target.value)}
           className={inputClass}
-        />
+        >
+          <option value="" disabled>
+            Select programme
+          </option>
+          {programs.map((p) => (
+            <option key={p.id} value={p.name}>
+              {p.name}
+            </option>
+          ))}
+        </select>
       </FormField>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">

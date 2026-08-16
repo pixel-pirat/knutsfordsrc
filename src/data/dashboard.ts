@@ -6,6 +6,7 @@ export type DashboardNavItem = {
 
 export const dashboardNav: DashboardNavItem[] = [
   { label: "Overview", href: "/dashboard", icon: "dashboard" },
+  { label: "Digital ID", href: "/dashboard/id", icon: "id" },
   { label: "Dues", href: "/dashboard/dues", icon: "wallet" },
   { label: "Resources", href: "/dashboard/resources", icon: "book" },
   { label: "Games", href: "/dashboard/games", icon: "gamepad" },

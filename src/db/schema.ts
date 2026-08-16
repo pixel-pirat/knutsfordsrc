@@ -82,6 +82,15 @@ export const permits = pgTable("permits", {
   emailSentAt: timestamp("email_sent_at", { withTimezone: true }),
 });
 
+export const programs = pgTable("programs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull().unique(),
+  active: boolean("active").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export const auditLogs = pgTable("audit_logs", {
   id: uuid("id").primaryKey().defaultRandom(),
   actorId: uuid("actor_id")
@@ -136,3 +145,5 @@ export type Permit = typeof permits.$inferSelect;
 export type NewPermit = typeof permits.$inferInsert;
 export type AuditLog = typeof auditLogs.$inferSelect;
 export type NewAuditLog = typeof auditLogs.$inferInsert;
+export type Program = typeof programs.$inferSelect;
+export type NewProgram = typeof programs.$inferInsert;
