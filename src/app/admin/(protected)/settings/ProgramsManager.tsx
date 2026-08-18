@@ -77,12 +77,9 @@ export function ProgramsManager({
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-extrabold text-ink sm:text-3xl">Programmes</h1>
-        <p className="mt-1 text-sm text-neutral-500">
-          Manage the list of programmes students can select from their profile
-        </p>
-      </div>
+      <p className="mb-4 text-sm text-neutral-500">
+        Manage the list of programmes students can select from their profile
+      </p>
 
       <form onSubmit={handleAdd} className="mb-6 flex max-w-md flex-wrap items-start gap-2">
         <div className="min-w-0 flex-1">
