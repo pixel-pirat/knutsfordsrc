@@ -1,53 +1,78 @@
 "use client";
 
-import { useState } from "react";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts";
+import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
 import { formatCurrency } from "@/lib/permits";
 
 type DayData = { day: string; count: number; revenue: string };
 
-export function PermitsChart({ data }: { data: DayData[] }) {
-  const [hovered, setHovered] = useState<number | null>(null);
-  const maxCount = Math.max(1, ...data.map((d) => d.count));
+const chartConfig = {
+  count: {
+    label: "Permits",
+    color: "var(--color-gold)",
+  },
+} satisfies ChartConfig;
+
+function ChartTooltip({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: { payload: DayData }[];
+}) {
+  if (!active || !payload?.length) return null;
+  const d = payload[0].payload;
 
   return (
-    <div>
-      <div className="flex h-40 gap-1.5 sm:gap-2">
-        {data.map((d, i) => {
-          const heightPct = d.count === 0 ? 3 : Math.max(6, (d.count / maxCount) * 100);
-          const isHovered = hovered === i;
-          return (
-            <div
-              key={d.day + i}
-              className="relative flex h-full flex-1 flex-col items-center justify-end"
-              onMouseEnter={() => setHovered(i)}
-              onMouseLeave={() => setHovered(null)}
-            >
-              {isHovered && (
-                <div className="absolute bottom-full mb-2 z-10 w-max max-w-[9rem] -translate-x-1/2 rounded-lg bg-ink px-2.5 py-1.5 text-center text-xs text-white shadow-lg left-1/2">
-                  <p className="font-semibold">{d.count} permit{d.count === 1 ? "" : "s"}</p>
-                  <p className="text-neutral-300">{formatCurrency(d.revenue)}</p>
-                  <p className="text-neutral-400">{d.day}</p>
-                </div>
-              )}
-              <div
-                className={`w-full rounded-t-md transition-colors ${
-                  isHovered ? "bg-gold-dark" : "bg-gold"
-                }`}
-                style={{ height: `${heightPct}%` }}
-              />
-            </div>
-          );
-        })}
-      </div>
-      <div className="mt-2 flex gap-1.5 sm:gap-2">
-        {data.map((d, i) => (
-          <div key={d.day + i} className="flex-1 text-center">
-            {(i % 2 === 0 || i === data.length - 1) && (
-              <span className="text-[10px] text-neutral-400">{d.day}</span>
-            )}
-          </div>
-        ))}
-      </div>
+    <div className="rounded-lg bg-ink px-3 py-2 text-xs text-white shadow-lg">
+      <p className="font-semibold">
+        {d.count} permit{d.count === 1 ? "" : "s"}
+      </p>
+      <p className="text-neutral-300">{formatCurrency(d.revenue)}</p>
+      <p className="text-neutral-400">{d.day}</p>
     </div>
+  );
+}
+
+export function PermitsChart({ data }: { data: DayData[] }) {
+  return (
+    <ChartContainer config={chartConfig} className="aspect-auto h-52 w-full">
+      <AreaChart data={data} margin={{ left: -20, right: 8, top: 8, bottom: 0 }}>
+        <defs>
+          <linearGradient id="permitsFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="var(--color-gold)" stopOpacity={0.35} />
+            <stop offset="95%" stopColor="var(--color-gold)" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid vertical={false} stroke="var(--border)" strokeOpacity={0.5} />
+        <XAxis
+          dataKey="day"
+          tickLine={false}
+          axisLine={false}
+          tickMargin={8}
+          interval="preserveStartEnd"
+          tick={{ fontSize: 10 }}
+        />
+        <YAxis
+          allowDecimals={false}
+          tickLine={false}
+          axisLine={false}
+          tickMargin={4}
+          width={28}
+          tick={{ fontSize: 10 }}
+        />
+        <Tooltip content={<ChartTooltip />} cursor={{ stroke: "var(--color-gold)", strokeOpacity: 0.2 }} />
+        <Area
+          type="monotone"
+          dataKey="count"
+          stroke="var(--color-gold)"
+          strokeWidth={2}
+          fill="url(#permitsFill)"
+          dot={false}
+          activeDot={{ r: 4, strokeWidth: 0 }}
+          isAnimationActive={false}
+        />
+      </AreaChart>
+    </ChartContainer>
   );
 }
