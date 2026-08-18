@@ -4,6 +4,8 @@ import { requireAdmin } from "@/lib/adminGuard";
 import { hashPassword, generateTempPassword } from "@/lib/crypto";
 import { getStudentByIndexNumber, createStudent } from "@/db/queries";
 import { logAudit } from "@/db/adminQueries";
+import { sendStudentWelcomeEmail, isEmailConfigured } from "@/lib/email";
+import { getAppUrl } from "@/lib/url";
 
 export async function POST(request: Request) {
   const { admin, error } = await requireAdmin("create_student");
@@ -61,6 +63,20 @@ export async function POST(request: Request) {
     },
   });
 
+  let emailSent = false;
+  if (isEmailConfigured() && student.email) {
+    const result = await sendStudentWelcomeEmail({
+      to: student.email,
+      name: `${student.firstName} ${student.lastName}`,
+      indexNumber: student.indexNumber,
+      temporaryPassword,
+      program: student.program,
+      level: student.level,
+      loginUrl: `${getAppUrl()}/login`,
+    });
+    emailSent = result.sent;
+  }
+
   return NextResponse.json({
     student: {
       id: student.id,
@@ -69,5 +85,6 @@ export async function POST(request: Request) {
       lastName: student.lastName,
     },
     temporaryPassword,
+    emailSent,
   });
 }

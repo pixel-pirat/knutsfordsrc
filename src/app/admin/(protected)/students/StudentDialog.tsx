@@ -66,6 +66,7 @@ export function StudentDialog({
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [tempPassword, setTempPassword] = useState<string | null>(null);
+  const [welcomeEmailSent, setWelcomeEmailSent] = useState(false);
   const [programs, setPrograms] = useState<{ id: string; name: string }[]>([]);
 
   // Reset transient UI state when the dialog opens for a (possibly new) student,
@@ -78,6 +79,7 @@ export function StudentDialog({
       setFormError(null);
       setFieldErrors({});
       setTempPassword(null);
+      setWelcomeEmailSent(false);
       if (studentId) {
         setLoading(true);
       } else {
@@ -148,6 +150,7 @@ export function StudentDialog({
       }
 
       setTempPassword(data.temporaryPassword);
+      setWelcomeEmailSent(Boolean(data.emailSent));
       onSuccess?.();
     } catch {
       setFormError("Something went wrong. Please try again.");
@@ -248,6 +251,11 @@ export function StudentDialog({
               </p>
               <p className="mt-3 rounded-md bg-white px-3 py-2 text-center font-mono text-sm font-semibold text-ink ring-1 ring-black/10">
                 {tempPassword}
+              </p>
+              <p className="mt-3 text-xs text-neutral-500">
+                {welcomeEmailSent
+                  ? "These details, along with the login page link, have also been emailed to the student."
+                  : "Email not sent (no email on file for this student, or email isn't configured yet) — share the password with them directly."}
               </p>
             </div>
             <DialogFooter>

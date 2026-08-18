@@ -32,6 +32,14 @@ export function updateStudentProfile(
     .returning();
 }
 
+export function updateStudentPassword(id: string, passwordHash: string) {
+  return db
+    .update(students)
+    .set({ passwordHash, updatedAt: new Date() })
+    .where(eq(students.id, id))
+    .returning();
+}
+
 export function updateStudentAvatar(id: string, avatarUrl: string) {
   return db
     .update(students)

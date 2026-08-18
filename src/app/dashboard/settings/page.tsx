@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentStudent } from "@/db/queries";
 import { SettingsForm } from "./SettingsForm";
 import { StudentAvatarSection } from "./StudentAvatarSection";
+import { ChangePasswordForm } from "./ChangePasswordForm";
 
 export default async function SettingsPage() {
   const student = await getCurrentStudent();
@@ -63,6 +64,13 @@ export default async function SettingsPage() {
             }}
           />
         </div>
+      </div>
+
+      <div className="mt-6 rounded-2xl bg-white p-6 ring-1 ring-black/5 lg:max-w-2xl">
+        <h2 className="text-sm font-bold tracking-wide text-neutral-400">
+          CHANGE PASSWORD
+        </h2>
+        <ChangePasswordForm />
       </div>
     </div>
   );

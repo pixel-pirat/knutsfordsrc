@@ -72,3 +72,88 @@ export async function sendPermitEmail({
   }
   return { sent: true, error: null };
 }
+
+export async function sendPasswordChangedEmail({
+  to,
+  name,
+}: {
+  to: string;
+  name: string;
+}) {
+  const client = getClient();
+  if (!client) {
+    return { sent: false, error: "Email sending is not configured yet." };
+  }
+
+  const { error } = await client.emails.send({
+    from: FROM_ADDRESS,
+    to,
+    subject: "Your Knutsford SRC password was changed",
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2 style="color: #14120c;">Password Changed</h2>
+        <p>Hi ${name},</p>
+        <p>This is a confirmation that the password on your Knutsford SRC account was just changed. If you made this change, no further action is needed.</p>
+        <p style="color: #b91c1c; font-weight: 600;">If you did not make this change, contact the SRC office immediately.</p>
+        <p style="color: #888; font-size: 12px; margin-top: 24px;">Knutsford University SRC</p>
+      </div>
+    `,
+  });
+
+  if (error) {
+    return { sent: false, error: error.message };
+  }
+  return { sent: true, error: null };
+}
+
+export async function sendStudentWelcomeEmail({
+  to,
+  name,
+  indexNumber,
+  temporaryPassword,
+  program,
+  level,
+  loginUrl,
+}: {
+  to: string;
+  name: string;
+  indexNumber: string;
+  temporaryPassword: string;
+  program: string | null;
+  level: string | null;
+  loginUrl: string;
+}) {
+  const client = getClient();
+  if (!client) {
+    return { sent: false, error: "Email sending is not configured yet." };
+  }
+
+  const { error } = await client.emails.send({
+    from: FROM_ADDRESS,
+    to,
+    subject: "Welcome to Knutsford SRC — Your Account Details",
+    html: `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+        <h2 style="color: #14120c;">Welcome, ${name}</h2>
+        <p>An account has been created for you on the Knutsford SRC Student Digital Hub. Here are your login details:</p>
+        <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+          <tr><td style="padding: 6px 0; color: #666;">Index Number</td><td style="padding: 6px 0; font-weight: 600;">${indexNumber}</td></tr>
+          <tr><td style="padding: 6px 0; color: #666;">Temporary Password</td><td style="padding: 6px 0; font-weight: 600;">${temporaryPassword}</td></tr>
+          ${program ? `<tr><td style="padding: 6px 0; color: #666;">Programme</td><td style="padding: 6px 0; font-weight: 600;">${program}</td></tr>` : ""}
+          ${level ? `<tr><td style="padding: 6px 0; color: #666;">Level</td><td style="padding: 6px 0; font-weight: 600;">Level ${level}</td></tr>` : ""}
+        </table>
+        <p>
+          <a href="${loginUrl}" style="display: inline-block; background: #14120c; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600;">Log In</a>
+        </p>
+        <p style="color: #888; font-size: 13px;">Or visit: ${loginUrl}</p>
+        <p style="margin-top: 16px;">We recommend changing your password after your first login (Settings → Change Password).</p>
+        <p style="color: #888; font-size: 12px; margin-top: 24px;">Knutsford University SRC</p>
+      </div>
+    `,
+  });
+
+  if (error) {
+    return { sent: false, error: error.message };
+  }
+  return { sent: true, error: null };
+}

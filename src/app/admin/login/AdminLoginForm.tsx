@@ -4,6 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AuthCard } from "@/components/AuthCard";
 import { FormField, inputClass } from "@/components/FormField";
+import { PasswordInput } from "@/components/PasswordInput";
 import { adminLoginSchema, adminBootstrapSchema } from "@/lib/validation";
 
 export function AdminLoginForm() {
@@ -146,13 +147,11 @@ export function AdminLoginForm() {
             />
           </FormField>
           <FormField label="Password" htmlFor="password" error={fieldErrors.password} hint="At least 8 characters">
-            <input
+            <PasswordInput
               id="password"
-              type="password"
               autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={inputClass}
               placeholder="••••••••"
             />
           </FormField>
@@ -161,13 +160,11 @@ export function AdminLoginForm() {
             htmlFor="confirmPassword"
             error={fieldErrors.confirmPassword}
           >
-            <input
+            <PasswordInput
               id="confirmPassword"
-              type="password"
               autoComplete="new-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className={inputClass}
               placeholder="••••••••"
             />
           </FormField>
@@ -210,13 +207,11 @@ export function AdminLoginForm() {
           />
         </FormField>
         <FormField label="Password" htmlFor="password" error={fieldErrors.password}>
-          <input
+          <PasswordInput
             id="password"
-            type="password"
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className={inputClass}
             placeholder="••••••••"
           />
         </FormField>

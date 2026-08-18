@@ -51,6 +51,14 @@ export function updateAdmin(
     .returning();
 }
 
+export function updateAdminPassword(id: string, passwordHash: string) {
+  return db
+    .update(adminUsers)
+    .set({ passwordHash, updatedAt: new Date() })
+    .where(eq(adminUsers.id, id))
+    .returning();
+}
+
 export async function getCurrentAdmin() {
   const session = await getAdminSession();
   if (!session) return null;

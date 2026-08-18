@@ -104,3 +104,8 @@ export const adminProfileUpdateSchema = z.object({
 export const programCreateSchema = z.object({
   name: z.string().trim().min(1, "Programme name is required").max(120),
 });
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, "Current password is required"),
+  newPassword: passwordSchema,
+});

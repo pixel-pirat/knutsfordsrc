@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/AuthCard";
 import { FormField, inputClass } from "@/components/FormField";
+import { PasswordInput } from "@/components/PasswordInput";
 import { loginSchema } from "@/lib/validation";
 
 export function LoginForm() {
@@ -95,15 +96,13 @@ export function LoginForm() {
           htmlFor="password"
           error={fieldErrors.password}
         >
-          <input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             autoComplete="current-password"
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className={inputClass}
           />
         </FormField>
 

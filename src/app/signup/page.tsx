@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AuthCard } from "@/components/AuthCard";
 import { FormField, inputClass } from "@/components/FormField";
+import { PasswordInput } from "@/components/PasswordInput";
 import { signupSchema } from "@/lib/validation";
 
 export default function SignupPage() {
@@ -143,15 +144,13 @@ export default function SignupPage() {
           error={fieldErrors.password}
           hint="At least 8 characters"
         >
-          <input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             autoComplete="new-password"
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className={inputClass}
           />
         </FormField>
 
@@ -160,15 +159,13 @@ export default function SignupPage() {
           htmlFor="confirmPassword"
           error={fieldErrors.confirmPassword}
         >
-          <input
+          <PasswordInput
             id="confirmPassword"
             name="confirmPassword"
-            type="password"
             autoComplete="new-password"
             placeholder="••••••••"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className={inputClass}
           />
         </FormField>
 

@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { PERMISSIONS } from "@/lib/permissions";
 import { adminCreateSchema } from "@/lib/validation";
@@ -187,9 +188,10 @@ export function AdminDialog({
           {mode === "create" && (
             <div>
               <Label htmlFor="adminDialogPassword">Temporary Password</Label>
-              <Input
+              <PasswordInput
                 id="adminDialogPassword"
                 className="mt-1.5"
+                autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
