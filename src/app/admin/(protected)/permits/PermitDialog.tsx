@@ -79,7 +79,8 @@ export function PermitDialog({
   const containerRef = useRef<HTMLDivElement>(null);
   const [amount, setAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
-  const [expiresAt, setExpiresAt] = useState("");
+  const [expiryDays, setExpiryDays] = useState<number | null>(null);
+  const [expiryPreview, setExpiryPreview] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -118,7 +119,6 @@ export function PermitDialog({
         setSelected(null);
         setAmount("");
         setPaymentMethod("");
-        setExpiresAt("");
         setCreated(null);
         setDetail(null);
       }
@@ -131,6 +131,29 @@ export function PermitDialog({
       .then((res) => res.json())
       .then((data) => setDetail(data.permit))
       .finally(() => setLoading(false));
+  }, [open, permitId]);
+
+  useEffect(() => {
+    if (!open || permitId) return;
+    fetch("/api/admin/settings/permit-expiry")
+      .then((res) => res.json())
+      .then((data) => {
+        const days = typeof data.days === "number" ? data.days : null;
+        setExpiryDays(days);
+        setExpiryPreview(
+          days
+            ? new Date(Date.now() + days * 86400000).toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })
+            : null
+        );
+      })
+      .catch(() => {
+        setExpiryDays(null);
+        setExpiryPreview(null);
+      });
   }, [open, permitId]);
 
   useEffect(() => {
@@ -179,10 +202,6 @@ export function PermitDialog({
       setFieldErrors({ amount: "Enter the amount paid" });
       return;
     }
-    if (!expiresAt) {
-      setFieldErrors({ expiresAt: "Expiry date is required" });
-      return;
-    }
 
     setSubmitting(true);
     try {
@@ -192,7 +211,6 @@ export function PermitDialog({
         body: JSON.stringify({
           studentId: selected.id,
           amount: amountNumber,
-          expiresAt,
           paymentMethod,
         }),
       });
@@ -221,7 +239,6 @@ export function PermitDialog({
     setQuery("");
     setAmount("");
     setPaymentMethod("");
-    setExpiresAt("");
     setCreated(null);
     setFormError(null);
   }
@@ -395,17 +412,13 @@ export function PermitDialog({
                   )}
                 </div>
                 <div>
-                  <Label htmlFor="permitExpiresAt">Expiry Date</Label>
-                  <Input
-                    id="permitExpiresAt"
-                    type="date"
-                    className="mt-1.5"
-                    value={expiresAt}
-                    onChange={(e) => setExpiresAt(e.target.value)}
-                  />
-                  {fieldErrors.expiresAt && (
-                    <p className="mt-1 text-xs text-red-600">{fieldErrors.expiresAt}</p>
-                  )}
+                  <Label>Expires</Label>
+                  <p className="mt-1.5 flex h-8 items-center text-sm text-neutral-600">
+                    {expiryPreview ?? "—"}
+                  </p>
+                  <p className="mt-1 text-xs text-neutral-400">
+                    Set by the super admin ({expiryDays ?? "…"} days from today)
+                  </p>
                 </div>
               </div>
 

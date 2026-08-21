@@ -92,7 +92,6 @@ export const permitIssueSchema = z.object({
     .number()
     .positive("Enter the amount paid")
     .max(1_000_000, "Enter a valid amount"),
-  expiresAt: z.string().min(1, "Expiry date is required"),
   paymentMethod: paymentMethodSchema.optional().or(z.literal("")),
 });
 
@@ -106,6 +105,14 @@ export const adminProfileUpdateSchema = z.object({
 
 export const programCreateSchema = z.object({
   name: z.string().trim().min(1, "Programme name is required").max(120),
+});
+
+export const permitExpiryDaysSchema = z.object({
+  days: z.coerce
+    .number()
+    .int("Enter a whole number of days")
+    .positive("Enter a positive number of days")
+    .max(3650, "Enter a value under 3650 days"),
 });
 
 export const changePasswordSchema = z.object({

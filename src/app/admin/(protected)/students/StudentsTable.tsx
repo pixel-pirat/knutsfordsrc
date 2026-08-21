@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Pagination } from "@/components/admin/Pagination";
 import { StudentDialog } from "./StudentDialog";
 
 type StudentRow = {
@@ -29,10 +30,16 @@ export function StudentsTable({
   students,
   canCreate,
   initialQuery,
+  page,
+  totalPages,
+  total,
 }: {
   students: StudentRow[];
   canCreate: boolean;
   initialQuery: string;
+  page: number;
+  totalPages: number;
+  total: number;
 }) {
   const router = useRouter();
   const [query, setQuery] = useState(initialQuery);
@@ -101,6 +108,14 @@ export function StudentsTable({
           </TableBody>
         </Table>
       </div>
+
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        total={total}
+        basePath="/admin/students"
+        searchParams={{ q: initialQuery || undefined }}
+      />
 
       <StudentDialog
         studentId={null}

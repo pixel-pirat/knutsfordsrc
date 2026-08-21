@@ -58,10 +58,37 @@ export function StudentDetailClient({
   const [editOpen, setEditOpen] = useState(false);
   const [permitDialogOpen, setPermitDialogOpen] = useState(false);
   const [selectedPermitId, setSelectedPermitId] = useState<string | null>(null);
+  const [resending, setResending] = useState(false);
+  const [resendResult, setResendResult] = useState<{
+    temporaryPassword: string;
+    emailSent: boolean;
+  } | null>(null);
+  const [resendError, setResendError] = useState<string | null>(null);
 
   function openPermit(id: string) {
     setSelectedPermitId(id);
     setPermitDialogOpen(true);
+  }
+
+  async function handleResendWelcome() {
+    setResending(true);
+    setResendError(null);
+    setResendResult(null);
+    try {
+      const res = await fetch(`/api/admin/students/${student.id}/resend-welcome`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setResendError(data.error ?? "Something went wrong. Please try again.");
+        return;
+      }
+      setResendResult({ temporaryPassword: data.temporaryPassword, emailSent: data.emailSent });
+    } catch {
+      setResendError("Something went wrong. Please try again.");
+    } finally {
+      setResending(false);
+    }
   }
 
   return (
@@ -88,8 +115,32 @@ export function StudentDetailClient({
             <p className="text-sm text-neutral-500">{student.indexNumber}</p>
           </div>
         </div>
-        {canEdit && <Button onClick={() => setEditOpen(true)}>Edit Student</Button>}
+        {canEdit && (
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" onClick={handleResendWelcome} disabled={resending}>
+              {resending ? "Sending…" : "Resend Welcome Email"}
+            </Button>
+            <Button onClick={() => setEditOpen(true)}>Edit Student</Button>
+          </div>
+        )}
       </div>
+
+      {resendError && (
+        <p className="mb-6 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{resendError}</p>
+      )}
+      {resendResult && (
+        <div className="mb-6 rounded-xl bg-gold/15 p-4 ring-1 ring-gold/30">
+          <p className="text-sm font-semibold text-ink">New temporary password issued</p>
+          <p className="mt-2 rounded-md bg-white px-3 py-2 text-center font-mono text-sm font-semibold text-ink ring-1 ring-black/10">
+            {resendResult.temporaryPassword}
+          </p>
+          <p className="mt-2 text-xs text-neutral-500">
+            {resendResult.emailSent
+              ? "This has also been emailed to the student, along with the login link."
+              : "Email not sent (no email on file, or email isn't configured yet) — share this password with the student directly. Their previous password no longer works."}
+          </p>
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">

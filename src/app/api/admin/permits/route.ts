@@ -7,6 +7,7 @@ import {
   generatePermitReference,
   markPermitEmailSent,
   logAudit,
+  getPermitExpiryDays,
 } from "@/db/adminQueries";
 import { sendPermitEmail, isEmailConfigured } from "@/lib/email";
 
@@ -23,17 +24,15 @@ export async function POST(request: Request) {
     );
   }
 
-  const { studentId, amount, expiresAt, paymentMethod } = parsed.data;
+  const { studentId, amount, paymentMethod } = parsed.data;
 
   const student = await getStudentById(studentId);
   if (!student) {
     return NextResponse.json({ error: "Student not found" }, { status: 404 });
   }
 
-  const expiresAtDate = new Date(expiresAt);
-  if (Number.isNaN(expiresAtDate.getTime())) {
-    return NextResponse.json({ error: "Invalid expiry date" }, { status: 400 });
-  }
+  const expiryDays = await getPermitExpiryDays();
+  const expiresAtDate = new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000);
 
   const referenceNumber = generatePermitReference();
   const [permit] = await createPermit({

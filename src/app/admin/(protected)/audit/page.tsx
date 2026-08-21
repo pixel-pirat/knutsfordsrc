@@ -2,15 +2,24 @@ import { getCurrentAdmin, listAuditLogs, countAuditLogs } from "@/db/adminQuerie
 import { hasPermission } from "@/lib/permissions";
 import { AccessRestricted } from "@/components/admin/AccessRestricted";
 import { describeAuditEntry } from "@/lib/audit";
+import { Pagination } from "@/components/admin/Pagination";
+import { PAGE_SIZE, parsePage } from "@/lib/pagination";
 
-export default async function AuditPage() {
+export default async function AuditPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const admin = await getCurrentAdmin();
   if (!admin || !hasPermission(admin, "view_audit_log")) {
     return <AccessRestricted />;
   }
 
+  const { page: pageParam } = await searchParams;
+  const page = parsePage(pageParam);
+
   const [entries, total] = await Promise.all([
-    listAuditLogs({ limit: 100 }),
+    listAuditLogs({ limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }),
     countAuditLogs(),
   ]);
 
@@ -53,6 +62,13 @@ export default async function AuditPage() {
           ))}
         </ul>
       </div>
+
+      <Pagination
+        page={page}
+        totalPages={Math.max(1, Math.ceil(total / PAGE_SIZE))}
+        total={total}
+        basePath="/admin/audit"
+      />
     </div>
   );
 }

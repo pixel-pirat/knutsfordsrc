@@ -1,20 +1,39 @@
-import { getCurrentAdmin, listStudents, searchStudents } from "@/db/adminQueries";
+import {
+  getCurrentAdmin,
+  listStudents,
+  searchStudents,
+  countStudents,
+  countSearchStudents,
+} from "@/db/adminQueries";
 import { hasPermission } from "@/lib/permissions";
 import { AccessRestricted } from "@/components/admin/AccessRestricted";
+import { PAGE_SIZE, parsePage } from "@/lib/pagination";
 import { StudentsTable } from "./StudentsTable";
 
 export default async function StudentsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; page?: string }>;
 }) {
   const admin = await getCurrentAdmin();
   if (!admin || !hasPermission(admin, "view_students")) {
     return <AccessRestricted />;
   }
 
-  const { q } = await searchParams;
-  const students = q ? await searchStudents(q, { limit: 100 }) : await listStudents({ limit: 100 });
+  const { q, page: pageParam } = await searchParams;
+  const query = q?.trim();
+  const page = parsePage(pageParam);
+  const offset = (page - 1) * PAGE_SIZE;
+
+  const [students, total] = query
+    ? await Promise.all([
+        searchStudents(query, { limit: PAGE_SIZE, offset }),
+        countSearchStudents(query),
+      ])
+    : await Promise.all([
+        listStudents({ limit: PAGE_SIZE, offset }),
+        countStudents(),
+      ]);
 
   return (
     <div>
@@ -29,6 +48,9 @@ export default async function StudentsPage({
         students={students}
         canCreate={hasPermission(admin, "create_student")}
         initialQuery={q ?? ""}
+        page={page}
+        totalPages={Math.max(1, Math.ceil(total / PAGE_SIZE))}
+        total={total}
       />
     </div>
   );

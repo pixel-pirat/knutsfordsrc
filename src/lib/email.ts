@@ -142,11 +142,17 @@ export async function sendStudentWelcomeEmail({
           ${program ? `<tr><td style="padding: 6px 0; color: #666;">Programme</td><td style="padding: 6px 0; font-weight: 600;">${program}</td></tr>` : ""}
           ${level ? `<tr><td style="padding: 6px 0; color: #666;">Level</td><td style="padding: 6px 0; font-weight: 600;">Level ${level}</td></tr>` : ""}
         </table>
+        <p style="margin-top: 20px; font-weight: 600;">How to log in:</p>
+        <ol style="padding-left: 20px; margin: 8px 0; color: #333;">
+          <li style="margin-bottom: 6px;">Go to <a href="${loginUrl}">${loginUrl}</a></li>
+          <li style="margin-bottom: 6px;">Enter your Index Number and the Temporary Password above</li>
+          <li style="margin-bottom: 6px;">Once logged in, open Settings and change your password</li>
+          <li>Complete the rest of your profile if anything is missing</li>
+        </ol>
         <p>
           <a href="${loginUrl}" style="display: inline-block; background: #14120c; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600;">Log In</a>
         </p>
         <p style="color: #888; font-size: 13px;">Or visit: ${loginUrl}</p>
-        <p style="margin-top: 16px;">We recommend changing your password after your first login (Settings → Change Password).</p>
         <p style="color: #888; font-size: 12px; margin-top: 24px;">Knutsford University SRC</p>
       </div>
     `,

@@ -1,4 +1,4 @@
-import { desc, eq, ilike, or, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { db } from "./index";
 import {
   adminUsers,
@@ -6,9 +6,32 @@ import {
   permits,
   auditLogs,
   programs,
+  settings,
   type NewAdminUser,
   type NewPermit,
 } from "./schema";
+
+export const PERMIT_EXPIRY_DAYS_KEY = "permit_expiry_days";
+export const DEFAULT_PERMIT_EXPIRY_DAYS = 365;
+
+export async function getSetting(key: string) {
+  const row = await db.query.settings.findFirst({ where: eq(settings.key, key) });
+  return row?.value ?? null;
+}
+
+export async function setSetting(key: string, value: string) {
+  return db
+    .insert(settings)
+    .values({ key, value })
+    .onConflictDoUpdate({ target: settings.key, set: { value, updatedAt: new Date() } })
+    .returning();
+}
+
+export async function getPermitExpiryDays() {
+  const value = await getSetting(PERMIT_EXPIRY_DAYS_KEY);
+  const parsed = value ? Number(value) : NaN;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_PERMIT_EXPIRY_DAYS;
+}
 import { getAdminSession } from "@/lib/adminAuth";
 
 export function getAdminByEmail(email: string) {
@@ -109,8 +132,64 @@ export function createPermit(values: NewPermit) {
   return db.insert(permits).values(values).returning();
 }
 
-export function listPermits({ limit = 50, offset = 0 } = {}) {
+export type PermitStatusFilter = "active" | "pending" | "expired";
+
+function buildPermitConditions({
+  query,
+  status,
+}: {
+  query?: string;
+  status?: PermitStatusFilter;
+} = {}) {
+  const conditions = [];
+
+  if (query) {
+    const like = `%${query}%`;
+    const matchingStudentIds = db
+      .select({ id: students.id })
+      .from(students)
+      .where(
+        or(
+          ilike(students.indexNumber, like),
+          ilike(students.firstName, like),
+          ilike(students.lastName, like),
+          ilike(sql`${students.firstName} || ' ' || ${students.lastName}`, like)
+        )
+      );
+    conditions.push(
+      or(ilike(permits.referenceNumber, like), inArray(permits.studentId, matchingStudentIds))
+    );
+  }
+
+  if (status === "expired") {
+    conditions.push(sql`${permits.expiresAt} IS NOT NULL AND ${permits.expiresAt} <= now()`);
+  } else if (status === "active") {
+    conditions.push(
+      sql`${permits.cardStatus} = 'active' AND (${permits.expiresAt} IS NULL OR ${permits.expiresAt} > now())`
+    );
+  } else if (status === "pending") {
+    conditions.push(
+      sql`${permits.cardStatus} = 'pending' AND (${permits.expiresAt} IS NULL OR ${permits.expiresAt} > now())`
+    );
+  }
+
+  return conditions;
+}
+
+export function listPermits({
+  limit = 50,
+  offset = 0,
+  query,
+  status,
+}: {
+  limit?: number;
+  offset?: number;
+  query?: string;
+  status?: PermitStatusFilter;
+} = {}) {
+  const conditions = buildPermitConditions({ query, status });
   return db.query.permits.findMany({
+    where: conditions.length > 0 ? and(...conditions) : undefined,
     orderBy: desc(permits.issuedAt),
     limit,
     offset,
@@ -123,8 +202,18 @@ export function listPermits({ limit = 50, offset = 0 } = {}) {
   });
 }
 
-export async function countPermits() {
-  const [row] = await db.select({ count: sql<number>`count(*)::int` }).from(permits);
+export async function countPermits({
+  query,
+  status,
+}: {
+  query?: string;
+  status?: PermitStatusFilter;
+} = {}) {
+  const conditions = buildPermitConditions({ query, status });
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(permits)
+    .where(conditions.length > 0 ? and(...conditions) : undefined);
   return row?.count ?? 0;
 }
 
@@ -133,19 +222,32 @@ export async function countStudents() {
   return row?.count ?? 0;
 }
 
-export function searchStudents(query: string, { limit = 50 } = {}) {
+function studentSearchCondition(query: string) {
   const like = `%${query}%`;
+  return or(
+    ilike(students.indexNumber, like),
+    ilike(students.firstName, like),
+    ilike(students.lastName, like),
+    ilike(students.email, like),
+    ilike(sql`${students.firstName} || ' ' || ${students.lastName}`, like)
+  );
+}
+
+export function searchStudents(query: string, { limit = 50, offset = 0 } = {}) {
   return db.query.students.findMany({
-    where: or(
-      ilike(students.indexNumber, like),
-      ilike(students.firstName, like),
-      ilike(students.lastName, like),
-      ilike(students.email, like),
-      ilike(sql`${students.firstName} || ' ' || ${students.lastName}`, like)
-    ),
+    where: studentSearchCondition(query),
     orderBy: desc(students.createdAt),
     limit,
+    offset,
   });
+}
+
+export async function countSearchStudents(query: string) {
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(students)
+    .where(studentSearchCondition(query));
+  return row?.count ?? 0;
 }
 
 export async function permitsIssuedLast14Days() {
