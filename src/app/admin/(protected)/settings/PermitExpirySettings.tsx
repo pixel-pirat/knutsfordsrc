@@ -44,7 +44,7 @@ export function PermitExpirySettings({ initialDays }: { initialDays: number }) {
 
   return (
     <div>
-      <p className="mb-4 text-sm text-neutral-500">
+      <p className="mb-4 text-sm text-neutral-500 dark:text-neutral-400">
         New permits automatically expire this many days after being issued. Staff issuing
         permits can no longer type a custom expiry date — this keeps every permit consistent
         and prevents mis-entries.
@@ -66,8 +66,8 @@ export function PermitExpirySettings({ initialDays }: { initialDays: number }) {
           {loading ? "Saving…" : "Save"}
         </Button>
       </form>
-      {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
-      {success && <p className="mt-3 text-sm text-green-700">Permit expiry policy updated.</p>}
+      {error && <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>}
+      {success && <p className="mt-3 text-sm text-green-700 dark:text-green-400">Permit expiry policy updated.</p>}
     </div>
   );
 }

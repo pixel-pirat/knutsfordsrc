@@ -30,7 +30,7 @@ export function Pagination({
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 px-1 py-3">
-      <p className="text-xs text-neutral-400">
+      <p className="text-xs text-neutral-400 dark:text-neutral-500">
         Page {page} of {totalPages} &middot; {total} total
       </p>
       <div className="flex gap-2">
@@ -38,10 +38,10 @@ export function Pagination({
           href={hrefFor(page - 1)}
           aria-disabled={prevDisabled}
           tabIndex={prevDisabled ? -1 : undefined}
-          className={`rounded-md border border-black/10 px-3 py-1.5 text-xs font-semibold ${
+          className={`rounded-md border border-black/10 dark:border-white/10 px-3 py-1.5 text-xs font-semibold ${
             prevDisabled
               ? "pointer-events-none opacity-40"
-              : "text-ink transition-colors hover:bg-black/5"
+              : "text-ink dark:text-neutral-100 transition-colors hover:bg-black/5 dark:hover:bg-white/10"
           }`}
         >
           Previous
@@ -50,10 +50,10 @@ export function Pagination({
           href={hrefFor(page + 1)}
           aria-disabled={nextDisabled}
           tabIndex={nextDisabled ? -1 : undefined}
-          className={`rounded-md border border-black/10 px-3 py-1.5 text-xs font-semibold ${
+          className={`rounded-md border border-black/10 dark:border-white/10 px-3 py-1.5 text-xs font-semibold ${
             nextDisabled
               ? "pointer-events-none opacity-40"
-              : "text-ink transition-colors hover:bg-black/5"
+              : "text-ink dark:text-neutral-100 transition-colors hover:bg-black/5 dark:hover:bg-white/10"
           }`}
         >
           Next

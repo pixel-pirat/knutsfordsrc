@@ -24,8 +24,8 @@ export default async function StudentIdPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-extrabold text-ink sm:text-3xl">Digital ID</h1>
-        <p className="mt-1 text-sm text-neutral-500">
+        <h1 className="text-2xl font-extrabold text-ink dark:text-neutral-100 sm:text-3xl">Digital ID</h1>
+        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
           Your official Knutsford University digital identification card
         </p>
       </div>
@@ -40,11 +40,11 @@ export default async function StudentIdPage() {
           qrDataUrl={qrDataUrl}
         />
 
-        <div className="mt-6 rounded-2xl bg-white p-6 ring-1 ring-black/5">
-          <h2 className="text-sm font-bold text-ink">Card Details</h2>
+        <div className="mt-6 rounded-2xl bg-white dark:bg-neutral-900 p-6 ring-1 ring-black/5 dark:ring-white/10">
+          <h2 className="text-sm font-bold text-ink dark:text-neutral-100">Card Details</h2>
           <dl className="mt-4 grid grid-cols-2 gap-4 text-sm">
             <div>
-              <dt className="text-xs text-neutral-400">Permit Status</dt>
+              <dt className="text-xs text-neutral-400 dark:text-neutral-500">Permit Status</dt>
               <dd className="mt-1">
                 {status ? (
                   <span
@@ -53,16 +53,16 @@ export default async function StudentIdPage() {
                     {status}
                   </span>
                 ) : (
-                  <span className="text-neutral-500">No permit issued</span>
+                  <span className="text-neutral-500 dark:text-neutral-400">No permit issued</span>
                 )}
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-neutral-400">Dues Balance</dt>
-              <dd className="mt-1 font-semibold text-ink">{dues.balance}</dd>
+              <dt className="text-xs text-neutral-400 dark:text-neutral-500">Dues Balance</dt>
+              <dd className="mt-1 font-semibold text-ink dark:text-neutral-100">{dues.balance}</dd>
             </div>
           </dl>
-          <p className="mt-4 text-xs leading-5 text-neutral-400">
+          <p className="mt-4 text-xs leading-5 text-neutral-400 dark:text-neutral-500">
             Scan the QR code on your card to let anyone verify your identity and
             status instantly — no login required.
           </p>

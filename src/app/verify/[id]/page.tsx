@@ -20,10 +20,10 @@ export default async function VerifyStudentPage({
 
   if (!student) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-cream px-4">
-        <div className="w-full max-w-sm rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-black/5">
-          <p className="text-base font-semibold text-ink">ID Not Found</p>
-          <p className="mt-2 text-sm text-neutral-500">
+      <div className="flex min-h-screen items-center justify-center bg-cream dark:bg-neutral-950 px-4">
+        <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-neutral-900 p-8 text-center shadow-sm ring-1 ring-black/5 dark:ring-white/10">
+          <p className="text-base font-semibold text-ink dark:text-neutral-100">ID Not Found</p>
+          <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
             This student ID could not be verified.
           </p>
         </div>
@@ -35,7 +35,7 @@ export default async function VerifyStudentPage({
   const status = latestPermit ? getPermitStatus(latestPermit) : null;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-cream px-4 py-10">
+    <div className="flex min-h-screen items-center justify-center bg-cream dark:bg-neutral-950 px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-6 flex items-center justify-center gap-2.5">
           <Image
@@ -46,13 +46,13 @@ export default async function VerifyStudentPage({
             className="h-12 w-auto"
           />
           <span className="text-lg font-bold tracking-tight">
-            <span className="text-gold-dark">KNUTSFORD</span>{" "}
-            <span className="text-ink">UNIVERSITY</span>
+            <span className="text-gold-dark dark:text-gold-light">KNUTSFORD</span>{" "}
+            <span className="text-ink dark:text-neutral-100">UNIVERSITY</span>
           </span>
         </div>
 
-        <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-7">
-          <p className="text-center text-xs font-bold tracking-wide text-gold-dark">
+        <div className="rounded-2xl bg-white dark:bg-neutral-900 p-6 shadow-sm ring-1 ring-black/5 dark:ring-white/10 sm:p-7">
+          <p className="text-center text-xs font-bold tracking-wide text-gold-dark dark:text-gold-light">
             VERIFIED STUDENT IDENTITY
           </p>
 
@@ -63,25 +63,25 @@ export default async function VerifyStudentPage({
               size="lg"
               className="h-20 w-20"
             />
-            <p className="mt-3 text-lg font-extrabold text-ink">
+            <p className="mt-3 text-lg font-extrabold text-ink dark:text-neutral-100">
               {student.firstName} {student.lastName}
             </p>
-            <p className="text-sm text-neutral-500">{student.indexNumber}</p>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400">{student.indexNumber}</p>
           </div>
 
-          <dl className="mt-6 grid grid-cols-2 gap-4 rounded-xl bg-neutral-50 p-4 text-sm">
+          <dl className="mt-6 grid grid-cols-2 gap-4 rounded-xl bg-neutral-50 dark:bg-neutral-900 p-4 text-sm">
             <div>
-              <dt className="text-xs text-neutral-400">Programme</dt>
-              <dd className="text-neutral-700">{student.program ?? "—"}</dd>
+              <dt className="text-xs text-neutral-400 dark:text-neutral-500">Programme</dt>
+              <dd className="text-neutral-700 dark:text-neutral-300">{student.program ?? "—"}</dd>
             </div>
             <div>
-              <dt className="text-xs text-neutral-400">Level</dt>
-              <dd className="text-neutral-700">
+              <dt className="text-xs text-neutral-400 dark:text-neutral-500">Level</dt>
+              <dd className="text-neutral-700 dark:text-neutral-300">
                 {student.level ? `Level ${student.level}` : "—"}
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-neutral-400">Permit Status</dt>
+              <dt className="text-xs text-neutral-400 dark:text-neutral-500">Permit Status</dt>
               <dd>
                 {status ? (
                   <span
@@ -90,24 +90,24 @@ export default async function VerifyStudentPage({
                     {status}
                   </span>
                 ) : (
-                  <span className="text-neutral-500">No permit issued</span>
+                  <span className="text-neutral-500 dark:text-neutral-400">No permit issued</span>
                 )}
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-neutral-400">Dues Balance</dt>
-              <dd className="font-semibold text-ink">{dues.balance}</dd>
+              <dt className="text-xs text-neutral-400 dark:text-neutral-500">Dues Balance</dt>
+              <dd className="font-semibold text-ink dark:text-neutral-100">{dues.balance}</dd>
             </div>
             <div className="col-span-2">
-              <dt className="text-xs text-neutral-400">Outstanding</dt>
-              <dd className="text-neutral-700">
+              <dt className="text-xs text-neutral-400 dark:text-neutral-500">Outstanding</dt>
+              <dd className="text-neutral-700 dark:text-neutral-300">
                 {dues.balance === "GHS 0.00" ? "None" : `${dues.balance} (${dues.term})`}
               </dd>
             </div>
           </dl>
         </div>
 
-        <p className="mt-5 text-center text-xs text-neutral-400">
+        <p className="mt-5 text-center text-xs text-neutral-400 dark:text-neutral-500">
           Scanned via Knutsford SRC Digital ID
         </p>
       </div>

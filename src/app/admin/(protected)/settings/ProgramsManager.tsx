@@ -77,7 +77,7 @@ export function ProgramsManager({
 
   return (
     <div>
-      <p className="mb-4 text-sm text-neutral-500">
+      <p className="mb-4 text-sm text-neutral-500 dark:text-neutral-400">
         Manage the list of programmes students can select from their profile
       </p>
 
@@ -88,14 +88,14 @@ export function ProgramsManager({
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-          {error && <p className="mt-1.5 text-xs text-red-600">{error}</p>}
+          {error && <p className="mt-1.5 text-xs text-red-600 dark:text-red-400">{error}</p>}
         </div>
         <Button type="submit" disabled={loading}>
           {loading ? "Adding…" : "Add Programme"}
         </Button>
       </form>
 
-      <div className="rounded-2xl bg-white ring-1 ring-black/5">
+      <div className="rounded-2xl bg-white dark:bg-neutral-900 ring-1 ring-black/5 dark:ring-white/10">
         <Table>
           <TableHeader>
             <TableRow>
@@ -106,20 +106,20 @@ export function ProgramsManager({
           <TableBody>
             {programs.length === 0 && (
               <TableRow>
-                <TableCell colSpan={2} className="py-10 text-center text-neutral-400">
+                <TableCell colSpan={2} className="py-10 text-center text-neutral-400 dark:text-neutral-500">
                   No programmes added yet.
                 </TableCell>
               </TableRow>
             )}
             {programs.map((p) => (
               <TableRow key={p.id}>
-                <TableCell className="font-medium text-ink">{p.name}</TableCell>
+                <TableCell className="font-medium text-ink dark:text-neutral-100">{p.name}</TableCell>
                 <TableCell className="text-right">
                   <button
                     type="button"
                     onClick={() => handleDelete(p)}
                     disabled={deletingId === p.id}
-                    className="text-xs font-semibold text-red-600 hover:underline disabled:opacity-60"
+                    className="text-xs font-semibold text-red-600 dark:text-red-400 hover:underline disabled:opacity-60"
                   >
                     {deletingId === p.id ? "Removing…" : "Remove"}
                   </button>

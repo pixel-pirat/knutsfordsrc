@@ -16,7 +16,7 @@ export function StatusBreakdownBar({
 
   return (
     <div>
-      <div className="flex h-3 w-full overflow-hidden rounded-full bg-neutral-100">
+      <div className="flex h-3 w-full overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
         {segments.map(
           (s) =>
             s.value > 0 && (
@@ -32,8 +32,8 @@ export function StatusBreakdownBar({
         {segments.map((s) => (
           <div key={s.label} className="flex items-center gap-2">
             <span className={`h-2.5 w-2.5 rounded-full ${s.dot}`} />
-            <span className="text-neutral-600">{s.label}</span>
-            <span className="font-semibold text-ink">{s.value}</span>
+            <span className="text-neutral-600 dark:text-neutral-300">{s.label}</span>
+            <span className="font-semibold text-ink dark:text-neutral-100">{s.value}</span>
           </div>
         ))}
       </div>

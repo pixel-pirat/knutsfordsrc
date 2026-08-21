@@ -17,10 +17,10 @@ export function DuesOverview() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-extrabold text-ink sm:text-3xl">
+        <h1 className="text-2xl font-extrabold text-ink dark:text-neutral-100 sm:text-3xl">
           SRC Dues
         </h1>
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
           Manage your SRC dues contribution, payments and receipts
         </p>
       </div>
@@ -63,27 +63,27 @@ export function DuesOverview() {
             </div>
           </div>
 
-          <div className="rounded-2xl bg-white p-6 ring-1 ring-black/5 sm:p-8">
+          <div className="rounded-2xl bg-white dark:bg-neutral-900 p-6 ring-1 ring-black/5 dark:ring-white/10 sm:p-8">
             <div className="grid grid-cols-3 gap-4 text-center sm:text-left">
               <div>
-                <p className="text-sm font-semibold text-neutral-400">
+                <p className="text-sm font-semibold text-neutral-400 dark:text-neutral-500">
                   Total Dues
                 </p>
-                <p className="mt-2 text-lg font-bold text-ink sm:text-xl">
+                <p className="mt-2 text-lg font-bold text-ink dark:text-neutral-100 sm:text-xl">
                   {dues.total}
                 </p>
               </div>
               <div>
-                <p className="text-sm font-semibold text-neutral-400">Paid</p>
-                <p className="mt-2 text-lg font-bold text-ink sm:text-xl">
+                <p className="text-sm font-semibold text-neutral-400 dark:text-neutral-500">Paid</p>
+                <p className="mt-2 text-lg font-bold text-ink dark:text-neutral-100 sm:text-xl">
                   {dues.paid}
                 </p>
               </div>
               <div>
-                <p className="text-sm font-semibold text-neutral-400">
+                <p className="text-sm font-semibold text-neutral-400 dark:text-neutral-500">
                   Balance
                 </p>
-                <p className="mt-2 text-lg font-bold text-ink sm:text-xl">
+                <p className="mt-2 text-lg font-bold text-ink dark:text-neutral-100 sm:text-xl">
                   {dues.balance}
                 </p>
               </div>
@@ -93,10 +93,10 @@ export function DuesOverview() {
 
         <div className="space-y-6">
           <div className="rounded-2xl bg-gold/15 p-6 ring-1 ring-gold/30">
-            <h2 className="text-center text-sm font-extrabold tracking-wide text-ink">
+            <h2 className="text-center text-sm font-extrabold tracking-wide text-ink dark:text-neutral-100">
               PAYMENT REMINDER
             </h2>
-            <p className="mt-3 text-sm leading-6 text-neutral-700">
+            <p className="mt-3 text-sm leading-6 text-neutral-700 dark:text-neutral-300">
               You have an Outstanding balance for {dues.term}
             </p>
             <button
@@ -107,14 +107,14 @@ export function DuesOverview() {
             </button>
           </div>
 
-          <div className="rounded-2xl bg-white p-6 ring-1 ring-black/5">
-            <h2 className="text-lg font-extrabold text-ink">QUICK LINKS</h2>
+          <div className="rounded-2xl bg-white dark:bg-neutral-900 p-6 ring-1 ring-black/5 dark:ring-white/10">
+            <h2 className="text-lg font-extrabold text-ink dark:text-neutral-100">QUICK LINKS</h2>
             <ul className="mt-4 space-y-2.5">
               {dashboardQuickLinks.map((link) => (
                 <li key={link}>
                   <Link
                     href={dashboardQuickLinkHrefs[link]}
-                    className="text-sm text-neutral-700 transition-colors hover:text-gold-dark"
+                    className="text-sm text-neutral-700 dark:text-neutral-300 transition-colors hover:text-gold-dark"
                   >
                     {link}
                   </Link>
@@ -129,9 +129,9 @@ export function DuesOverview() {
             </button>
           </div>
 
-          <div className="rounded-2xl bg-white p-6 ring-1 ring-black/5">
-            <h2 className="text-base font-bold text-ink">Need Help?</h2>
-            <p className="mt-2 text-sm leading-6 text-neutral-500">
+          <div className="rounded-2xl bg-white dark:bg-neutral-900 p-6 ring-1 ring-black/5 dark:ring-white/10">
+            <h2 className="text-base font-bold text-ink dark:text-neutral-100">Need Help?</h2>
+            <p className="mt-2 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
               For any dues payment inquiries, contact the SRC finance office.
             </p>
             <button
@@ -144,12 +144,12 @@ export function DuesOverview() {
         </div>
       </div>
 
-      <div className="mt-6 rounded-2xl bg-white p-6 ring-1 ring-black/5 sm:p-8">
-        <h2 className="text-xl font-extrabold text-ink">Payment History</h2>
+      <div className="mt-6 rounded-2xl bg-white dark:bg-neutral-900 p-6 ring-1 ring-black/5 dark:ring-white/10 sm:p-8">
+        <h2 className="text-xl font-extrabold text-ink dark:text-neutral-100">Payment History</h2>
         <div className="mt-5 overflow-x-auto">
           <table className="w-full min-w-[560px] text-left text-sm">
             <thead>
-              <tr className="border-b border-black/10 bg-neutral-50 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+              <tr className="border-b border-black/10 dark:border-white/10 bg-neutral-50 dark:bg-neutral-900 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
                 <th className="px-4 py-3">Date</th>
                 <th className="px-4 py-3">Reference</th>
                 <th className="px-4 py-3">Description</th>
@@ -159,7 +159,7 @@ export function DuesOverview() {
             </thead>
             <tbody>
               <tr>
-                <td colSpan={5} className="px-4 py-10 text-center text-sm text-neutral-400">
+                <td colSpan={5} className="px-4 py-10 text-center text-sm text-neutral-400 dark:text-neutral-500">
                   No payments yet. Your receipts will show up here once you
                   make a payment.
                 </td>

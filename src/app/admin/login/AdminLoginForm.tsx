@@ -170,7 +170,7 @@ export function AdminLoginForm() {
           </FormField>
 
           {formError && (
-            <p className="rounded-md bg-red-50 px-3.5 py-2.5 text-sm text-red-600">
+            <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3.5 py-2.5 text-sm text-red-600 dark:text-red-400">
               {formError}
             </p>
           )}
@@ -178,7 +178,7 @@ export function AdminLoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-md bg-ink px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-neutral-800 disabled:opacity-60"
+            className="w-full rounded-md bg-ink px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-neutral-800 disabled:opacity-60 dark:bg-gold dark:text-ink dark:hover:bg-gold-dark"
           >
             {loading ? "Creating account…" : "Create Super Admin Account"}
           </button>
@@ -217,7 +217,7 @@ export function AdminLoginForm() {
         </FormField>
 
         {formError && (
-          <p className="rounded-md bg-red-50 px-3.5 py-2.5 text-sm text-red-600">
+          <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3.5 py-2.5 text-sm text-red-600 dark:text-red-400">
             {formError}
           </p>
         )}
@@ -225,7 +225,7 @@ export function AdminLoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-md bg-ink px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-neutral-800 disabled:opacity-60"
+          className="w-full rounded-md bg-ink px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-neutral-800 disabled:opacity-60 dark:bg-gold dark:text-ink dark:hover:bg-gold-dark"
         >
           {loading ? "Signing in…" : "Sign In"}
         </button>

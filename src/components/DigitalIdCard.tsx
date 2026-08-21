@@ -23,7 +23,7 @@ export function DigitalIdCard({
           <span className="text-xs font-bold tracking-wide text-gold-light">
             KNUTSFORD UNIVERSITY
           </span>
-          <p className="text-xs text-neutral-400">Student Digital ID</p>
+          <p className="text-xs text-neutral-400 dark:text-neutral-500">Student Digital ID</p>
         </div>
         <Image
           src="/logo.png"
@@ -43,7 +43,7 @@ export function DigitalIdCard({
             {[program, level && `Level ${level}`].filter(Boolean).join(" · ") || "—"}
           </p>
         </div>
-        <div className="shrink-0 rounded-lg bg-white p-1.5">
+        <div className="shrink-0 rounded-lg bg-white dark:bg-neutral-900 p-1.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={qrDataUrl} alt="Verification QR code" className="h-20 w-20 sm:h-24 sm:w-24" />
         </div>

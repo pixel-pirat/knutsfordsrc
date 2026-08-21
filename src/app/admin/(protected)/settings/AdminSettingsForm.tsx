@@ -84,21 +84,21 @@ export function AdminSettingsForm({
 
         <div>
           <Label>Email</Label>
-          <p className="mt-1.5 text-sm text-neutral-500">{initial.email}</p>
+          <p className="mt-1.5 text-sm text-neutral-500 dark:text-neutral-400">{initial.email}</p>
         </div>
 
         <div>
           <Label>Role</Label>
-          <p className="mt-1.5 text-sm capitalize text-neutral-500">
+          <p className="mt-1.5 text-sm capitalize text-neutral-500 dark:text-neutral-400">
             {initial.role.replace("_", " ")}
           </p>
         </div>
 
         {error && (
-          <p className="rounded-md bg-red-50 px-3.5 py-2.5 text-sm text-red-600">{error}</p>
+          <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3.5 py-2.5 text-sm text-red-600 dark:text-red-400">{error}</p>
         )}
         {success && (
-          <p className="rounded-md bg-green-50 px-3.5 py-2.5 text-sm text-green-700">
+          <p className="rounded-md bg-green-50 dark:bg-green-950/40 px-3.5 py-2.5 text-sm text-green-700 dark:text-green-400">
             Profile updated.
           </p>
         )}

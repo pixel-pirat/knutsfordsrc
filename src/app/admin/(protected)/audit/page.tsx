@@ -26,30 +26,30 @@ export default async function AuditPage({
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-extrabold text-ink sm:text-3xl">
+        <h1 className="text-2xl font-extrabold text-ink dark:text-neutral-100 sm:text-3xl">
           Audit Trail
         </h1>
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
           Every record-affecting action taken by SRC executives ({total} total)
         </p>
       </div>
 
-      <div className="rounded-2xl bg-white ring-1 ring-black/5">
-        <ul className="divide-y divide-black/5">
+      <div className="rounded-2xl bg-white dark:bg-neutral-900 ring-1 ring-black/5 dark:ring-white/10">
+        <ul className="divide-y divide-black/5 dark:divide-white/10">
           {entries.length === 0 && (
-            <li className="px-5 py-10 text-center text-sm text-neutral-400">
+            <li className="px-5 py-10 text-center text-sm text-neutral-400 dark:text-neutral-500">
               No activity yet.
             </li>
           )}
           {entries.map((entry) => (
             <li key={entry.id} className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0">
-                <p className="text-sm text-ink">{describeAuditEntry(entry)}</p>
-                <p className="mt-0.5 text-xs text-neutral-400">
+                <p className="text-sm text-ink dark:text-neutral-100">{describeAuditEntry(entry)}</p>
+                <p className="mt-0.5 text-xs text-neutral-400 dark:text-neutral-500">
                   {entry.actor?.name ?? "Unknown"} ({entry.actor?.email ?? "—"})
                 </p>
               </div>
-              <span className="shrink-0 text-xs text-neutral-400">
+              <span className="shrink-0 text-xs text-neutral-400 dark:text-neutral-500">
                 {new Date(entry.createdAt).toLocaleString("en-GB", {
                   day: "numeric",
                   month: "short",

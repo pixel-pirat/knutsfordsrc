@@ -76,7 +76,7 @@ export function ChangePasswordForm() {
           onChange={(e) => setCurrentPassword(e.target.value)}
         />
         {fieldErrors.currentPassword && (
-          <p className="mt-1 text-xs text-red-600">{fieldErrors.currentPassword}</p>
+          <p className="mt-1 text-xs text-red-600 dark:text-red-400">{fieldErrors.currentPassword}</p>
         )}
       </div>
 
@@ -91,7 +91,7 @@ export function ChangePasswordForm() {
             onChange={(e) => setNewPassword(e.target.value)}
           />
           {fieldErrors.newPassword && (
-            <p className="mt-1 text-xs text-red-600">{fieldErrors.newPassword}</p>
+            <p className="mt-1 text-xs text-red-600 dark:text-red-400">{fieldErrors.newPassword}</p>
           )}
         </div>
         <div>
@@ -104,16 +104,16 @@ export function ChangePasswordForm() {
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
           {fieldErrors.confirmPassword && (
-            <p className="mt-1 text-xs text-red-600">{fieldErrors.confirmPassword}</p>
+            <p className="mt-1 text-xs text-red-600 dark:text-red-400">{fieldErrors.confirmPassword}</p>
           )}
         </div>
       </div>
 
       {formError && (
-        <p className="rounded-md bg-red-50 px-3.5 py-2.5 text-sm text-red-600">{formError}</p>
+        <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3.5 py-2.5 text-sm text-red-600 dark:text-red-400">{formError}</p>
       )}
       {success && (
-        <p className="rounded-md bg-green-50 px-3.5 py-2.5 text-sm text-green-700">{success}</p>
+        <p className="rounded-md bg-green-50 dark:bg-green-950/40 px-3.5 py-2.5 text-sm text-green-700 dark:text-green-400">{success}</p>
       )}
 
       <Button type="submit" disabled={loading}>

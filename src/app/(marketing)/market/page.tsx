@@ -20,7 +20,7 @@ export default function MarketPage() {
         imageAlt="Overhead view of a study workspace with laptops"
       />
 
-      <section className="bg-white">
+      <section className="bg-white dark:bg-neutral-900">
         <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
           <MarketGrid products={marketProducts} categories={marketCategories} />
         </div>

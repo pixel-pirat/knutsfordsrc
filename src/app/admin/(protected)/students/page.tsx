@@ -38,8 +38,8 @@ export default async function StudentsPage({
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-extrabold text-ink sm:text-3xl">Students</h1>
-        <p className="mt-1 text-sm text-neutral-500">
+        <h1 className="text-2xl font-extrabold text-ink dark:text-neutral-100 sm:text-3xl">Students</h1>
+        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
           Search the student directory or click a row for full details
         </p>
       </div>

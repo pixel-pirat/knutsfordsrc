@@ -22,9 +22,9 @@ export default async function StudentDetailPage({
 
   if (!student) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl bg-white px-6 py-20 text-center ring-1 ring-black/5">
-        <p className="text-base font-semibold text-ink">Student Not Found</p>
-        <Link href="/admin/students" className="mt-3 text-sm text-gold-dark hover:underline">
+      <div className="flex flex-col items-center justify-center rounded-2xl bg-white dark:bg-neutral-900 px-6 py-20 text-center ring-1 ring-black/5 dark:ring-white/10">
+        <p className="text-base font-semibold text-ink dark:text-neutral-100">Student Not Found</p>
+        <Link href="/admin/students" className="mt-3 text-sm text-gold-dark dark:text-gold-light hover:underline">
           Back to students
         </Link>
       </div>

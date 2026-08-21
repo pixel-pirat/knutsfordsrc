@@ -22,12 +22,12 @@ export default function NewsPage() {
         imageAlt="Student working on a laptop"
       />
 
-      <section className="bg-white">
+      <section className="bg-white dark:bg-neutral-900">
         <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
           {featured && (
             <a
               href="#"
-              className="group mb-12 grid gap-6 overflow-hidden rounded-2xl bg-neutral-50 ring-1 ring-black/5 lg:grid-cols-2"
+              className="group mb-12 grid gap-6 overflow-hidden rounded-2xl bg-neutral-50 dark:bg-neutral-900 ring-1 ring-black/5 dark:ring-white/10 lg:grid-cols-2"
             >
               <div className="relative aspect-[16/10] lg:aspect-auto">
                 <Image
@@ -38,14 +38,14 @@ export default function NewsPage() {
                 />
               </div>
               <div className="flex flex-col justify-center p-6 lg:p-10">
-                <span className="text-xs font-bold uppercase tracking-wide text-gold-dark">
+                <span className="text-xs font-bold uppercase tracking-wide text-gold-dark dark:text-gold-light">
                   Featured
                 </span>
-                <h2 className="mt-3 text-2xl font-extrabold leading-tight text-ink sm:text-3xl">
+                <h2 className="mt-3 text-2xl font-extrabold leading-tight text-ink dark:text-neutral-100 sm:text-3xl">
                   {featured.title}
                 </h2>
                 {featured.excerpt && (
-                  <p className="mt-4 text-base leading-7 text-neutral-600">
+                  <p className="mt-4 text-base leading-7 text-neutral-600 dark:text-neutral-300">
                     {featured.excerpt}
                   </p>
                 )}
@@ -61,8 +61,8 @@ export default function NewsPage() {
                     </div>
                   )}
                   <div className="text-sm">
-                    <p className="font-medium text-ink">{featured.author}</p>
-                    <p className="text-neutral-400">{featured.time}</p>
+                    <p className="font-medium text-ink dark:text-neutral-100">{featured.author}</p>
+                    <p className="text-neutral-400 dark:text-neutral-500">{featured.time}</p>
                   </div>
                 </div>
               </div>
@@ -74,7 +74,7 @@ export default function NewsPage() {
               <a
                 key={item.title}
                 href="#"
-                className="group flex flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-black/5 transition-shadow hover:shadow-md"
+                className="group flex flex-col overflow-hidden rounded-2xl bg-white dark:bg-neutral-900 ring-1 ring-black/5 dark:ring-white/10 transition-shadow hover:shadow-md"
               >
                 <div className="relative aspect-[4/3]">
                   <Image
@@ -85,11 +85,11 @@ export default function NewsPage() {
                   />
                 </div>
                 <div className="flex flex-1 flex-col p-5">
-                  <h3 className="text-base font-semibold leading-snug text-ink">
+                  <h3 className="text-base font-semibold leading-snug text-ink dark:text-neutral-100">
                     {item.title}
                   </h3>
                   {item.excerpt && (
-                    <p className="mt-2 line-clamp-2 text-sm text-neutral-500">
+                    <p className="mt-2 line-clamp-2 text-sm text-neutral-500 dark:text-neutral-400">
                       {item.excerpt}
                     </p>
                   )}
@@ -104,7 +104,7 @@ export default function NewsPage() {
                         />
                       </div>
                     )}
-                    <p className="text-xs text-neutral-500">
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
                       {item.author} &middot; {item.time}
                     </p>
                   </div>

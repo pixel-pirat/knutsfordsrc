@@ -89,8 +89,8 @@ export function PermitsTable({
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-ink sm:text-3xl">Permits</h1>
-          <p className="mt-1 text-sm text-neutral-500">
+          <h1 className="text-2xl font-extrabold text-ink dark:text-neutral-100 sm:text-3xl">Permits</h1>
+          <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
             All permits issued through the Digital Hub
           </p>
         </div>
@@ -121,7 +121,7 @@ export function PermitsTable({
         </Select>
       </div>
 
-      <div className="rounded-2xl bg-white ring-1 ring-black/5">
+      <div className="rounded-2xl bg-white dark:bg-neutral-900 ring-1 ring-black/5 dark:ring-white/10">
         <Table>
           <TableHeader>
             <TableRow>
@@ -137,7 +137,7 @@ export function PermitsTable({
           <TableBody>
             {permits.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="py-10 text-center text-neutral-400">
+                <TableCell colSpan={7} className="py-10 text-center text-neutral-400 dark:text-neutral-500">
                   No permits found.
                 </TableCell>
               </TableRow>
@@ -150,17 +150,17 @@ export function PermitsTable({
                   className="cursor-pointer"
                   onClick={() => openPermit(p.id)}
                 >
-                  <TableCell className="font-medium text-ink">{p.referenceNumber}</TableCell>
-                  <TableCell className="text-neutral-700">
+                  <TableCell className="font-medium text-ink dark:text-neutral-100">{p.referenceNumber}</TableCell>
+                  <TableCell className="text-neutral-700 dark:text-neutral-300">
                     {p.student?.firstName} {p.student?.lastName}
-                    <span className="ml-1.5 text-xs text-neutral-400">
+                    <span className="ml-1.5 text-xs text-neutral-400 dark:text-neutral-500">
                       {p.student?.indexNumber}
                     </span>
                   </TableCell>
-                  <TableCell className="text-neutral-700">{formatCurrency(p.amount)}</TableCell>
-                  <TableCell className="text-neutral-500">{p.paymentMethod ?? "—"}</TableCell>
-                  <TableCell className="text-neutral-700">{p.issuer?.name}</TableCell>
-                  <TableCell className="text-neutral-500">
+                  <TableCell className="text-neutral-700 dark:text-neutral-300">{formatCurrency(p.amount)}</TableCell>
+                  <TableCell className="text-neutral-500 dark:text-neutral-400">{p.paymentMethod ?? "—"}</TableCell>
+                  <TableCell className="text-neutral-700 dark:text-neutral-300">{p.issuer?.name}</TableCell>
+                  <TableCell className="text-neutral-500 dark:text-neutral-400">
                     {p.expiresAt
                       ? new Date(p.expiresAt).toLocaleDateString("en-GB", {
                           day: "numeric",

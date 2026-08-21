@@ -23,7 +23,7 @@ export function AdminSidebar({
   });
 
   return (
-    <div className="flex h-full flex-col bg-neutral-50">
+    <div className="flex h-full flex-col bg-neutral-50 dark:bg-neutral-900">
       <div className="flex items-center gap-2.5 px-6 py-6">
         <Image
           src="/logo.png"
@@ -33,16 +33,16 @@ export function AdminSidebar({
           className="h-9 w-auto"
         />
         <div>
-          <p className="text-sm font-bold leading-tight text-ink">
+          <p className="text-sm font-bold leading-tight text-ink dark:text-neutral-100">
             Knutsford SRC
           </p>
-          <p className="text-xs leading-tight text-neutral-500">
+          <p className="text-xs leading-tight text-neutral-500 dark:text-neutral-400">
             Executive Portal
           </p>
         </div>
       </div>
 
-      <p className="px-6 pb-2 text-xs font-semibold tracking-wide text-neutral-400">
+      <p className="px-6 pb-2 text-xs font-semibold tracking-wide text-neutral-400 dark:text-neutral-500">
         ADMIN
       </p>
 
@@ -59,8 +59,8 @@ export function AdminSidebar({
               onClick={onNavigate}
               className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                 active
-                  ? "bg-ink text-white"
-                  : "text-neutral-600 hover:bg-black/5 hover:text-ink"
+                  ? "bg-ink text-white dark:bg-gold/15 dark:text-gold-light"
+                  : "text-neutral-600 hover:bg-black/5 hover:text-ink dark:text-neutral-400 dark:hover:bg-white/10 dark:hover:text-neutral-100"
               }`}
             >
               <HubIcon name={item.icon} className="h-4.5 w-4.5 shrink-0" />

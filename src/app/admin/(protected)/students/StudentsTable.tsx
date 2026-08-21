@@ -69,7 +69,7 @@ export function StudentsTable({
         {canCreate && <Button onClick={() => setDialogOpen(true)}>Create Student</Button>}
       </div>
 
-      <div className="rounded-2xl bg-white ring-1 ring-black/5">
+      <div className="rounded-2xl bg-white dark:bg-neutral-900 ring-1 ring-black/5 dark:ring-white/10">
         <Table>
           <TableHeader>
             <TableRow>
@@ -84,7 +84,7 @@ export function StudentsTable({
           <TableBody>
             {students.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="py-10 text-center text-neutral-400">
+                <TableCell colSpan={6} className="py-10 text-center text-neutral-400 dark:text-neutral-500">
                   No students found.
                 </TableCell>
               </TableRow>
@@ -95,14 +95,14 @@ export function StudentsTable({
                 className="cursor-pointer"
                 onClick={() => router.push(`/admin/students/${s.id}`)}
               >
-                <TableCell className="font-medium text-ink">{s.indexNumber}</TableCell>
-                <TableCell className="text-neutral-700">
+                <TableCell className="font-medium text-ink dark:text-neutral-100">{s.indexNumber}</TableCell>
+                <TableCell className="text-neutral-700 dark:text-neutral-300">
                   {s.firstName} {s.lastName}
                 </TableCell>
-                <TableCell className="text-neutral-500">{s.email ?? "—"}</TableCell>
-                <TableCell className="text-neutral-500">{s.phone ?? "—"}</TableCell>
-                <TableCell className="text-neutral-500">{s.program ?? "—"}</TableCell>
-                <TableCell className="text-neutral-500">{s.level ?? "—"}</TableCell>
+                <TableCell className="text-neutral-500 dark:text-neutral-400">{s.email ?? "—"}</TableCell>
+                <TableCell className="text-neutral-500 dark:text-neutral-400">{s.phone ?? "—"}</TableCell>
+                <TableCell className="text-neutral-500 dark:text-neutral-400">{s.program ?? "—"}</TableCell>
+                <TableCell className="text-neutral-500 dark:text-neutral-400">{s.level ?? "—"}</TableCell>
               </TableRow>
             ))}
           </TableBody>

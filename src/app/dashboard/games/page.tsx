@@ -5,10 +5,10 @@ export default function DashboardGamesPage() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-extrabold text-ink sm:text-3xl">
+        <h1 className="text-2xl font-extrabold text-ink dark:text-neutral-100 sm:text-3xl">
           Games
         </h1>
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
           Trivia, tournaments and leaderboards are on the way
         </p>
       </div>
@@ -26,15 +26,15 @@ export default function DashboardGamesPage() {
         {gameModes.map((mode) => (
           <div
             key={mode.title}
-            className="rounded-2xl bg-white p-6 ring-1 ring-black/5"
+            className="rounded-2xl bg-white dark:bg-neutral-900 p-6 ring-1 ring-black/5 dark:ring-white/10"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gold/15 text-gold-dark">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gold/15 text-gold-dark dark:text-gold-light">
               <HubIcon name={mode.icon} className="h-5 w-5" />
             </div>
-            <h3 className="mt-4 text-base font-semibold text-ink">
+            <h3 className="mt-4 text-base font-semibold text-ink dark:text-neutral-100">
               {mode.title}
             </h3>
-            <p className="mt-1.5 text-sm leading-6 text-neutral-500">
+            <p className="mt-1.5 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
               {mode.description}
             </p>
           </div>

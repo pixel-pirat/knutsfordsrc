@@ -58,15 +58,15 @@ export function AdminsManager({ initialAdmins }: { initialAdmins: AdminRow[] }) 
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-ink sm:text-3xl">Admins</h1>
-          <p className="mt-1 text-sm text-neutral-500">
+          <h1 className="text-2xl font-extrabold text-ink dark:text-neutral-100 sm:text-3xl">Admins</h1>
+          <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
             Manage sub-admin accounts and what they can do
           </p>
         </div>
         <Button onClick={() => openDialog(null)}>New Admin</Button>
       </div>
 
-      <div className="rounded-2xl bg-white ring-1 ring-black/5">
+      <div className="rounded-2xl bg-white dark:bg-neutral-900 ring-1 ring-black/5 dark:ring-white/10">
         <Table>
           <TableHeader>
             <TableRow>
@@ -85,13 +85,13 @@ export function AdminsManager({ initialAdmins }: { initialAdmins: AdminRow[] }) 
                 onClick={() => a.role !== "super_admin" && openDialog(a)}
               >
                 <TableCell>
-                  <p className="font-medium text-ink">{a.name}</p>
-                  <p className="text-xs text-neutral-400">{a.email}</p>
+                  <p className="font-medium text-ink dark:text-neutral-100">{a.name}</p>
+                  <p className="text-xs text-neutral-400 dark:text-neutral-500">{a.email}</p>
                 </TableCell>
-                <TableCell className="capitalize text-neutral-700">
+                <TableCell className="capitalize text-neutral-700 dark:text-neutral-300">
                   {a.role.replace("_", " ")}
                 </TableCell>
-                <TableCell className="text-neutral-500">
+                <TableCell className="text-neutral-500 dark:text-neutral-400">
                   {a.role === "super_admin"
                     ? "All permissions"
                     : a.permissions.length > 0
@@ -116,7 +116,7 @@ export function AdminsManager({ initialAdmins }: { initialAdmins: AdminRow[] }) 
                       type="button"
                       onClick={(e) => toggleActive(a, e)}
                       disabled={togglingId === a.id}
-                      className="text-xs font-semibold text-gold-dark hover:underline disabled:opacity-60"
+                      className="text-xs font-semibold text-gold-dark dark:text-gold-light hover:underline disabled:opacity-60"
                     >
                       {a.active ? "Deactivate" : "Reactivate"}
                     </button>

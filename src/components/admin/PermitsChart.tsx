@@ -29,7 +29,7 @@ function ChartTooltip({
         {d.count} permit{d.count === 1 ? "" : "s"}
       </p>
       <p className="text-neutral-300">{formatCurrency(d.revenue)}</p>
-      <p className="text-neutral-400">{d.day}</p>
+      <p className="text-neutral-400 dark:text-neutral-500">{d.day}</p>
     </div>
   );
 }

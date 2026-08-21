@@ -19,13 +19,13 @@ export default function GalleryPage() {
         imageAlt="Shelves of books in the university library"
       />
 
-      <section className="bg-white">
+      <section className="bg-white dark:bg-neutral-900">
         <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
           <div className="columns-2 gap-4 sm:columns-3 lg:columns-4 [&>*]:mb-4">
             {galleryImages.map((img) => (
               <div
                 key={img.src}
-                className="relative overflow-hidden rounded-2xl bg-neutral-200 ring-1 ring-black/5"
+                className="relative overflow-hidden rounded-2xl bg-neutral-200 ring-1 ring-black/5 dark:ring-white/10"
               >
                 <Image
                   src={img.src}

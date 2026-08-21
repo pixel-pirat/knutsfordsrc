@@ -22,22 +22,22 @@ export default function AboutPage() {
         imageAlt="Knutsford University academic block"
       />
 
-      <section className="bg-white">
+      <section className="bg-white dark:bg-neutral-900">
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-6 py-16 sm:grid-cols-4 lg:px-8">
           {aboutStats.map((stat) => (
             <div key={stat.label} className="text-center">
-              <p className="text-3xl font-extrabold text-gold-dark sm:text-4xl">
+              <p className="text-3xl font-extrabold text-gold-dark dark:text-gold-light sm:text-4xl">
                 {stat.value}
               </p>
-              <p className="mt-1 text-sm text-neutral-500">{stat.label}</p>
+              <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">{stat.label}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="bg-cream">
+      <section className="bg-cream dark:bg-neutral-950">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 py-20 lg:grid-cols-2 lg:items-center lg:px-8 lg:py-24">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl ring-1 ring-black/5">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl ring-1 ring-black/5 dark:ring-white/10">
             <Image
               src="https://images.unsplash.com/photo-1543269865-cbf427effbad?w=1000&q=80"
               alt="Knutsford students catching up between classes"
@@ -46,13 +46,13 @@ export default function AboutPage() {
             />
           </div>
           <div>
-            <span className="text-sm font-bold tracking-wide text-gold-dark">
+            <span className="text-sm font-bold tracking-wide text-gold-dark dark:text-gold-light">
               OUR MISSION
             </span>
-            <h2 className="mt-3 text-3xl font-extrabold leading-tight text-ink sm:text-4xl">
+            <h2 className="mt-3 text-3xl font-extrabold leading-tight text-ink dark:text-neutral-100 sm:text-4xl">
               Preparing Students for Life, Not Just Graduation
             </h2>
-            <p className="mt-5 max-w-md text-base leading-7 text-neutral-700">
+            <p className="mt-5 max-w-md text-base leading-7 text-neutral-700 dark:text-neutral-300">
               We believe university should equip students with more than a
               degree — academic rigour, real community, and the practical
               tools to manage campus life, find opportunity, and lead. The
@@ -61,7 +61,7 @@ export default function AboutPage() {
             </p>
             <Link
               href="/#hub"
-              className="mt-8 inline-block rounded-md bg-ink px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-neutral-800"
+              className="mt-8 inline-block rounded-md bg-ink px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-neutral-800 dark:bg-gold dark:text-ink dark:hover:bg-gold-dark"
             >
               Explore the Digital Hub
             </Link>
@@ -69,13 +69,13 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="bg-white">
+      <section className="bg-white dark:bg-neutral-900">
         <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-24">
           <div className="mb-12 max-w-xl">
-            <span className="text-sm font-bold tracking-wide text-gold-dark">
+            <span className="text-sm font-bold tracking-wide text-gold-dark dark:text-gold-light">
               WHAT WE STAND FOR
             </span>
-            <h2 className="mt-3 text-3xl font-extrabold leading-tight text-ink sm:text-4xl">
+            <h2 className="mt-3 text-3xl font-extrabold leading-tight text-ink dark:text-neutral-100 sm:text-4xl">
               Our Values
             </h2>
           </div>
@@ -83,15 +83,15 @@ export default function AboutPage() {
             {aboutValues.map((value) => (
               <div
                 key={value.title}
-                className="rounded-2xl bg-neutral-50 p-6 ring-1 ring-black/5"
+                className="rounded-2xl bg-neutral-50 dark:bg-neutral-900 p-6 ring-1 ring-black/5 dark:ring-white/10"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gold/15 text-gold-dark">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gold/15 text-gold-dark dark:text-gold-light">
                   <HubIcon name={value.icon} className="h-5 w-5" />
                 </div>
-                <h3 className="mt-4 text-base font-semibold text-ink">
+                <h3 className="mt-4 text-base font-semibold text-ink dark:text-neutral-100">
                   {value.title}
                 </h3>
-                <p className="mt-1.5 text-sm leading-6 text-neutral-500">
+                <p className="mt-1.5 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
                   {value.description}
                 </p>
               </div>

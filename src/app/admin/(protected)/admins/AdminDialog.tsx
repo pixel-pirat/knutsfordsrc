@@ -166,7 +166,7 @@ export function AdminDialog({
                 onChange={(e) => setName(e.target.value)}
               />
               {fieldErrors.name && (
-                <p className="mt-1 text-xs text-red-600">{fieldErrors.name}</p>
+                <p className="mt-1 text-xs text-red-600 dark:text-red-400">{fieldErrors.name}</p>
               )}
             </div>
             <div>
@@ -180,7 +180,7 @@ export function AdminDialog({
                 onChange={(e) => setEmail(e.target.value)}
               />
               {fieldErrors.email && (
-                <p className="mt-1 text-xs text-red-600">{fieldErrors.email}</p>
+                <p className="mt-1 text-xs text-red-600 dark:text-red-400">{fieldErrors.email}</p>
               )}
             </div>
           </div>
@@ -195,22 +195,22 @@ export function AdminDialog({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <p className="mt-1 text-xs text-neutral-400">
+              <p className="mt-1 text-xs text-neutral-400 dark:text-neutral-500">
                 At least 8 characters — share this with them to sign in
               </p>
               {fieldErrors.password && (
-                <p className="mt-1 text-xs text-red-600">{fieldErrors.password}</p>
+                <p className="mt-1 text-xs text-red-600 dark:text-red-400">{fieldErrors.password}</p>
               )}
             </div>
           )}
 
           <div>
-            <p className="mb-2 text-sm font-medium text-ink">Permissions</p>
+            <p className="mb-2 text-sm font-medium text-ink dark:text-neutral-100">Permissions</p>
             <div className="grid gap-2.5 sm:grid-cols-2">
               {PERMISSIONS.map((p) => (
                 <label
                   key={p.key}
-                  className="flex items-start gap-2.5 rounded-lg border border-black/10 p-3 text-sm hover:bg-black/5"
+                  className="flex items-start gap-2.5 rounded-lg border border-black/10 dark:border-white/10 p-3 text-sm hover:bg-black/5 dark:hover:bg-white/10"
                 >
                   <input
                     type="checkbox"
@@ -219,8 +219,8 @@ export function AdminDialog({
                     className="mt-0.5"
                   />
                   <span>
-                    <span className="block font-medium text-ink">{p.label}</span>
-                    <span className="block text-xs text-neutral-500">{p.description}</span>
+                    <span className="block font-medium text-ink dark:text-neutral-100">{p.label}</span>
+                    <span className="block text-xs text-neutral-500 dark:text-neutral-400">{p.description}</span>
                   </span>
                 </label>
               ))}
@@ -228,7 +228,7 @@ export function AdminDialog({
           </div>
 
           {formError && (
-            <p className="rounded-md bg-red-50 px-3.5 py-2.5 text-sm text-red-600">
+            <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3.5 py-2.5 text-sm text-red-600 dark:text-red-400">
               {formError}
             </p>
           )}

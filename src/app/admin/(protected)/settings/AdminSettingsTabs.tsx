@@ -29,14 +29,14 @@ export function AdminSettingsTabs({
       </TabsList>
 
       <TabsContent value="profile">
-        <div className="mt-4 max-w-lg rounded-2xl bg-white p-6 ring-1 ring-black/5">
+        <div className="mt-4 max-w-lg rounded-2xl bg-white dark:bg-neutral-900 p-6 ring-1 ring-black/5 dark:ring-white/10">
           <AdminSettingsForm initial={profile} />
         </div>
       </TabsContent>
 
       <TabsContent value="password">
-        <div className="mt-4 max-w-lg rounded-2xl bg-white p-6 ring-1 ring-black/5">
-          <h2 className="mb-4 text-sm font-bold tracking-wide text-neutral-400">
+        <div className="mt-4 max-w-lg rounded-2xl bg-white dark:bg-neutral-900 p-6 ring-1 ring-black/5 dark:ring-white/10">
+          <h2 className="mb-4 text-sm font-bold tracking-wide text-neutral-400 dark:text-neutral-500">
             CHANGE PASSWORD
           </h2>
           <ChangePasswordForm />
@@ -45,7 +45,7 @@ export function AdminSettingsTabs({
 
       {isSuperAdmin && (
         <TabsContent value="programmes">
-          <div className="mt-4 rounded-2xl bg-white p-6 ring-1 ring-black/5">
+          <div className="mt-4 rounded-2xl bg-white dark:bg-neutral-900 p-6 ring-1 ring-black/5 dark:ring-white/10">
             <ProgramsManager initialPrograms={initialPrograms} />
           </div>
         </TabsContent>
@@ -53,8 +53,8 @@ export function AdminSettingsTabs({
 
       {isSuperAdmin && (
         <TabsContent value="permits">
-          <div className="mt-4 max-w-lg rounded-2xl bg-white p-6 ring-1 ring-black/5">
-            <h2 className="mb-4 text-sm font-bold tracking-wide text-neutral-400">
+          <div className="mt-4 max-w-lg rounded-2xl bg-white dark:bg-neutral-900 p-6 ring-1 ring-black/5 dark:ring-white/10">
+            <h2 className="mb-4 text-sm font-bold tracking-wide text-neutral-400 dark:text-neutral-500">
               PERMIT EXPIRY POLICY
             </h2>
             <PermitExpirySettings initialDays={permitExpiryDays} />

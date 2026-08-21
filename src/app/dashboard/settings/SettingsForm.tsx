@@ -172,12 +172,12 @@ export function SettingsForm({ initial }: { initial: InitialValues }) {
       </div>
 
       {formError && (
-        <p className="rounded-md bg-red-50 px-3.5 py-2.5 text-sm text-red-600">
+        <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3.5 py-2.5 text-sm text-red-600 dark:text-red-400">
           {formError}
         </p>
       )}
       {success && (
-        <p className="rounded-md bg-green-50 px-3.5 py-2.5 text-sm text-green-700">
+        <p className="rounded-md bg-green-50 dark:bg-green-950/40 px-3.5 py-2.5 text-sm text-green-700 dark:text-green-400">
           Profile updated successfully.
         </p>
       )}
@@ -185,7 +185,7 @@ export function SettingsForm({ initial }: { initial: InitialValues }) {
       <button
         type="submit"
         disabled={loading}
-        className="rounded-md bg-ink px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-neutral-800 disabled:opacity-60"
+        className="rounded-md bg-ink px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-neutral-800 disabled:opacity-60 dark:bg-gold dark:text-ink dark:hover:bg-gold-dark"
       >
         {loading ? "Saving…" : "Save Changes"}
       </button>

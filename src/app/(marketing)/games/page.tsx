@@ -48,13 +48,13 @@ export default function GamesPage() {
         </div>
       </section>
 
-      <section className="bg-cream">
+      <section className="bg-cream dark:bg-neutral-950">
         <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-24">
           <div className="mb-12 max-w-xl">
-            <span className="text-sm font-bold tracking-wide text-gold-dark">
+            <span className="text-sm font-bold tracking-wide text-gold-dark dark:text-gold-light">
               WHAT TO EXPECT
             </span>
-            <h2 className="mt-3 text-3xl font-extrabold leading-tight text-ink sm:text-4xl">
+            <h2 className="mt-3 text-3xl font-extrabold leading-tight text-ink dark:text-neutral-100 sm:text-4xl">
               Four Ways to Play
             </h2>
           </div>
@@ -63,15 +63,15 @@ export default function GamesPage() {
             {gameModes.map((mode) => (
               <div
                 key={mode.title}
-                className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5"
+                className="rounded-2xl bg-white dark:bg-neutral-900 p-6 shadow-sm ring-1 ring-black/5 dark:ring-white/10"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gold/15 text-gold-dark">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gold/15 text-gold-dark dark:text-gold-light">
                   <HubIcon name={mode.icon} className="h-5 w-5" />
                 </div>
-                <h3 className="mt-4 text-base font-semibold text-ink">
+                <h3 className="mt-4 text-base font-semibold text-ink dark:text-neutral-100">
                   {mode.title}
                 </h3>
-                <p className="mt-1.5 text-sm leading-6 text-neutral-500">
+                <p className="mt-1.5 text-sm leading-6 text-neutral-500 dark:text-neutral-400">
                   {mode.description}
                 </p>
               </div>

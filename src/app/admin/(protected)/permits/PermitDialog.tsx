@@ -305,13 +305,13 @@ export function PermitDialog({
               <div ref={containerRef} className="relative">
                 <Label htmlFor="permitStudentSearch">Student</Label>
                 {selected ? (
-                  <div className="mt-1.5 rounded-xl bg-neutral-50 p-4">
+                  <div className="mt-1.5 rounded-xl bg-neutral-50 dark:bg-neutral-900 p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="font-semibold text-ink">
+                        <p className="font-semibold text-ink dark:text-neutral-100">
                           {selected.firstName} {selected.lastName}
                         </p>
-                        <p className="text-sm text-neutral-500">{selected.indexNumber}</p>
+                        <p className="text-sm text-neutral-500 dark:text-neutral-400">{selected.indexNumber}</p>
                       </div>
                       <button
                         type="button"
@@ -319,27 +319,27 @@ export function PermitDialog({
                           setSelected(null);
                           setQuery("");
                         }}
-                        className="shrink-0 text-xs font-semibold text-gold-dark hover:underline"
+                        className="shrink-0 text-xs font-semibold text-gold-dark dark:text-gold-light hover:underline"
                       >
                         change
                       </button>
                     </div>
-                    <dl className="mt-3 grid grid-cols-2 gap-2 text-xs text-neutral-500">
+                    <dl className="mt-3 grid grid-cols-2 gap-2 text-xs text-neutral-500 dark:text-neutral-400">
                       <div>
-                        <dt className="text-neutral-400">Email</dt>
-                        <dd className="text-neutral-700">{selected.email ?? "—"}</dd>
+                        <dt className="text-neutral-400 dark:text-neutral-500">Email</dt>
+                        <dd className="text-neutral-700 dark:text-neutral-300">{selected.email ?? "—"}</dd>
                       </div>
                       <div>
-                        <dt className="text-neutral-400">Phone</dt>
-                        <dd className="text-neutral-700">{selected.phone ?? "—"}</dd>
+                        <dt className="text-neutral-400 dark:text-neutral-500">Phone</dt>
+                        <dd className="text-neutral-700 dark:text-neutral-300">{selected.phone ?? "—"}</dd>
                       </div>
                       <div>
-                        <dt className="text-neutral-400">Programme</dt>
-                        <dd className="text-neutral-700">{selected.program ?? "—"}</dd>
+                        <dt className="text-neutral-400 dark:text-neutral-500">Programme</dt>
+                        <dd className="text-neutral-700 dark:text-neutral-300">{selected.program ?? "—"}</dd>
                       </div>
                       <div>
-                        <dt className="text-neutral-400">Level</dt>
-                        <dd className="text-neutral-700">
+                        <dt className="text-neutral-400 dark:text-neutral-500">Level</dt>
+                        <dd className="text-neutral-700 dark:text-neutral-300">
                           {selected.level ? `Level ${selected.level}` : "—"}
                         </dd>
                       </div>
@@ -357,14 +357,14 @@ export function PermitDialog({
                       onFocus={() => setShowResults(true)}
                     />
                     {showResults && query.trim().length >= 2 && (
-                      <div className="absolute z-10 mt-1.5 w-full rounded-xl bg-white p-1.5 shadow-lg ring-1 ring-black/10">
+                      <div className="absolute z-10 mt-1.5 w-full rounded-xl bg-white dark:bg-neutral-900 p-1.5 shadow-lg ring-1 ring-black/10 dark:ring-white/10">
                         {searching && (
-                          <p className="px-3 py-2 text-sm text-neutral-400">Searching…</p>
+                          <p className="px-3 py-2 text-sm text-neutral-400 dark:text-neutral-500">Searching…</p>
                         )}
                         {!searching && results.length === 0 && (
-                          <p className="px-3 py-2 text-sm text-neutral-400">
+                          <p className="px-3 py-2 text-sm text-neutral-400 dark:text-neutral-500">
                             No students found.{" "}
-                            <Link href="/admin/students" className="text-gold-dark hover:underline">
+                            <Link href="/admin/students" className="text-gold-dark dark:text-gold-light hover:underline">
                               Create one first
                             </Link>
                           </p>
@@ -380,12 +380,12 @@ export function PermitDialog({
                                 setResults([]);
                                 setShowResults(false);
                               }}
-                              className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm hover:bg-black/5"
+                              className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm hover:bg-black/5 dark:hover:bg-white/10"
                             >
-                              <span className="font-medium text-ink">
+                              <span className="font-medium text-ink dark:text-neutral-100">
                                 {s.firstName} {s.lastName}
                               </span>
-                              <span className="text-xs text-neutral-400">{s.indexNumber}</span>
+                              <span className="text-xs text-neutral-400 dark:text-neutral-500">{s.indexNumber}</span>
                             </button>
                           ))}
                       </div>
@@ -408,15 +408,15 @@ export function PermitDialog({
                     onChange={(e) => setAmount(e.target.value)}
                   />
                   {fieldErrors.amount && (
-                    <p className="mt-1 text-xs text-red-600">{fieldErrors.amount}</p>
+                    <p className="mt-1 text-xs text-red-600 dark:text-red-400">{fieldErrors.amount}</p>
                   )}
                 </div>
                 <div>
                   <Label>Expires</Label>
-                  <p className="mt-1.5 flex h-8 items-center text-sm text-neutral-600">
+                  <p className="mt-1.5 flex h-8 items-center text-sm text-neutral-600 dark:text-neutral-300">
                     {expiryPreview ?? "—"}
                   </p>
-                  <p className="mt-1 text-xs text-neutral-400">
+                  <p className="mt-1 text-xs text-neutral-400 dark:text-neutral-500">
                     Set by the super admin ({expiryDays ?? "…"} days from today)
                   </p>
                 </div>
@@ -439,7 +439,7 @@ export function PermitDialog({
               </div>
 
               {formError && (
-                <p className="rounded-md bg-red-50 px-3.5 py-2.5 text-sm text-red-600">
+                <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3.5 py-2.5 text-sm text-red-600 dark:text-red-400">
                   {formError}
                 </p>
               )}
@@ -462,13 +462,13 @@ export function PermitDialog({
               <DialogTitle>Permit Created</DialogTitle>
             </DialogHeader>
             <div className="text-center">
-              <span className="inline-flex rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700">
+              <span className="inline-flex rounded-full bg-green-50 dark:bg-green-950/40 px-3 py-1 text-xs font-semibold text-green-700 dark:text-green-400">
                 {created.referenceNumber}
               </span>
-              <p className="mt-3 text-sm text-neutral-500">
+              <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-400">
                 {formatCurrency(created.amount)} &middot; {created.studentName}
               </p>
-              <p className="mt-1 text-xs text-neutral-400">
+              <p className="mt-1 text-xs text-neutral-400 dark:text-neutral-500">
                 Expires{" "}
                 {new Date(created.expiresAt).toLocaleDateString("en-GB", {
                   day: "numeric",
@@ -476,7 +476,7 @@ export function PermitDialog({
                   year: "numeric",
                 })}
               </p>
-              <p className="mt-3 text-xs text-neutral-400">
+              <p className="mt-3 text-xs text-neutral-400 dark:text-neutral-500">
                 {created.emailSent
                   ? "Receipt emailed to the student."
                   : "Receipt email not sent (student has no email on file, or email isn't configured yet)."}
@@ -497,13 +497,13 @@ export function PermitDialog({
               <DialogTitle>Permit Details</DialogTitle>
             </DialogHeader>
             {loading || !detail ? (
-              <p className="py-8 text-center text-sm text-neutral-400">Loading…</p>
+              <p className="py-8 text-center text-sm text-neutral-400 dark:text-neutral-500">Loading…</p>
             ) : (
               <div className="space-y-5">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-base font-semibold text-ink">{detail.referenceNumber}</p>
-                    <p className="text-sm text-neutral-500">
+                    <p className="text-base font-semibold text-ink dark:text-neutral-100">{detail.referenceNumber}</p>
+                    <p className="text-sm text-neutral-500 dark:text-neutral-400">
                       {detail.student.firstName} {detail.student.lastName} &middot;{" "}
                       {detail.student.indexNumber}
                     </p>
@@ -513,22 +513,22 @@ export function PermitDialog({
                   </Badge>
                 </div>
 
-                <dl className="grid grid-cols-2 gap-4 rounded-xl bg-neutral-50 p-4 text-sm">
+                <dl className="grid grid-cols-2 gap-4 rounded-xl bg-neutral-50 dark:bg-neutral-900 p-4 text-sm">
                   <div>
-                    <dt className="text-xs text-neutral-400">Amount Paid</dt>
-                    <dd className="font-semibold text-ink">{formatCurrency(detail.amount)}</dd>
+                    <dt className="text-xs text-neutral-400 dark:text-neutral-500">Amount Paid</dt>
+                    <dd className="font-semibold text-ink dark:text-neutral-100">{formatCurrency(detail.amount)}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-neutral-400">Payment Method</dt>
-                    <dd className="text-neutral-700">{detail.paymentMethod ?? "—"}</dd>
+                    <dt className="text-xs text-neutral-400 dark:text-neutral-500">Payment Method</dt>
+                    <dd className="text-neutral-700 dark:text-neutral-300">{detail.paymentMethod ?? "—"}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-neutral-400">Issued By</dt>
-                    <dd className="text-neutral-700">{detail.issuer?.name ?? "—"}</dd>
+                    <dt className="text-xs text-neutral-400 dark:text-neutral-500">Issued By</dt>
+                    <dd className="text-neutral-700 dark:text-neutral-300">{detail.issuer?.name ?? "—"}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-neutral-400">Date Paid</dt>
-                    <dd className="text-neutral-700">
+                    <dt className="text-xs text-neutral-400 dark:text-neutral-500">Date Paid</dt>
+                    <dd className="text-neutral-700 dark:text-neutral-300">
                       {new Date(detail.issuedAt).toLocaleDateString("en-GB", {
                         day: "numeric",
                         month: "short",
@@ -537,8 +537,8 @@ export function PermitDialog({
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-neutral-400">Expires</dt>
-                    <dd className="text-neutral-700">
+                    <dt className="text-xs text-neutral-400 dark:text-neutral-500">Expires</dt>
+                    <dd className="text-neutral-700 dark:text-neutral-300">
                       {detail.expiresAt
                         ? new Date(detail.expiresAt).toLocaleDateString("en-GB", {
                             day: "numeric",
@@ -549,8 +549,8 @@ export function PermitDialog({
                     </dd>
                   </div>
                   <div className="col-span-2">
-                    <dt className="text-xs text-neutral-400">Receipt Email</dt>
-                    <dd className="text-neutral-700">
+                    <dt className="text-xs text-neutral-400 dark:text-neutral-500">Receipt Email</dt>
+                    <dd className="text-neutral-700 dark:text-neutral-300">
                       {detail.emailSentAt
                         ? `Sent ${new Date(detail.emailSentAt).toLocaleString("en-GB", {
                             day: "numeric",
@@ -566,12 +566,12 @@ export function PermitDialog({
                 </dl>
 
                 {actionError && (
-                  <p className="rounded-md bg-red-50 px-3.5 py-2.5 text-sm text-red-600">
+                  <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3.5 py-2.5 text-sm text-red-600 dark:text-red-400">
                     {actionError}
                   </p>
                 )}
                 {actionMessage && (
-                  <p className="rounded-md bg-green-50 px-3.5 py-2.5 text-sm text-green-700">
+                  <p className="rounded-md bg-green-50 dark:bg-green-950/40 px-3.5 py-2.5 text-sm text-green-700 dark:text-green-400">
                     {actionMessage}
                   </p>
                 )}

@@ -79,7 +79,7 @@ export default function SignupPage() {
       footer={
         <>
           Already have an account?{" "}
-          <Link href="/login" className="font-semibold text-gold-dark hover:underline">
+          <Link href="/login" className="font-semibold text-gold-dark dark:text-gold-light hover:underline">
             Log in
           </Link>
         </>
@@ -170,7 +170,7 @@ export default function SignupPage() {
         </FormField>
 
         {formError && (
-          <p className="rounded-md bg-red-50 px-3.5 py-2.5 text-sm text-red-600">
+          <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3.5 py-2.5 text-sm text-red-600 dark:text-red-400">
             {formError}
           </p>
         )}
@@ -178,7 +178,7 @@ export default function SignupPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-md bg-ink px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-neutral-800 disabled:opacity-60"
+          className="w-full rounded-md bg-ink px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-neutral-800 disabled:opacity-60 dark:bg-gold dark:text-ink dark:hover:bg-gold-dark"
         >
           {loading ? "Creating account…" : "Create Account"}
         </button>

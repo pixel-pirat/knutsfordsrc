@@ -221,7 +221,7 @@ export function StudentDialog({
                 showAvatar
               />
               {formError && (
-                <p className="rounded-md bg-red-50 px-3.5 py-2.5 text-sm text-red-600">
+                <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3.5 py-2.5 text-sm text-red-600 dark:text-red-400">
                   {formError}
                 </p>
               )}
@@ -243,16 +243,16 @@ export function StudentDialog({
               <DialogTitle>Student Created</DialogTitle>
             </DialogHeader>
             <div className="rounded-xl bg-gold/15 p-5 ring-1 ring-gold/30">
-              <p className="text-sm font-semibold text-ink">
+              <p className="text-sm font-semibold text-ink dark:text-neutral-100">
                 {form.firstName} {form.lastName} ({form.indexNumber})
               </p>
-              <p className="mt-1 text-sm text-neutral-600">
+              <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">
                 Share this temporary password with the student so they can log in:
               </p>
-              <p className="mt-3 rounded-md bg-white px-3 py-2 text-center font-mono text-sm font-semibold text-ink ring-1 ring-black/10">
+              <p className="mt-3 rounded-md bg-white dark:bg-neutral-900 px-3 py-2 text-center font-mono text-sm font-semibold text-ink dark:text-neutral-100 ring-1 ring-black/10 dark:ring-white/10">
                 {tempPassword}
               </p>
-              <p className="mt-3 text-xs text-neutral-500">
+              <p className="mt-3 text-xs text-neutral-500 dark:text-neutral-400">
                 {welcomeEmailSent
                   ? "These details, along with the login page link, have also been emailed to the student."
                   : "Email not sent (no email on file for this student, or email isn't configured yet) — share the password with them directly."}
@@ -270,7 +270,7 @@ export function StudentDialog({
               <DialogTitle>Edit Student</DialogTitle>
             </DialogHeader>
             {loading ? (
-              <p className="py-8 text-center text-sm text-neutral-400">Loading…</p>
+              <p className="py-8 text-center text-sm text-neutral-400 dark:text-neutral-500">Loading…</p>
             ) : (
               <form onSubmit={handleEdit} className="space-y-4">
                 <StudentFormFields
@@ -281,7 +281,7 @@ export function StudentDialog({
                   showAvatar
                 />
                 {formError && (
-                  <p className="rounded-md bg-red-50 px-3.5 py-2.5 text-sm text-red-600">
+                  <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3.5 py-2.5 text-sm text-red-600 dark:text-red-400">
                     {formError}
                   </p>
                 )}
@@ -335,7 +335,7 @@ function StudentFormFields({
           onChange={(e) => setField("indexNumber", e.target.value)}
         />
         {fieldErrors.indexNumber && (
-          <p className="mt-1 text-xs text-red-600">{fieldErrors.indexNumber}</p>
+          <p className="mt-1 text-xs text-red-600 dark:text-red-400">{fieldErrors.indexNumber}</p>
         )}
       </div>
 
@@ -349,7 +349,7 @@ function StudentFormFields({
             onChange={(e) => setField("firstName", e.target.value)}
           />
           {fieldErrors.firstName && (
-            <p className="mt-1 text-xs text-red-600">{fieldErrors.firstName}</p>
+            <p className="mt-1 text-xs text-red-600 dark:text-red-400">{fieldErrors.firstName}</p>
           )}
         </div>
         <div>
@@ -361,7 +361,7 @@ function StudentFormFields({
             onChange={(e) => setField("lastName", e.target.value)}
           />
           {fieldErrors.lastName && (
-            <p className="mt-1 text-xs text-red-600">{fieldErrors.lastName}</p>
+            <p className="mt-1 text-xs text-red-600 dark:text-red-400">{fieldErrors.lastName}</p>
           )}
         </div>
       </div>
@@ -377,7 +377,7 @@ function StudentFormFields({
             onChange={(e) => setField("email", e.target.value)}
           />
           {fieldErrors.email && (
-            <p className="mt-1 text-xs text-red-600">{fieldErrors.email}</p>
+            <p className="mt-1 text-xs text-red-600 dark:text-red-400">{fieldErrors.email}</p>
           )}
         </div>
         <div>
@@ -399,7 +399,7 @@ function StudentFormFields({
           </SelectTrigger>
           <SelectContent>
             {programs.length === 0 && (
-              <p className="px-3 py-2 text-xs text-neutral-400">
+              <p className="px-3 py-2 text-xs text-neutral-400 dark:text-neutral-500">
                 No programmes configured yet
               </p>
             )}

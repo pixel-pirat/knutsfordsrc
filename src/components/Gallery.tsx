@@ -6,20 +6,20 @@ export function Gallery() {
   const preview = galleryImages.slice(0, 6);
 
   return (
-    <section className="bg-white">
+    <section className="bg-white dark:bg-neutral-900">
       <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-24">
         <div className="mb-10 flex items-end justify-between">
           <div>
-            <span className="text-sm font-bold tracking-wide text-gold-dark">
+            <span className="text-sm font-bold tracking-wide text-gold-dark dark:text-gold-light">
               CAMPUS GALLERY
             </span>
-            <h2 className="mt-2 text-3xl font-extrabold text-ink sm:text-4xl">
+            <h2 className="mt-2 text-3xl font-extrabold text-ink dark:text-neutral-100 sm:text-4xl">
               Life at Knutsford
             </h2>
           </div>
           <Link
             href="/gallery"
-            className="hidden text-sm font-semibold text-gold-dark hover:underline sm:block"
+            className="hidden text-sm font-semibold text-gold-dark dark:text-gold-light hover:underline sm:block"
           >
             view all
           </Link>
@@ -29,7 +29,7 @@ export function Gallery() {
           {preview.map((img) => (
             <div
               key={img.src}
-              className={`relative aspect-square overflow-hidden rounded-2xl bg-neutral-200 ring-1 ring-black/5 ${
+              className={`relative aspect-square overflow-hidden rounded-2xl bg-neutral-200 dark:bg-neutral-800 ring-1 ring-black/5 dark:ring-white/10 ${
                 img.tall ? "sm:row-span-2" : ""
               }`}
             >

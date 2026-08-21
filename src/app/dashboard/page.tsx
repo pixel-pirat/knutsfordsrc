@@ -6,9 +6,9 @@ export default async function DashboardOverviewPage() {
 
   return (
     <div>
-      <p className="mb-6 text-sm text-neutral-500">
+      <p className="mb-6 text-sm text-neutral-500 dark:text-neutral-400">
         Welcome back,{" "}
-        <span className="font-semibold text-ink">{student?.firstName}</span>
+        <span className="font-semibold text-ink dark:text-neutral-100">{student?.firstName}</span>
       </p>
       <DuesOverview />
     </div>

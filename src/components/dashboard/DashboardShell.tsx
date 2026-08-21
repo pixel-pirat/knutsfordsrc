@@ -15,8 +15,8 @@ export function DashboardShell({
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-white">
-      <aside className="hidden w-64 shrink-0 border-r border-black/5 lg:block">
+    <div className="flex min-h-screen bg-white dark:bg-neutral-900">
+      <aside className="hidden w-64 shrink-0 border-r border-black/5 dark:border-white/10 lg:block">
         <div className="sticky top-0 h-screen">
           <Sidebar />
         </div>
@@ -30,7 +30,7 @@ export function DashboardShell({
             onClick={() => setMobileOpen(false)}
             className="absolute inset-0 bg-black/40"
           />
-          <div className="absolute inset-y-0 left-0 w-72 max-w-[85%] bg-neutral-50 shadow-xl">
+          <div className="absolute inset-y-0 left-0 w-72 max-w-[85%] bg-neutral-50 dark:bg-neutral-900 shadow-xl">
             <Sidebar onNavigate={() => setMobileOpen(false)} />
           </div>
         </div>
@@ -38,7 +38,7 @@ export function DashboardShell({
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar student={student} onMenuClick={() => setMobileOpen(true)} />
-        <main className="flex-1 bg-neutral-50/50 p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 bg-neutral-50/50 dark:bg-neutral-950/50 p-4 sm:p-6 lg:p-8">
           {children}
         </main>
       </div>

@@ -11,7 +11,7 @@ const socials = [
 
 export function SiteFooterBar() {
   return (
-    <footer className="bg-ink text-neutral-400">
+    <footer className="bg-ink text-neutral-400 dark:text-neutral-500">
       <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
@@ -77,7 +77,7 @@ export function SiteFooterBar() {
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-xs text-neutral-500 sm:flex-row">
+        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-xs text-neutral-500 dark:text-neutral-400 sm:flex-row">
           <p>&copy; 2026 Knutsford University. All rights reserved.</p>
           <div className="flex gap-6">
             <a href="#" className="hover:text-gold-light">Privacy Policy</a>
