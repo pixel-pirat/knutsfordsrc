@@ -85,7 +85,6 @@ export const adminStudentUpdateSchema = z.object({
 });
 
 export const paymentMethodSchema = z.enum(["Cash", "MoMo", "Bank Payment", "Free Card"]);
-export const paymentStatusSchema = z.enum(["Confirmed", "Pending"]);
 
 export const permitIssueSchema = z.object({
   studentId: z.uuid("Select a student first"),
@@ -94,7 +93,6 @@ export const permitIssueSchema = z.object({
     .positive("Enter the amount paid")
     .max(1_000_000, "Enter a valid amount"),
   paymentMethod: paymentMethodSchema.optional().or(z.literal("")),
-  paymentStatus: paymentStatusSchema.optional().or(z.literal("")),
 });
 
 export const avatarUpdateSchema = z.object({

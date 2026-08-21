@@ -56,7 +56,6 @@ export default async function StudentDetailPage({
         referenceNumber: p.referenceNumber,
         amount: p.amount,
         paymentMethod: p.paymentMethod,
-        paymentStatus: p.paymentStatus,
         cardStatus: p.cardStatus,
         expiresAt: p.expiresAt ? p.expiresAt.toISOString() : null,
         issuer: p.issuer,

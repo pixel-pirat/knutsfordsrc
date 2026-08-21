@@ -22,7 +22,6 @@ export async function GET(
       referenceNumber: permit.referenceNumber,
       amount: permit.amount,
       paymentMethod: permit.paymentMethod,
-      paymentStatus: permit.paymentStatus,
       cardStatus: permit.cardStatus,
       status: getPermitStatus(permit),
       issuedAt: permit.issuedAt,

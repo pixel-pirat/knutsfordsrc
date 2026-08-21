@@ -38,7 +38,6 @@ type PermitRow = {
   referenceNumber: string;
   amount: string | null;
   paymentMethod: string | null;
-  paymentStatus: string | null;
   cardStatus: string;
   expiresAt: string | null;
   issuer: { id: string; name: string } | null;
@@ -193,7 +192,6 @@ export function StudentDetailClient({
                   <TableHead>Reference</TableHead>
                   <TableHead>Amount</TableHead>
                   <TableHead>Payment</TableHead>
-                  <TableHead>Payment Status</TableHead>
                   <TableHead>Issued By</TableHead>
                   <TableHead>Expires</TableHead>
                   <TableHead>Status</TableHead>
@@ -202,7 +200,7 @@ export function StudentDetailClient({
               <TableBody>
                 {permits.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={7} className="py-10 text-center text-neutral-400 dark:text-neutral-500">
+                    <TableCell colSpan={6} className="py-10 text-center text-neutral-400 dark:text-neutral-500">
                       No permits issued to this student yet.
                     </TableCell>
                   </TableRow>
@@ -218,7 +216,6 @@ export function StudentDetailClient({
                       <TableCell className="font-medium text-ink dark:text-neutral-100">{p.referenceNumber}</TableCell>
                       <TableCell className="text-neutral-700 dark:text-neutral-300">{formatCurrency(p.amount)}</TableCell>
                       <TableCell className="text-neutral-500 dark:text-neutral-400">{p.paymentMethod ?? "—"}</TableCell>
-                      <TableCell className="text-neutral-500 dark:text-neutral-400">{p.paymentStatus ?? "—"}</TableCell>
                       <TableCell className="text-neutral-700 dark:text-neutral-300">{p.issuer?.name ?? "—"}</TableCell>
                       <TableCell className="text-neutral-500 dark:text-neutral-400">
                         {p.expiresAt
