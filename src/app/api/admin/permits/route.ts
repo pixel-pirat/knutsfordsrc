@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { studentId, amount, paymentMethod } = parsed.data;
+  const { studentId, amount, paymentMethod, paymentStatus } = parsed.data;
 
   const student = await getStudentById(studentId);
   if (!student) {
@@ -41,6 +41,7 @@ export async function POST(request: Request) {
     referenceNumber,
     amount: amount.toFixed(2),
     paymentMethod: paymentMethod || null,
+    paymentStatus: paymentStatus || null,
     issuedBy: admin.id,
     expiresAt: expiresAtDate,
   });

@@ -24,6 +24,7 @@ import {
 import { formatCurrency, getPermitStatus, permitStatusBadge } from "@/lib/permits";
 
 const PAYMENT_METHODS = ["Cash", "MoMo", "Bank Payment", "Free Card"] as const;
+const PAYMENT_STATUSES = ["Confirmed", "Pending"] as const;
 
 type StudentResult = {
   id: string;
@@ -41,6 +42,7 @@ type PermitDetail = {
   referenceNumber: string;
   amount: string | null;
   paymentMethod: string | null;
+  paymentStatus: string | null;
   cardStatus: string;
   status: string;
   issuedAt: string;
@@ -79,6 +81,7 @@ export function PermitDialog({
   const containerRef = useRef<HTMLDivElement>(null);
   const [amount, setAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
+  const [paymentStatus, setPaymentStatus] = useState("");
   const [expiryDays, setExpiryDays] = useState<number | null>(null);
   const [expiryPreview, setExpiryPreview] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -119,6 +122,7 @@ export function PermitDialog({
         setSelected(null);
         setAmount("");
         setPaymentMethod("");
+        setPaymentStatus("");
         setCreated(null);
         setDetail(null);
       }
@@ -212,6 +216,7 @@ export function PermitDialog({
           studentId: selected.id,
           amount: amountNumber,
           paymentMethod,
+          paymentStatus,
         }),
       });
       const data = await res.json();
@@ -239,6 +244,7 @@ export function PermitDialog({
     setQuery("");
     setAmount("");
     setPaymentMethod("");
+    setPaymentStatus("");
     setCreated(null);
     setFormError(null);
   }
@@ -422,20 +428,37 @@ export function PermitDialog({
                 </div>
               </div>
 
-              <div>
-                <Label>Payment Method</Label>
-                <Select value={paymentMethod} onValueChange={(v) => setPaymentMethod(v ?? "")}>
-                  <SelectTrigger className="mt-1.5 w-full">
-                    <SelectValue placeholder="Select payment method" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PAYMENT_METHODS.map((m) => (
-                      <SelectItem key={m} value={m}>
-                        {m}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Payment Method</Label>
+                  <Select value={paymentMethod} onValueChange={(v) => setPaymentMethod(v ?? "")}>
+                    <SelectTrigger className="mt-1.5 w-full">
+                      <SelectValue placeholder="Select payment method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PAYMENT_METHODS.map((m) => (
+                        <SelectItem key={m} value={m}>
+                          {m}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Payment Status</Label>
+                  <Select value={paymentStatus} onValueChange={(v) => setPaymentStatus(v ?? "")}>
+                    <SelectTrigger className="mt-1.5 w-full">
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PAYMENT_STATUSES.map((s) => (
+                        <SelectItem key={s} value={s}>
+                          {s}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               {formError && (
@@ -521,6 +544,10 @@ export function PermitDialog({
                   <div>
                     <dt className="text-xs text-neutral-400 dark:text-neutral-500">Payment Method</dt>
                     <dd className="text-neutral-700 dark:text-neutral-300">{detail.paymentMethod ?? "—"}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-neutral-400 dark:text-neutral-500">Payment Status</dt>
+                    <dd className="text-neutral-700 dark:text-neutral-300">{detail.paymentStatus ?? "—"}</dd>
                   </div>
                   <div>
                     <dt className="text-xs text-neutral-400 dark:text-neutral-500">Issued By</dt>
