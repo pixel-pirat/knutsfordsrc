@@ -14,7 +14,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { formatCurrency, getPermitStatus, permitStatusBadge } from "@/lib/permits";
+
+const PAYMENT_METHODS = ["Cash", "MoMo", "Bank Payment", "Free Card"] as const;
 
 type StudentResult = {
   id: string;
@@ -31,6 +40,7 @@ type PermitDetail = {
   id: string;
   referenceNumber: string;
   amount: string | null;
+  paymentMethod: string | null;
   cardStatus: string;
   status: string;
   issuedAt: string;
@@ -68,6 +78,7 @@ export function PermitDialog({
   const [selected, setSelected] = useState<StudentResult | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [amount, setAmount] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("");
   const [expiresAt, setExpiresAt] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -106,6 +117,7 @@ export function PermitDialog({
         setResults([]);
         setSelected(null);
         setAmount("");
+        setPaymentMethod("");
         setExpiresAt("");
         setCreated(null);
         setDetail(null);
@@ -177,7 +189,12 @@ export function PermitDialog({
       const res = await fetch("/api/admin/permits", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ studentId: selected.id, amount: amountNumber, expiresAt }),
+        body: JSON.stringify({
+          studentId: selected.id,
+          amount: amountNumber,
+          expiresAt,
+          paymentMethod,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -203,6 +220,7 @@ export function PermitDialog({
     setSelected(null);
     setQuery("");
     setAmount("");
+    setPaymentMethod("");
     setExpiresAt("");
     setCreated(null);
     setFormError(null);
@@ -391,6 +409,22 @@ export function PermitDialog({
                 </div>
               </div>
 
+              <div>
+                <Label>Payment Method</Label>
+                <Select value={paymentMethod} onValueChange={(v) => setPaymentMethod(v ?? "")}>
+                  <SelectTrigger className="mt-1.5 w-full">
+                    <SelectValue placeholder="Select payment method" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PAYMENT_METHODS.map((m) => (
+                      <SelectItem key={m} value={m}>
+                        {m}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               {formError && (
                 <p className="rounded-md bg-red-50 px-3.5 py-2.5 text-sm text-red-600">
                   {formError}
@@ -470,6 +504,10 @@ export function PermitDialog({
                   <div>
                     <dt className="text-xs text-neutral-400">Amount Paid</dt>
                     <dd className="font-semibold text-ink">{formatCurrency(detail.amount)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-neutral-400">Payment Method</dt>
+                    <dd className="text-neutral-700">{detail.paymentMethod ?? "—"}</dd>
                   </div>
                   <div>
                     <dt className="text-xs text-neutral-400">Issued By</dt>

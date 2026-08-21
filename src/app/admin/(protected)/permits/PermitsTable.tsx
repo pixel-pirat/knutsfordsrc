@@ -19,6 +19,7 @@ type PermitRow = {
   id: string;
   referenceNumber: string;
   amount: string | null;
+  paymentMethod: string | null;
   cardStatus: string;
   expiresAt: string | null;
   student: { firstName: string; lastName: string; indexNumber: string } | null;
@@ -62,6 +63,7 @@ export function PermitsTable({
               <TableHead>Reference</TableHead>
               <TableHead>Student</TableHead>
               <TableHead>Amount</TableHead>
+              <TableHead>Payment</TableHead>
               <TableHead>Issued By</TableHead>
               <TableHead>Expires</TableHead>
               <TableHead>Status</TableHead>
@@ -70,7 +72,7 @@ export function PermitsTable({
           <TableBody>
             {permits.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="py-10 text-center text-neutral-400">
+                <TableCell colSpan={7} className="py-10 text-center text-neutral-400">
                   No permits issued yet.
                 </TableCell>
               </TableRow>
@@ -91,6 +93,7 @@ export function PermitsTable({
                     </span>
                   </TableCell>
                   <TableCell className="text-neutral-700">{formatCurrency(p.amount)}</TableCell>
+                  <TableCell className="text-neutral-500">{p.paymentMethod ?? "—"}</TableCell>
                   <TableCell className="text-neutral-700">{p.issuer?.name}</TableCell>
                   <TableCell className="text-neutral-500">
                     {p.expiresAt

@@ -71,6 +71,7 @@ export const permits = pgTable("permits", {
   status: permitStatusEnum("status").notNull().default("active"),
   cardStatus: cardStatusEnum("card_status").notNull().default("pending"),
   amount: numeric("amount", { precision: 10, scale: 2 }),
+  paymentMethod: text("payment_method"),
   notes: text("notes"),
   issuedBy: uuid("issued_by")
     .notNull()

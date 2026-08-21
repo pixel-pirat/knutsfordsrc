@@ -36,6 +36,7 @@ export async function GET(
         id: p.id,
         referenceNumber: p.referenceNumber,
         amount: p.amount,
+        paymentMethod: p.paymentMethod,
         cardStatus: p.cardStatus,
         issuedAt: p.issuedAt,
         expiresAt: p.expiresAt,

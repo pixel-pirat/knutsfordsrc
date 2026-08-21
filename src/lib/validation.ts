@@ -84,6 +84,8 @@ export const adminStudentUpdateSchema = z.object({
   avatarUrl: z.url().optional().or(z.literal("")),
 });
 
+export const paymentMethodSchema = z.enum(["Cash", "MoMo", "Bank Payment", "Free Card"]);
+
 export const permitIssueSchema = z.object({
   studentId: z.uuid("Select a student first"),
   amount: z.coerce
@@ -91,6 +93,7 @@ export const permitIssueSchema = z.object({
     .positive("Enter the amount paid")
     .max(1_000_000, "Enter a valid amount"),
   expiresAt: z.string().min(1, "Expiry date is required"),
+  paymentMethod: paymentMethodSchema.optional().or(z.literal("")),
 });
 
 export const avatarUpdateSchema = z.object({

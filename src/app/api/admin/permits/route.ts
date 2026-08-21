@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { studentId, amount, expiresAt } = parsed.data;
+  const { studentId, amount, expiresAt, paymentMethod } = parsed.data;
 
   const student = await getStudentById(studentId);
   if (!student) {
@@ -41,6 +41,7 @@ export async function POST(request: Request) {
     permitType: "Permit",
     referenceNumber,
     amount: amount.toFixed(2),
+    paymentMethod: paymentMethod || null,
     issuedBy: admin.id,
     expiresAt: expiresAtDate,
   });
