@@ -2,9 +2,11 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAdmin, requireSuperAdmin } from "@/lib/adminGuard";
 import { PERMISSION_KEYS } from "@/lib/permissions";
-import { getAdminById, updateAdmin, logAudit } from "@/db/adminQueries";
+import { getAdminById, getAdminByEmail, updateAdmin, logAudit } from "@/db/adminQueries";
 
 const updateSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").optional(),
+  email: z.email("Enter a valid email").optional(),
   active: z.boolean().optional(),
   permissions: z.array(z.string()).optional(),
 });
@@ -43,7 +45,19 @@ export async function PATCH(
     );
   }
 
-  const values: { active?: boolean; permissions?: string[] } = {};
+  if (parsed.data.email !== undefined) {
+    const conflict = await getAdminByEmail(parsed.data.email);
+    if (conflict && conflict.id !== id) {
+      return NextResponse.json(
+        { error: "Another admin already uses this email" },
+        { status: 409 }
+      );
+    }
+  }
+
+  const values: { name?: string; email?: string; active?: boolean; permissions?: string[] } = {};
+  if (parsed.data.name !== undefined) values.name = parsed.data.name;
+  if (parsed.data.email !== undefined) values.email = parsed.data.email;
   if (parsed.data.active !== undefined) values.active = parsed.data.active;
   if (parsed.data.permissions !== undefined) {
     values.permissions = parsed.data.permissions.filter((p) =>

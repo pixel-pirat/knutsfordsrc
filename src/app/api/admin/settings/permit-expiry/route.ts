@@ -1,14 +1,20 @@
 import { NextResponse } from "next/server";
 import { requireAdmin, requireSuperAdmin } from "@/lib/adminGuard";
-import { permitExpiryDaysSchema } from "@/lib/validation";
-import { getPermitExpiryDays, setSetting, logAudit, PERMIT_EXPIRY_DAYS_KEY } from "@/db/adminQueries";
+import { permitExpiryDateSchema } from "@/lib/validation";
+import {
+  getPermitExpiryDate,
+  setSetting,
+  bulkApplyPermitExpiry,
+  logAudit,
+  PERMIT_EXPIRY_DATE_KEY,
+} from "@/db/adminQueries";
 
 export async function GET() {
   const { error } = await requireAdmin();
   if (error) return error;
 
-  const days = await getPermitExpiryDays();
-  return NextResponse.json({ days });
+  const date = await getPermitExpiryDate();
+  return NextResponse.json({ date: date ? date.toISOString().slice(0, 10) : null });
 }
 
 export async function PATCH(request: Request) {
@@ -22,7 +28,7 @@ export async function PATCH(request: Request) {
   }
 
   const body = await request.json().catch(() => null);
-  const parsed = permitExpiryDaysSchema.safeParse(body);
+  const parsed = permitExpiryDateSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { error: parsed.error.issues[0]?.message ?? "Invalid input" },
@@ -30,14 +36,17 @@ export async function PATCH(request: Request) {
     );
   }
 
-  await setSetting(PERMIT_EXPIRY_DAYS_KEY, String(parsed.data.days));
+  const expiryDate = new Date(`${parsed.data.date}T23:59:59.000Z`);
+
+  await setSetting(PERMIT_EXPIRY_DATE_KEY, parsed.data.date);
+  const updated = await bulkApplyPermitExpiry(expiryDate);
 
   await logAudit({
     actorId: admin.id,
     action: "settings.update_permit_expiry",
     targetType: "settings",
-    metadata: { days: parsed.data.days },
+    metadata: { date: parsed.data.date, permitsUpdated: updated.length },
   });
 
-  return NextResponse.json({ days: parsed.data.days });
+  return NextResponse.json({ date: parsed.data.date, updatedCount: updated.length });
 }

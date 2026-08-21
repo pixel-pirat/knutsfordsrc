@@ -5,20 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function PermitExpirySettings({ initialDays }: { initialDays: number }) {
-  const [days, setDays] = useState(String(initialDays));
+export function PermitExpirySettings({ initialDate }: { initialDate: string | null }) {
+  const [date, setDate] = useState(initialDate ?? "");
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
-    setSuccess(false);
+    setSuccess(null);
 
-    const parsed = Number(days);
-    if (!days || Number.isNaN(parsed) || parsed <= 0 || !Number.isInteger(parsed)) {
-      setError("Enter a whole number of days greater than 0");
+    if (!date) {
+      setError("Select an expiry date");
       return;
     }
 
@@ -27,14 +26,16 @@ export function PermitExpirySettings({ initialDays }: { initialDays: number }) {
       const res = await fetch("/api/admin/settings/permit-expiry", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ days: parsed }),
+        body: JSON.stringify({ date }),
       });
       const data = await res.json();
       if (!res.ok) {
         setError(data.error ?? "Something went wrong. Please try again.");
         return;
       }
-      setSuccess(true);
+      setSuccess(
+        `Saved. ${data.updatedCount} active/pending permit${data.updatedCount === 1 ? "" : "s"} updated to this date. Already-expired permits were left alone.`
+      );
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -45,29 +46,27 @@ export function PermitExpirySettings({ initialDays }: { initialDays: number }) {
   return (
     <div>
       <p className="mb-4 text-sm text-neutral-500 dark:text-neutral-400">
-        New permits automatically expire this many days after being issued. Staff issuing
-        permits can no longer type a custom expiry date — this keeps every permit consistent
-        and prevents mis-entries.
+        This is the single expiry date used for every permit. Saving immediately updates every
+        currently active or pending permit to this date — new permits also use it. Permits that
+        have already expired are left as expired and are not affected.
       </p>
       <form onSubmit={handleSubmit} className="flex max-w-xs flex-wrap items-start gap-2">
         <div className="min-w-0 flex-1">
-          <Label htmlFor="permitExpiryDays">Validity Period (days)</Label>
+          <Label htmlFor="permitExpiryDate">Expiry Date</Label>
           <Input
-            id="permitExpiryDays"
-            type="number"
-            min="1"
-            step="1"
+            id="permitExpiryDate"
+            type="date"
             className="mt-1.5"
-            value={days}
-            onChange={(e) => setDays(e.target.value)}
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
           />
         </div>
         <Button type="submit" disabled={loading} className="mt-6">
-          {loading ? "Saving…" : "Save"}
+          {loading ? "Applying…" : "Apply to All Permits"}
         </Button>
       </form>
       {error && <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>}
-      {success && <p className="mt-3 text-sm text-green-700 dark:text-green-400">Permit expiry policy updated.</p>}
+      {success && <p className="mt-3 text-sm text-green-700 dark:text-green-400">{success}</p>}
     </div>
   );
 }

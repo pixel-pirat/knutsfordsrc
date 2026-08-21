@@ -64,10 +64,38 @@ export function StudentDetailClient({
     emailSent: boolean;
   } | null>(null);
   const [resendError, setResendError] = useState<string | null>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   function openPermit(id: string) {
     setSelectedPermitId(id);
     setPermitDialogOpen(true);
+  }
+
+  async function handleDeleteStudent() {
+    if (!confirmingDelete) {
+      setConfirmingDelete(true);
+      return;
+    }
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const res = await fetch(`/api/admin/students/${student.id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setDeleteError(data.error ?? "Failed to delete student");
+        setConfirmingDelete(false);
+        return;
+      }
+      router.push("/admin/students");
+      router.refresh();
+    } catch {
+      setDeleteError("Failed to delete student");
+      setConfirmingDelete(false);
+    } finally {
+      setDeleting(false);
+    }
   }
 
   async function handleResendWelcome() {
@@ -121,12 +149,28 @@ export function StudentDetailClient({
               {resending ? "Sending…" : "Resend Welcome Email"}
             </Button>
             <Button onClick={() => setEditOpen(true)}>Edit Student</Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteStudent}
+              disabled={deleting}
+            >
+              {deleting ? "Deleting…" : confirmingDelete ? "Confirm Delete?" : "Delete Student"}
+            </Button>
           </div>
         )}
       </div>
 
       {resendError && (
         <p className="mb-6 rounded-xl bg-red-50 dark:bg-red-950/40 px-4 py-3 text-sm text-red-600 dark:text-red-400">{resendError}</p>
+      )}
+      {deleteError && (
+        <p className="mb-6 rounded-xl bg-red-50 dark:bg-red-950/40 px-4 py-3 text-sm text-red-600 dark:text-red-400">{deleteError}</p>
+      )}
+      {confirmingDelete && !deleting && (
+        <p className="mb-6 rounded-xl bg-red-50 dark:bg-red-950/40 px-4 py-3 text-sm text-red-600 dark:text-red-400">
+          This permanently deletes {student.firstName} {student.lastName} and all {permits.length}{" "}
+          permit{permits.length === 1 ? "" : "s"} issued to them. Click &ldquo;Confirm Delete?&rdquo; again to proceed, or navigate away to cancel.
+        </p>
       )}
       {resendResult && (
         <div className="mb-6 rounded-xl bg-gold/15 p-4 ring-1 ring-gold/30">
@@ -143,7 +187,7 @@ export function StudentDetailClient({
       )}
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
+        <div className="min-w-0 space-y-6 lg:col-span-2">
           <div className="rounded-2xl bg-white dark:bg-neutral-900 p-6 ring-1 ring-black/5 dark:ring-white/10 sm:p-8">
             <h2 className="text-sm font-bold text-ink dark:text-neutral-100">Profile</h2>
             <dl className="mt-4 grid grid-cols-2 gap-4 text-sm">

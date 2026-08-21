@@ -116,10 +116,14 @@ export function AdminDialog({
   async function handleEdit(e: FormEvent) {
     e.preventDefault();
     setFormError(null);
+    setFieldErrors({});
     if (!admin) return;
 
-    if (!name.trim()) {
-      setFieldErrors({ name: "Name is required" });
+    const errors: Record<string, string> = {};
+    if (!name.trim()) errors.name = "Name is required";
+    if (!email.trim()) errors.email = "Email is required";
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
 
@@ -128,7 +132,7 @@ export function AdminDialog({
       const res = await fetch(`/api/admin/admins/${admin.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), permissions }),
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), permissions }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -176,7 +180,6 @@ export function AdminDialog({
                 type="email"
                 className="mt-1.5"
                 value={email}
-                disabled={mode === "edit"}
                 onChange={(e) => setEmail(e.target.value)}
               />
               {fieldErrors.email && (

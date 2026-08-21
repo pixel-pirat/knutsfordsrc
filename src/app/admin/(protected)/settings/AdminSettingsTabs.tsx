@@ -12,12 +12,12 @@ export function AdminSettingsTabs({
   profile,
   isSuperAdmin,
   initialPrograms,
-  permitExpiryDays,
+  permitExpiryDate,
 }: {
   profile: { name: string; email: string; avatarUrl: string | null; role: string };
   isSuperAdmin: boolean;
   initialPrograms: ProgramRow[];
-  permitExpiryDays: number;
+  permitExpiryDate: string | null;
 }) {
   return (
     <Tabs defaultValue="profile">
@@ -57,7 +57,7 @@ export function AdminSettingsTabs({
             <h2 className="mb-4 text-sm font-bold tracking-wide text-neutral-400 dark:text-neutral-500">
               PERMIT EXPIRY POLICY
             </h2>
-            <PermitExpirySettings initialDays={permitExpiryDays} />
+            <PermitExpirySettings initialDate={permitExpiryDate} />
           </div>
         </TabsContent>
       )}

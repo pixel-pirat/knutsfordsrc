@@ -79,8 +79,8 @@ export function PermitDialog({
   const containerRef = useRef<HTMLDivElement>(null);
   const [amount, setAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
-  const [expiryDays, setExpiryDays] = useState<number | null>(null);
   const [expiryPreview, setExpiryPreview] = useState<string | null>(null);
+  const [hasExpiryDate, setHasExpiryDate] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -99,6 +99,8 @@ export function PermitDialog({
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [resending, setResending] = useState(false);
   const [togglingStatus, setTogglingStatus] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Reset transient UI state when the dialog opens for a (possibly new) permit,
   // following React's "adjust state during render" pattern rather than an effect.
@@ -111,6 +113,7 @@ export function PermitDialog({
       setFieldErrors({});
       setActionError(null);
       setActionMessage(null);
+      setConfirmingDelete(false);
       if (permitId) {
         setLoading(true);
       } else {
@@ -138,11 +141,11 @@ export function PermitDialog({
     fetch("/api/admin/settings/permit-expiry")
       .then((res) => res.json())
       .then((data) => {
-        const days = typeof data.days === "number" ? data.days : null;
-        setExpiryDays(days);
+        const date = typeof data.date === "string" ? data.date : null;
+        setHasExpiryDate(Boolean(date));
         setExpiryPreview(
-          days
-            ? new Date(Date.now() + days * 86400000).toLocaleDateString("en-GB", {
+          date
+            ? new Date(`${date}T00:00:00`).toLocaleDateString("en-GB", {
                 day: "numeric",
                 month: "short",
                 year: "numeric",
@@ -151,7 +154,7 @@ export function PermitDialog({
         );
       })
       .catch(() => {
-        setExpiryDays(null);
+        setHasExpiryDate(false);
         setExpiryPreview(null);
       });
   }, [open, permitId]);
@@ -290,6 +293,32 @@ export function PermitDialog({
     }
   }
 
+  async function handleDelete() {
+    if (!detail) return;
+    if (!confirmingDelete) {
+      setConfirmingDelete(true);
+      return;
+    }
+    setDeleting(true);
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/admin/permits/${detail.id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setActionError(data.error ?? "Failed to delete permit");
+        setConfirmingDelete(false);
+        return;
+      }
+      onSuccess?.();
+      close();
+    } catch {
+      setActionError("Failed to delete permit");
+      setConfirmingDelete(false);
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
@@ -417,7 +446,9 @@ export function PermitDialog({
                     {expiryPreview ?? "—"}
                   </p>
                   <p className="mt-1 text-xs text-neutral-400 dark:text-neutral-500">
-                    Set by the super admin ({expiryDays ?? "…"} days from today)
+                    {hasExpiryDate
+                      ? "Set by the super admin"
+                      : "No expiry policy set yet — this permit won't expire"}
                   </p>
                 </div>
               </div>
@@ -578,6 +609,15 @@ export function PermitDialog({
               </div>
             )}
             <DialogFooter>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={deleting || !detail}
+                className="mr-auto"
+              >
+                {deleting ? "Deleting…" : confirmingDelete ? "Confirm Delete?" : "Delete Permit"}
+              </Button>
               <Button type="button" variant="outline" onClick={close}>
                 Close
               </Button>

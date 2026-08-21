@@ -3,7 +3,7 @@ import { requireAdmin } from "@/lib/adminGuard";
 import { adminStudentUpdateSchema } from "@/lib/validation";
 import { getStudentWithPermits, updateStudentByAdmin } from "@/db/queries";
 import { getStudentByIndexNumber } from "@/db/queries";
-import { logAudit } from "@/db/adminQueries";
+import { logAudit, deleteStudentCascade } from "@/db/adminQueries";
 
 export async function GET(
   request: Request,
@@ -121,4 +121,35 @@ export async function PATCH(
       avatarUrl: updated.avatarUrl,
     },
   });
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { admin, error } = await requireAdmin("create_student");
+  if (error) return error;
+
+  const { id } = await params;
+  const student = await getStudentWithPermits(id);
+  if (!student) {
+    return NextResponse.json({ error: "Student not found" }, { status: 404 });
+  }
+
+  await deleteStudentCascade(id);
+
+  await logAudit({
+    actorId: admin.id,
+    action: "student.delete",
+    targetType: "student",
+    targetId: id,
+    metadata: {
+      indexNumber: student.indexNumber,
+      firstName: student.firstName,
+      lastName: student.lastName,
+      permitsDeleted: student.permits.length,
+    },
+  });
+
+  return NextResponse.json({ success: true });
 }

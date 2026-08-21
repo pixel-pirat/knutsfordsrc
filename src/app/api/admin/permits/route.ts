@@ -7,7 +7,7 @@ import {
   generatePermitReference,
   markPermitEmailSent,
   logAudit,
-  getPermitExpiryDays,
+  getPermitExpiryDate,
 } from "@/db/adminQueries";
 import { sendPermitEmail, isEmailConfigured } from "@/lib/email";
 
@@ -31,8 +31,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Student not found" }, { status: 404 });
   }
 
-  const expiryDays = await getPermitExpiryDays();
-  const expiresAtDate = new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000);
+  const expiresAtDate = await getPermitExpiryDate();
 
   const referenceNumber = generatePermitReference();
   const [permit] = await createPermit({

@@ -11,8 +11,9 @@ import {
   type NewPermit,
 } from "./schema";
 
-export const PERMIT_EXPIRY_DAYS_KEY = "permit_expiry_days";
-export const DEFAULT_PERMIT_EXPIRY_DAYS = 365;
+import { getAdminSession } from "@/lib/adminAuth";
+
+export const PERMIT_EXPIRY_DATE_KEY = "permit_expiry_date";
 
 export async function getSetting(key: string) {
   const row = await db.query.settings.findFirst({ where: eq(settings.key, key) });
@@ -27,12 +28,20 @@ export async function setSetting(key: string, value: string) {
     .returning();
 }
 
-export async function getPermitExpiryDays() {
-  const value = await getSetting(PERMIT_EXPIRY_DAYS_KEY);
-  const parsed = value ? Number(value) : NaN;
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_PERMIT_EXPIRY_DAYS;
+export async function getPermitExpiryDate() {
+  const value = await getSetting(PERMIT_EXPIRY_DATE_KEY);
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
 }
-import { getAdminSession } from "@/lib/adminAuth";
+
+export async function bulkApplyPermitExpiry(date: Date) {
+  return db
+    .update(permits)
+    .set({ expiresAt: date })
+    .where(sql`${permits.expiresAt} IS NULL OR ${permits.expiresAt} > now()`)
+    .returning({ id: permits.id });
+}
 
 export function getAdminByEmail(email: string) {
   return db.query.adminUsers.findFirst({
@@ -64,7 +73,7 @@ export function listAdmins() {
 export function updateAdmin(
   id: string,
   values: Partial<
-    Pick<NewAdminUser, "permissions" | "active" | "name" | "avatarUrl">
+    Pick<NewAdminUser, "permissions" | "active" | "name" | "email" | "avatarUrl">
   >
 ) {
   return db
@@ -316,6 +325,15 @@ export function updatePermitCardStatus(id: string, cardStatus: "pending" | "acti
     .set({ cardStatus })
     .where(eq(permits.id, id))
     .returning();
+}
+
+export function deletePermit(id: string) {
+  return db.delete(permits).where(eq(permits.id, id)).returning();
+}
+
+export async function deleteStudentCascade(id: string) {
+  await db.delete(permits).where(eq(permits.studentId, id));
+  return db.delete(students).where(eq(students.id, id)).returning();
 }
 
 export function markPermitEmailSent(id: string) {

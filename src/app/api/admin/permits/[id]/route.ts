@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/adminGuard";
-import { getPermitById } from "@/db/adminQueries";
+import { getPermitById, deletePermit, logAudit } from "@/db/adminQueries";
 import { getPermitStatus } from "@/lib/permits";
 
 export async function GET(
@@ -38,4 +38,33 @@ export async function GET(
       },
     },
   });
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { admin, error } = await requireAdmin("issue_permit");
+  if (error) return error;
+
+  const { id } = await params;
+  const permit = await getPermitById(id);
+  if (!permit) {
+    return NextResponse.json({ error: "Permit not found" }, { status: 404 });
+  }
+
+  await deletePermit(id);
+
+  await logAudit({
+    actorId: admin.id,
+    action: "permit.delete",
+    targetType: "permit",
+    targetId: id,
+    metadata: {
+      referenceNumber: permit.referenceNumber,
+      studentIndexNumber: permit.student.indexNumber,
+    },
+  });
+
+  return NextResponse.json({ success: true });
 }

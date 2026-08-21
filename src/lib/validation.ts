@@ -107,12 +107,8 @@ export const programCreateSchema = z.object({
   name: z.string().trim().min(1, "Programme name is required").max(120),
 });
 
-export const permitExpiryDaysSchema = z.object({
-  days: z.coerce
-    .number()
-    .int("Enter a whole number of days")
-    .positive("Enter a positive number of days")
-    .max(3650, "Enter a value under 3650 days"),
+export const permitExpiryDateSchema = z.object({
+  date: z.iso.date("Select a valid expiry date"),
 });
 
 export const changePasswordSchema = z.object({

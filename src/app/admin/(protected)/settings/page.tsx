@@ -1,4 +1,4 @@
-import { getCurrentAdmin, listPrograms, getPermitExpiryDays } from "@/db/adminQueries";
+import { getCurrentAdmin, listPrograms, getPermitExpiryDate } from "@/db/adminQueries";
 import { redirect } from "next/navigation";
 import { AdminSettingsTabs } from "./AdminSettingsTabs";
 
@@ -7,9 +7,9 @@ export default async function AdminSettingsPage() {
   if (!admin) redirect("/admin/login");
 
   const isSuperAdmin = admin.role === "super_admin";
-  const [programs, permitExpiryDays] = await Promise.all([
+  const [programs, permitExpiryDate] = await Promise.all([
     isSuperAdmin ? listPrograms() : Promise.resolve([]),
-    isSuperAdmin ? getPermitExpiryDays() : Promise.resolve(365),
+    isSuperAdmin ? getPermitExpiryDate() : Promise.resolve(null),
   ]);
 
   return (
@@ -28,7 +28,7 @@ export default async function AdminSettingsPage() {
         }}
         isSuperAdmin={isSuperAdmin}
         initialPrograms={programs.map((p) => ({ id: p.id, name: p.name, active: p.active }))}
-        permitExpiryDays={permitExpiryDays}
+        permitExpiryDate={permitExpiryDate ? permitExpiryDate.toISOString().slice(0, 10) : null}
       />
     </div>
   );
