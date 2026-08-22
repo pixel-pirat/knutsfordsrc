@@ -301,6 +301,19 @@ export async function getPermitStatusBreakdown() {
   return row ?? { active: 0, pending: 0, expired: 0 };
 }
 
+export async function getPaymentMethodBreakdown() {
+  const rows = await db
+    .select({
+      method: sql<string>`COALESCE(${permits.paymentMethod}, 'Unspecified')`,
+      count: sql<number>`count(*)::int`,
+      revenue: sql<string>`COALESCE(SUM(${permits.amount}), 0)::text`,
+    })
+    .from(permits)
+    .groupBy(sql`COALESCE(${permits.paymentMethod}, 'Unspecified')`)
+    .orderBy(desc(sql`count(*)`));
+  return rows;
+}
+
 export async function getPermitsByIssuer() {
   const rows = await db
     .select({

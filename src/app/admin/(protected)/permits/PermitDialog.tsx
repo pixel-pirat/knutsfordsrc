@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import Link from "next/link";
 import {
   Dialog,
   DialogContent,
@@ -24,6 +23,7 @@ import {
 import { formatCurrency, getPermitStatus, permitStatusBadge } from "@/lib/permits";
 
 const PAYMENT_METHODS = ["Cash", "MoMo", "Bank Payment", "Free Card"] as const;
+const INDEX_NUMBER_PATTERN = /^261\d{5}$/;
 
 type StudentResult = {
   id: string;
@@ -92,6 +92,17 @@ export function PermitDialog({
     emailSent: boolean;
   } | null>(null);
 
+  // --- inline quick-create-student state ---
+  const [programs, setPrograms] = useState<{ id: string; name: string }[]>([]);
+  const [showQuickCreate, setShowQuickCreate] = useState(false);
+  const [newFirstName, setNewFirstName] = useState("");
+  const [newLastName, setNewLastName] = useState("");
+  const [newIndexNumber, setNewIndexNumber] = useState("");
+  const [newProgram, setNewProgram] = useState("");
+  const [quickCreateError, setQuickCreateError] = useState<string | null>(null);
+  const [quickCreating, setQuickCreating] = useState(false);
+  const [newStudentTempPassword, setNewStudentTempPassword] = useState<string | null>(null);
+
   // --- view mode state ---
   const [detail, setDetail] = useState<PermitDetail | null>(null);
   const [loading, setLoading] = useState(false);
@@ -124,6 +135,13 @@ export function PermitDialog({
         setPaymentMethod("");
         setCreated(null);
         setDetail(null);
+        setShowQuickCreate(false);
+        setNewFirstName("");
+        setNewLastName("");
+        setNewIndexNumber("");
+        setNewProgram("");
+        setQuickCreateError(null);
+        setNewStudentTempPassword(null);
       }
     }
   }
@@ -134,6 +152,14 @@ export function PermitDialog({
       .then((res) => res.json())
       .then((data) => setDetail(data.permit))
       .finally(() => setLoading(false));
+  }, [open, permitId]);
+
+  useEffect(() => {
+    if (!open || permitId) return;
+    fetch("/api/programs")
+      .then((res) => res.json())
+      .then((data) => setPrograms(data.programs ?? []))
+      .catch(() => setPrograms([]));
   }, [open, permitId]);
 
   useEffect(() => {
@@ -246,6 +272,67 @@ export function PermitDialog({
     setFormError(null);
   }
 
+  function openQuickCreate() {
+    setQuickCreateError(null);
+    setNewStudentTempPassword(null);
+    setNewFirstName("");
+    setNewLastName("");
+    setNewProgram("");
+    setNewIndexNumber(INDEX_NUMBER_PATTERN.test(query.trim()) ? query.trim() : "");
+    setShowQuickCreate(true);
+    setShowResults(false);
+  }
+
+  async function handleQuickCreateStudent(e: FormEvent) {
+    e.preventDefault();
+    setQuickCreateError(null);
+
+    if (!newFirstName.trim() || !newLastName.trim()) {
+      setQuickCreateError("Enter the student's first and last name");
+      return;
+    }
+    if (!INDEX_NUMBER_PATTERN.test(newIndexNumber.trim())) {
+      setQuickCreateError("Index number must start with 261 and be followed by 5 digits (e.g. 26103254)");
+      return;
+    }
+
+    setQuickCreating(true);
+    try {
+      const res = await fetch("/api/admin/students", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          indexNumber: newIndexNumber.trim(),
+          firstName: newFirstName.trim(),
+          lastName: newLastName.trim(),
+          program: newProgram,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setQuickCreateError(data.error ?? "Failed to create student");
+        return;
+      }
+      setSelected({
+        id: data.student.id,
+        indexNumber: data.student.indexNumber,
+        firstName: data.student.firstName,
+        lastName: data.student.lastName,
+        email: null,
+        phone: null,
+        program: newProgram || null,
+        level: null,
+      });
+      setNewStudentTempPassword(data.temporaryPassword);
+      setShowQuickCreate(false);
+      setQuery("");
+    } catch {
+      setQuickCreateError("Failed to create student");
+    } finally {
+      setQuickCreating(false);
+    }
+  }
+
   async function handleResend() {
     if (!detail) return;
     setResending(true);
@@ -347,6 +434,7 @@ export function PermitDialog({
                         onClick={() => {
                           setSelected(null);
                           setQuery("");
+                          setNewStudentTempPassword(null);
                         }}
                         className="shrink-0 text-xs font-semibold text-gold-dark dark:text-gold-light hover:underline"
                       >
@@ -373,6 +461,73 @@ export function PermitDialog({
                         </dd>
                       </div>
                     </dl>
+                    {newStudentTempPassword && (
+                      <p className="mt-3 rounded-lg bg-gold/10 px-3 py-2 text-xs text-ink dark:text-neutral-100">
+                        New student account created — temporary password:{" "}
+                        <span className="font-mono font-semibold">{newStudentTempPassword}</span>
+                      </p>
+                    )}
+                  </div>
+                ) : showQuickCreate ? (
+                  <div className="mt-1.5 space-y-3 rounded-xl bg-neutral-50 dark:bg-neutral-900 p-4">
+                    <p className="text-sm font-semibold text-ink dark:text-neutral-100">Create New Student</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="quickCreateFirstName">First Name</Label>
+                        <Input
+                          id="quickCreateFirstName"
+                          className="mt-1.5"
+                          value={newFirstName}
+                          onChange={(e) => setNewFirstName(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="quickCreateLastName">Last Name</Label>
+                        <Input
+                          id="quickCreateLastName"
+                          className="mt-1.5"
+                          value={newLastName}
+                          onChange={(e) => setNewLastName(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="quickCreateIndexNumber">Index Number</Label>
+                      <Input
+                        id="quickCreateIndexNumber"
+                        autoComplete="off"
+                        className="mt-1.5"
+                        placeholder="26103254"
+                        value={newIndexNumber}
+                        onChange={(e) => setNewIndexNumber(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label>Programme</Label>
+                      <Select value={newProgram} onValueChange={(v) => setNewProgram(v ?? "")}>
+                        <SelectTrigger className="mt-1.5 w-full">
+                          <SelectValue placeholder="Select programme" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {programs.map((p) => (
+                            <SelectItem key={p.id} value={p.name}>
+                              {p.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {quickCreateError && (
+                      <p className="text-xs text-red-600 dark:text-red-400">{quickCreateError}</p>
+                    )}
+                    <div className="flex justify-end gap-2">
+                      <Button type="button" variant="outline" size="sm" onClick={() => setShowQuickCreate(false)}>
+                        Cancel
+                      </Button>
+                      <Button type="button" size="sm" onClick={handleQuickCreateStudent} disabled={quickCreating}>
+                        {quickCreating ? "Creating…" : "Create Student"}
+                      </Button>
+                    </div>
                   </div>
                 ) : (
                   <>
@@ -392,10 +547,7 @@ export function PermitDialog({
                         )}
                         {!searching && results.length === 0 && (
                           <p className="px-3 py-2 text-sm text-neutral-400 dark:text-neutral-500">
-                            No students found.{" "}
-                            <Link href="/admin/students" className="text-gold-dark dark:text-gold-light hover:underline">
-                              Create one first
-                            </Link>
+                            No students found.
                           </p>
                         )}
                         {!searching &&
@@ -417,6 +569,15 @@ export function PermitDialog({
                               <span className="text-xs text-neutral-400 dark:text-neutral-500">{s.indexNumber}</span>
                             </button>
                           ))}
+                        {!searching && (
+                          <button
+                            type="button"
+                            onClick={openQuickCreate}
+                            className="mt-0.5 flex w-full items-center gap-1.5 rounded-lg border-t border-black/5 px-3 py-2.5 text-left text-sm font-medium text-gold-dark dark:border-white/10 dark:text-gold-light hover:bg-black/5 dark:hover:bg-white/10"
+                          >
+                            + Create new student
+                          </button>
+                        )}
                       </div>
                     )}
                   </>

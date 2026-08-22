@@ -9,13 +9,35 @@ import {
   totalRevenue,
   getPermitStatusBreakdown,
   getPermitsByIssuer,
+  getPaymentMethodBreakdown,
   listAuditLogs,
 } from "@/db/adminQueries";
 import { describeAuditEntry } from "@/lib/audit";
 import { formatCurrency } from "@/lib/permits";
 import { PermitsChart } from "@/components/admin/PermitsChart";
-import { StatusBreakdownBar } from "@/components/admin/StatusBreakdownBar";
-import { PermitsByIssuer } from "@/components/admin/PermitsByIssuer";
+import { DonutBreakdown, type DonutSegment } from "@/components/admin/DonutBreakdown";
+
+const CATEGORICAL_COLORS = [
+  "var(--color-chart-1)",
+  "var(--color-chart-2)",
+  "var(--color-chart-3)",
+  "var(--color-chart-4)",
+  "var(--color-chart-5)",
+  "var(--color-chart-6)",
+];
+
+function colorForKey(key: string) {
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
+  return CATEGORICAL_COLORS[hash % CATEGORICAL_COLORS.length];
+}
+
+const PAYMENT_METHOD_COLORS: Record<string, string> = {
+  Cash: "var(--color-chart-1)",
+  MoMo: "var(--color-chart-2)",
+  "Free Card": "var(--color-chart-3)",
+  "Bank Payment": "var(--color-chart-4)",
+};
 
 export default async function AdminOverviewPage() {
   const admin = await getCurrentAdmin();
@@ -27,6 +49,7 @@ export default async function AdminOverviewPage() {
     revenue,
     statusBreakdown,
     issuerBreakdown,
+    paymentBreakdown,
     recentActivity,
   ] = await Promise.all([
     countStudents(),
@@ -36,10 +59,33 @@ export default async function AdminOverviewPage() {
     totalRevenue(),
     getPermitStatusBreakdown(),
     getPermitsByIssuer(),
+    getPaymentMethodBreakdown(),
     listAuditLogs({ limit: 6 }),
   ]);
 
   const activeAdmins = admins.filter((a) => a.active).length;
+
+  const statusData: DonutSegment[] = [
+    { key: "active", label: "Active", value: statusBreakdown.active, color: "#22c55e" },
+    { key: "pending", label: "Pending", value: statusBreakdown.pending, color: "var(--color-gold)" },
+    { key: "expired", label: "Expired", value: statusBreakdown.expired, color: "#d4d4d4" },
+  ];
+
+  const issuerData: DonutSegment[] = issuerBreakdown.map((i) => ({
+    key: i.issuerId,
+    label: i.issuerName,
+    value: i.count,
+    color: colorForKey(i.issuerId),
+    secondaryLabel: formatCurrency(i.revenue),
+  }));
+
+  const paymentData: DonutSegment[] = paymentBreakdown.map((p) => ({
+    key: p.method,
+    label: p.method,
+    value: p.count,
+    color: PAYMENT_METHOD_COLORS[p.method] ?? colorForKey(p.method),
+    secondaryLabel: formatCurrency(p.revenue),
+  }));
 
   return (
     <div>
@@ -69,21 +115,28 @@ export default async function AdminOverviewPage() {
             PERMIT STATUS
           </h2>
           <div className="mt-5">
-            <StatusBreakdownBar
-              active={statusBreakdown.active}
-              pending={statusBreakdown.pending}
-              expired={statusBreakdown.expired}
-            />
+            <DonutBreakdown data={statusData} />
           </div>
         </div>
       </div>
 
-      <div className="mt-6 rounded-2xl bg-white dark:bg-neutral-900 p-6 ring-1 ring-black/5 dark:ring-white/10">
-        <h2 className="text-sm font-bold tracking-wide text-neutral-400 dark:text-neutral-500">
-          PERMITS ISSUED BY STAFF
-        </h2>
-        <div className="mt-5">
-          <PermitsByIssuer data={issuerBreakdown} />
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <div className="rounded-2xl bg-white dark:bg-neutral-900 p-6 ring-1 ring-black/5 dark:ring-white/10">
+          <h2 className="text-sm font-bold tracking-wide text-neutral-400 dark:text-neutral-500">
+            PAYMENT METHOD BREAKDOWN
+          </h2>
+          <div className="mt-5">
+            <DonutBreakdown data={paymentData} />
+          </div>
+        </div>
+
+        <div className="rounded-2xl bg-white dark:bg-neutral-900 p-6 ring-1 ring-black/5 dark:ring-white/10">
+          <h2 className="text-sm font-bold tracking-wide text-neutral-400 dark:text-neutral-500">
+            PERMITS ISSUED BY STAFF
+          </h2>
+          <div className="mt-5">
+            <DonutBreakdown data={issuerData} />
+          </div>
         </div>
       </div>
 
