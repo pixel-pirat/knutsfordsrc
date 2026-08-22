@@ -30,6 +30,7 @@ type PermitRow = {
   amount: string | null;
   paymentMethod: string | null;
   cardStatus: string;
+  issuedAt: string;
   expiresAt: string | null;
   student: { firstName: string; lastName: string; indexNumber: string } | null;
   issuer: { name: string } | null;
@@ -130,6 +131,7 @@ export function PermitsTable({
               <TableHead>Amount</TableHead>
               <TableHead>Payment</TableHead>
               <TableHead>Issued By</TableHead>
+              <TableHead>Issued</TableHead>
               <TableHead>Expires</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
@@ -137,7 +139,7 @@ export function PermitsTable({
           <TableBody>
             {permits.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="py-10 text-center text-neutral-400 dark:text-neutral-500">
+                <TableCell colSpan={8} className="py-10 text-center text-neutral-400 dark:text-neutral-500">
                   No permits found.
                 </TableCell>
               </TableRow>
@@ -160,6 +162,13 @@ export function PermitsTable({
                   <TableCell className="text-neutral-700 dark:text-neutral-300">{formatCurrency(p.amount)}</TableCell>
                   <TableCell className="text-neutral-500 dark:text-neutral-400">{p.paymentMethod ?? "—"}</TableCell>
                   <TableCell className="text-neutral-700 dark:text-neutral-300">{p.issuer?.name}</TableCell>
+                  <TableCell className="text-neutral-500 dark:text-neutral-400">
+                    {new Date(p.issuedAt).toLocaleDateString("en-GB", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </TableCell>
                   <TableCell className="text-neutral-500 dark:text-neutral-400">
                     {p.expiresAt
                       ? new Date(p.expiresAt).toLocaleDateString("en-GB", {

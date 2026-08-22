@@ -301,6 +301,21 @@ export async function getPermitStatusBreakdown() {
   return row ?? { active: 0, pending: 0, expired: 0 };
 }
 
+export async function getPermitsByIssuer() {
+  const rows = await db
+    .select({
+      issuerId: adminUsers.id,
+      issuerName: adminUsers.name,
+      count: sql<number>`count(${permits.id})::int`,
+      revenue: sql<string>`COALESCE(SUM(${permits.amount}), 0)::text`,
+    })
+    .from(permits)
+    .innerJoin(adminUsers, eq(permits.issuedBy, adminUsers.id))
+    .groupBy(adminUsers.id, adminUsers.name)
+    .orderBy(desc(sql`count(${permits.id})`));
+  return rows;
+}
+
 export function listStudents({ limit = 50, offset = 0 } = {}) {
   return db.query.students.findMany({
     orderBy: desc(students.createdAt),

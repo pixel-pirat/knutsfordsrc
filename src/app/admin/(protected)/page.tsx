@@ -8,12 +8,14 @@ import {
   permitsIssuedLast14Days,
   totalRevenue,
   getPermitStatusBreakdown,
+  getPermitsByIssuer,
   listAuditLogs,
 } from "@/db/adminQueries";
 import { describeAuditEntry } from "@/lib/audit";
 import { formatCurrency } from "@/lib/permits";
 import { PermitsChart } from "@/components/admin/PermitsChart";
 import { StatusBreakdownBar } from "@/components/admin/StatusBreakdownBar";
+import { PermitsByIssuer } from "@/components/admin/PermitsByIssuer";
 
 export default async function AdminOverviewPage() {
   const admin = await getCurrentAdmin();
@@ -24,6 +26,7 @@ export default async function AdminOverviewPage() {
     chartData,
     revenue,
     statusBreakdown,
+    issuerBreakdown,
     recentActivity,
   ] = await Promise.all([
     countStudents(),
@@ -32,6 +35,7 @@ export default async function AdminOverviewPage() {
     permitsIssuedLast14Days(),
     totalRevenue(),
     getPermitStatusBreakdown(),
+    getPermitsByIssuer(),
     listAuditLogs({ limit: 6 }),
   ]);
 
@@ -71,6 +75,15 @@ export default async function AdminOverviewPage() {
               expired={statusBreakdown.expired}
             />
           </div>
+        </div>
+      </div>
+
+      <div className="mt-6 rounded-2xl bg-white dark:bg-neutral-900 p-6 ring-1 ring-black/5 dark:ring-white/10">
+        <h2 className="text-sm font-bold tracking-wide text-neutral-400 dark:text-neutral-500">
+          PERMITS ISSUED BY STAFF
+        </h2>
+        <div className="mt-5">
+          <PermitsByIssuer data={issuerBreakdown} />
         </div>
       </div>
 

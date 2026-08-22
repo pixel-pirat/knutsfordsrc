@@ -34,6 +34,7 @@ export default async function PermitsPage({
         amount: p.amount,
         paymentMethod: p.paymentMethod,
         cardStatus: p.cardStatus,
+        issuedAt: p.issuedAt.toISOString(),
         expiresAt: p.expiresAt ? p.expiresAt.toISOString() : null,
         student: p.student,
         issuer: p.issuer,

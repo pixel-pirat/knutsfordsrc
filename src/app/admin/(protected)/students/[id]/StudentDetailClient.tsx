@@ -39,6 +39,7 @@ type PermitRow = {
   amount: string | null;
   paymentMethod: string | null;
   cardStatus: string;
+  issuedAt: string;
   expiresAt: string | null;
   issuer: { id: string; name: string } | null;
 };
@@ -237,6 +238,7 @@ export function StudentDetailClient({
                   <TableHead>Amount</TableHead>
                   <TableHead>Payment</TableHead>
                   <TableHead>Issued By</TableHead>
+                  <TableHead>Issued</TableHead>
                   <TableHead>Expires</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
@@ -244,7 +246,7 @@ export function StudentDetailClient({
               <TableBody>
                 {permits.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} className="py-10 text-center text-neutral-400 dark:text-neutral-500">
+                    <TableCell colSpan={7} className="py-10 text-center text-neutral-400 dark:text-neutral-500">
                       No permits issued to this student yet.
                     </TableCell>
                   </TableRow>
@@ -261,6 +263,13 @@ export function StudentDetailClient({
                       <TableCell className="text-neutral-700 dark:text-neutral-300">{formatCurrency(p.amount)}</TableCell>
                       <TableCell className="text-neutral-500 dark:text-neutral-400">{p.paymentMethod ?? "—"}</TableCell>
                       <TableCell className="text-neutral-700 dark:text-neutral-300">{p.issuer?.name ?? "—"}</TableCell>
+                      <TableCell className="text-neutral-500 dark:text-neutral-400">
+                        {new Date(p.issuedAt).toLocaleDateString("en-GB", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </TableCell>
                       <TableCell className="text-neutral-500 dark:text-neutral-400">
                         {p.expiresAt
                           ? new Date(p.expiresAt).toLocaleDateString("en-GB", {
