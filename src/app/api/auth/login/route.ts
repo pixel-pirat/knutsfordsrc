@@ -24,6 +24,16 @@ export async function POST(request: Request) {
 
   if (!student) return invalidResponse;
 
+  if (!student.passwordHash) {
+    return NextResponse.json(
+      {
+        error:
+          "This account hasn't been activated yet. Contact SRC staff to set up your password.",
+      },
+      { status: 403 }
+    );
+  }
+
   const valid = await verifyPassword(password, student.passwordHash);
   if (!valid) return invalidResponse;
 

@@ -7,6 +7,7 @@ import {
   pgEnum,
   jsonb,
   numeric,
+  integer,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -42,7 +43,7 @@ export const students = pgTable("students", {
   indexNumber: text("index_number").notNull().unique(),
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
-  passwordHash: text("password_hash").notNull(),
+  passwordHash: text("password_hash"),
   email: text("email").unique(),
   phone: text("phone"),
   program: text("program"),
@@ -101,6 +102,108 @@ export const settings = pgTable("settings", {
     .defaultNow(),
 });
 
+export const events = pgTable("events", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  title: text("title").notNull(),
+  description: text("description"),
+  location: text("location"),
+  startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
+  endsAt: timestamp("ends_at", { withTimezone: true }),
+  imageUrl: text("image_url"),
+  published: boolean("published").notNull().default(true),
+  createdBy: uuid("created_by")
+    .notNull()
+    .references(() => adminUsers.id),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const newsPosts = pgTable("news_posts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  title: text("title").notNull(),
+  excerpt: text("excerpt"),
+  body: text("body"),
+  imageUrl: text("image_url"),
+  published: boolean("published").notNull().default(true),
+  publishedAt: timestamp("published_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  createdBy: uuid("created_by")
+    .notNull()
+    .references(() => adminUsers.id),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const executiveYearGroups = pgTable("executive_year_groups", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  label: text("label").notNull().unique(),
+  description: text("description"),
+  active: boolean("active").notNull().default(true),
+  createdBy: uuid("created_by")
+    .notNull()
+    .references(() => adminUsers.id),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const executiveProfiles = pgTable("executive_profiles", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  yearGroupId: uuid("year_group_id")
+    .notNull()
+    .references(() => executiveYearGroups.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  position: text("position").notNull(),
+  bio: text("bio"),
+  avatarUrl: text("avatar_url"),
+  socialLinks: jsonb("social_links"),
+  adminUserId: uuid("admin_user_id").references(() => adminUsers.id, {
+    onDelete: "set null",
+  }),
+  displayOrder: integer("display_order").notNull().default(0),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const executiveAchievements = pgTable("executive_achievements", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  yearGroupId: uuid("year_group_id")
+    .notNull()
+    .references(() => executiveYearGroups.id, { onDelete: "cascade" }),
+  profileId: uuid("profile_id").references(() => executiveProfiles.id, {
+    onDelete: "set null",
+  }),
+  title: text("title").notNull(),
+  description: text("description"),
+  achievedAt: timestamp("achieved_at", { withTimezone: true }),
+  imageUrl: text("image_url"),
+  createdBy: uuid("created_by")
+    .notNull()
+    .references(() => adminUsers.id),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export const auditLogs = pgTable("audit_logs", {
   id: uuid("id").primaryKey().defaultRandom(),
   actorId: uuid("actor_id")
@@ -119,6 +222,60 @@ export const adminUsersRelations = relations(adminUsers, ({ many }) => ({
   studentsCreated: many(students),
   permitsIssued: many(permits),
   auditLogs: many(auditLogs),
+  eventsCreated: many(events),
+  newsPostsCreated: many(newsPosts),
+  executiveProfiles: many(executiveProfiles),
+}));
+
+export const executiveYearGroupsRelations = relations(
+  executiveYearGroups,
+  ({ many }) => ({
+    profiles: many(executiveProfiles),
+    achievements: many(executiveAchievements),
+  })
+);
+
+export const executiveProfilesRelations = relations(
+  executiveProfiles,
+  ({ one, many }) => ({
+    yearGroup: one(executiveYearGroups, {
+      fields: [executiveProfiles.yearGroupId],
+      references: [executiveYearGroups.id],
+    }),
+    adminUser: one(adminUsers, {
+      fields: [executiveProfiles.adminUserId],
+      references: [adminUsers.id],
+    }),
+    achievements: many(executiveAchievements),
+  })
+);
+
+export const executiveAchievementsRelations = relations(
+  executiveAchievements,
+  ({ one }) => ({
+    yearGroup: one(executiveYearGroups, {
+      fields: [executiveAchievements.yearGroupId],
+      references: [executiveYearGroups.id],
+    }),
+    profile: one(executiveProfiles, {
+      fields: [executiveAchievements.profileId],
+      references: [executiveProfiles.id],
+    }),
+  })
+);
+
+export const eventsRelations = relations(events, ({ one }) => ({
+  creator: one(adminUsers, {
+    fields: [events.createdBy],
+    references: [adminUsers.id],
+  }),
+}));
+
+export const newsPostsRelations = relations(newsPosts, ({ one }) => ({
+  creator: one(adminUsers, {
+    fields: [newsPosts.createdBy],
+    references: [adminUsers.id],
+  }),
 }));
 
 export const studentsRelations = relations(students, ({ one, many }) => ({
@@ -157,3 +314,13 @@ export type AuditLog = typeof auditLogs.$inferSelect;
 export type NewAuditLog = typeof auditLogs.$inferInsert;
 export type Program = typeof programs.$inferSelect;
 export type NewProgram = typeof programs.$inferInsert;
+export type Event = typeof events.$inferSelect;
+export type NewEvent = typeof events.$inferInsert;
+export type NewsPost = typeof newsPosts.$inferSelect;
+export type NewNewsPost = typeof newsPosts.$inferInsert;
+export type ExecutiveYearGroup = typeof executiveYearGroups.$inferSelect;
+export type NewExecutiveYearGroup = typeof executiveYearGroups.$inferInsert;
+export type ExecutiveProfile = typeof executiveProfiles.$inferSelect;
+export type NewExecutiveProfile = typeof executiveProfiles.$inferInsert;
+export type ExecutiveAchievement = typeof executiveAchievements.$inferSelect;
+export type NewExecutiveAchievement = typeof executiveAchievements.$inferInsert;

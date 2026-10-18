@@ -130,6 +130,26 @@ const icons: Record<string, ReactElement> = {
       strokeLinejoin="round"
     />
   ),
+  chevronDown: (
+    <path
+      d="M6 9l6 6 6-6"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  ),
+  newspaper: (
+    <path
+      d="M4 5.5A1.5 1.5 0 015.5 4H15a1 1 0 011 1v14.5a1.5 1.5 0 01-1.5 1.5h-9A1.5 1.5 0 014 19.5v-14zM16 8h2.5A1.5 1.5 0 0120 9.5v9a2 2 0 01-2 2M7 7.5h5M7 11h5M7 14.5h3"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  ),
 };
 
 export function HubIcon({

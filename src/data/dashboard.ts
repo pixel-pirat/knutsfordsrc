@@ -14,6 +14,7 @@ export const dashboardNav: DashboardNavItem[] = [
   { label: "Complaints", href: "/dashboard/complaints", icon: "flag" },
   { label: "Clubs", href: "/dashboard/clubs", icon: "users" },
   { label: "Events", href: "/dashboard/events", icon: "calendar" },
+  { label: "News", href: "/dashboard/news", icon: "newspaper" },
   { label: "Settings", href: "/dashboard/settings", icon: "gear" },
 ];
 

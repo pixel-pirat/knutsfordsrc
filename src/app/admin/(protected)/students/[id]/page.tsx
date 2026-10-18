@@ -50,6 +50,8 @@ export default async function StudentDetailPage({
         studyMode: student.studyMode,
         avatarUrl: student.avatarUrl,
         createdAt: student.createdAt.toISOString(),
+        hasPassword: Boolean(student.passwordHash),
+        profileCompleted: student.profileCompleted,
       }}
       permits={student.permits.map((p) => ({
         id: p.id,

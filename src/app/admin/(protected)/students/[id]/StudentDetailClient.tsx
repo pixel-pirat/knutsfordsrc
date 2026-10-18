@@ -31,6 +31,8 @@ type StudentDetail = {
   studyMode: string | null;
   avatarUrl: string | null;
   createdAt: string;
+  hasPassword: boolean;
+  profileCompleted: boolean;
 };
 
 type PermitRow = {
@@ -147,7 +149,11 @@ export function StudentDetailClient({
         {canEdit && (
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={handleResendWelcome} disabled={resending}>
-              {resending ? "Sending…" : "Resend Welcome Email"}
+              {resending
+                ? "Sending…"
+                : student.hasPassword
+                  ? "Resend Welcome Email"
+                  : "Activate Account (Set Password)"}
             </Button>
             <Button onClick={() => setEditOpen(true)}>Edit Student</Button>
             <Button
@@ -213,6 +219,21 @@ export function StudentDetailClient({
               <div>
                 <dt className="text-xs text-neutral-400 dark:text-neutral-500">Study Mode</dt>
                 <dd className="capitalize text-neutral-700 dark:text-neutral-300">{student.studyMode ?? "—"}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-neutral-400 dark:text-neutral-500">Profile</dt>
+                <dd>
+                  <Badge
+                    variant="outline"
+                    className={
+                      student.profileCompleted
+                        ? "border-green-200 bg-green-50 text-green-700"
+                        : "border-neutral-200 bg-neutral-100 text-neutral-500"
+                    }
+                  >
+                    {student.profileCompleted ? "Complete" : "Incomplete"}
+                  </Badge>
+                </dd>
               </div>
               <div>
                 <dt className="text-xs text-neutral-400 dark:text-neutral-500">Registered</dt>

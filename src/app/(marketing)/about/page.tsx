@@ -99,6 +99,27 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      <section className="bg-ink dark:bg-neutral-950">
+        <div className="mx-auto flex max-w-7xl flex-col items-center gap-6 px-6 py-16 text-center lg:px-8 lg:py-20">
+          <span className="text-sm font-bold tracking-wide text-gold">
+            KNOW YOUR EXECUTIVES
+          </span>
+          <h2 className="max-w-2xl text-3xl font-extrabold leading-tight text-white sm:text-4xl">
+            Meet the SRC Executives, Past and Present
+          </h2>
+          <p className="max-w-xl text-base leading-7 text-neutral-300">
+            A running hall of fame of every executive year group and what they achieved during
+            their term.
+          </p>
+          <Link
+            href="/about/executives"
+            className="mt-2 inline-block rounded-md bg-gold px-7 py-3.5 text-sm font-semibold text-ink transition-colors hover:bg-gold-dark"
+          >
+            Know Your Executives
+          </Link>
+        </div>
+      </section>
     </>
   );
 }

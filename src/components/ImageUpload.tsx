@@ -1,0 +1,98 @@
+"use client";
+
+import { useRef, useState } from "react";
+
+export function ImageUpload({
+  imageUrl,
+  onUploaded,
+  onRemove,
+}: {
+  imageUrl?: string | null;
+  onUploaded: (url: string) => void;
+  onRemove: () => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setError(null);
+    setPreview(URL.createObjectURL(file));
+    setUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Upload failed");
+        setPreview(null);
+        return;
+      }
+      onUploaded(data.url);
+    } catch {
+      setError("Upload failed. Please try again.");
+      setPreview(null);
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  }
+
+  const shown = preview ?? imageUrl;
+
+  return (
+    <div>
+      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-neutral-100 dark:bg-neutral-800">
+        {shown ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={shown} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-sm text-neutral-400 dark:text-neutral-500">
+            No image
+          </div>
+        )}
+        {uploading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+          </div>
+        )}
+      </div>
+      <div className="mt-2 flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          disabled={uploading}
+          className="rounded-md border border-black/10 dark:border-white/10 px-3.5 py-2 text-sm font-semibold text-neutral-700 dark:text-neutral-300 transition-colors hover:bg-black/5 dark:hover:bg-white/10 disabled:opacity-60"
+        >
+          {shown ? "Change image" : "Upload image"}
+        </button>
+        {shown && (
+          <button
+            type="button"
+            onClick={() => {
+              setPreview(null);
+              onRemove();
+            }}
+            className="text-sm font-semibold text-red-600 dark:text-red-400 hover:underline"
+          >
+            Remove
+          </button>
+        )}
+      </div>
+      <p className="mt-1 text-xs text-neutral-400 dark:text-neutral-500">JPG, PNG, WEBP or GIF, up to 5MB</p>
+      {error && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{error}</p>}
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        onChange={handleFile}
+        className="hidden"
+      />
+    </div>
+  );
+}

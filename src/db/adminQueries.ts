@@ -7,13 +7,26 @@ import {
   auditLogs,
   programs,
   settings,
+  events,
+  newsPosts,
+  executiveYearGroups,
+  executiveProfiles,
+  executiveAchievements,
   type NewAdminUser,
   type NewPermit,
+  type NewEvent,
+  type NewNewsPost,
+  type NewExecutiveYearGroup,
+  type NewExecutiveProfile,
+  type NewExecutiveAchievement,
 } from "./schema";
 
 import { getAdminSession } from "@/lib/adminAuth";
 
 export const PERMIT_EXPIRY_DATE_KEY = "permit_expiry_date";
+export const CONTACT_INFO_KEY = "contact_info";
+export const SEMESTER_CONFIG_KEY = "semester_config";
+export const PERMIT_CONFIG_KEY = "permit_config";
 
 export async function getSetting(key: string) {
   const row = await db.query.settings.findFirst({ where: eq(settings.key, key) });
@@ -26,6 +39,20 @@ export async function setSetting(key: string, value: string) {
     .values({ key, value })
     .onConflictDoUpdate({ target: settings.key, set: { value, updatedAt: new Date() } })
     .returning();
+}
+
+export async function getJsonSetting<T>(key: string): Promise<T | null> {
+  const value = await getSetting(key);
+  if (!value) return null;
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return null;
+  }
+}
+
+export function setJsonSetting(key: string, value: unknown) {
+  return setSetting(key, JSON.stringify(value));
 }
 
 export async function getPermitExpiryDate() {
@@ -72,9 +99,7 @@ export function listAdmins() {
 
 export function updateAdmin(
   id: string,
-  values: Partial<
-    Pick<NewAdminUser, "permissions" | "active" | "name" | "email" | "avatarUrl">
-  >
+  values: Partial<Pick<NewAdminUser, "permissions" | "active" | "name" | "email" | "avatarUrl">>
 ) {
   return db
     .update(adminUsers)
@@ -391,4 +416,206 @@ export function createProgram(name: string) {
 
 export function deleteProgram(id: string) {
   return db.delete(programs).where(eq(programs.id, id)).returning();
+}
+
+export function listEventsForAdmin({ limit = 200, offset = 0 } = {}) {
+  return db.query.events.findMany({
+    orderBy: desc(events.startsAt),
+    limit,
+    offset,
+  });
+}
+
+export function getEventById(id: string) {
+  return db.query.events.findFirst({ where: eq(events.id, id) });
+}
+
+export function createEvent(values: NewEvent) {
+  return db.insert(events).values(values).returning();
+}
+
+export function updateEvent(
+  id: string,
+  values: Partial<
+    Pick<
+      NewEvent,
+      "title" | "description" | "location" | "startsAt" | "endsAt" | "imageUrl" | "published"
+    >
+  >
+) {
+  return db
+    .update(events)
+    .set({ ...values, updatedAt: new Date() })
+    .where(eq(events.id, id))
+    .returning();
+}
+
+export function deleteEvent(id: string) {
+  return db.delete(events).where(eq(events.id, id)).returning();
+}
+
+export function listNewsForAdmin({ limit = 200, offset = 0 } = {}) {
+  return db.query.newsPosts.findMany({
+    orderBy: desc(newsPosts.publishedAt),
+    limit,
+    offset,
+  });
+}
+
+export function getNewsPostById(id: string) {
+  return db.query.newsPosts.findFirst({ where: eq(newsPosts.id, id) });
+}
+
+export function createNewsPost(values: NewNewsPost) {
+  return db.insert(newsPosts).values(values).returning();
+}
+
+export function updateNewsPost(
+  id: string,
+  values: Partial<Pick<NewNewsPost, "title" | "excerpt" | "body" | "imageUrl" | "published">>
+) {
+  return db
+    .update(newsPosts)
+    .set({ ...values, updatedAt: new Date() })
+    .where(eq(newsPosts.id, id))
+    .returning();
+}
+
+export function deleteNewsPost(id: string) {
+  return db.delete(newsPosts).where(eq(newsPosts.id, id)).returning();
+}
+
+// ---------- Executives: year groups ----------
+
+export function listYearGroupsForAdmin() {
+  return db.query.executiveYearGroups.findMany({
+    orderBy: desc(executiveYearGroups.createdAt),
+  });
+}
+
+export function getYearGroupById(id: string) {
+  return db.query.executiveYearGroups.findFirst({
+    where: eq(executiveYearGroups.id, id),
+  });
+}
+
+export function createYearGroup(values: NewExecutiveYearGroup) {
+  return db.insert(executiveYearGroups).values(values).returning();
+}
+
+export function updateYearGroup(
+  id: string,
+  values: Partial<Pick<NewExecutiveYearGroup, "label" | "description" | "active">>
+) {
+  return db
+    .update(executiveYearGroups)
+    .set({ ...values, updatedAt: new Date() })
+    .where(eq(executiveYearGroups.id, id))
+    .returning();
+}
+
+export function deleteYearGroup(id: string) {
+  return db.delete(executiveYearGroups).where(eq(executiveYearGroups.id, id)).returning();
+}
+
+// ---------- Executives: profiles ----------
+
+export function listProfilesForAdmin(yearGroupId?: string) {
+  return db.query.executiveProfiles.findMany({
+    where: yearGroupId ? eq(executiveProfiles.yearGroupId, yearGroupId) : undefined,
+    orderBy: (executiveProfiles, { asc }) => asc(executiveProfiles.displayOrder),
+    with: {
+      yearGroup: { columns: { id: true, label: true } },
+      adminUser: { columns: { id: true, name: true, email: true } },
+    },
+  });
+}
+
+export function getProfileById(id: string) {
+  return db.query.executiveProfiles.findFirst({
+    where: eq(executiveProfiles.id, id),
+    with: {
+      yearGroup: { columns: { id: true, label: true } },
+    },
+  });
+}
+
+export function getProfileByAdminUserId(adminUserId: string) {
+  return db.query.executiveProfiles.findFirst({
+    where: eq(executiveProfiles.adminUserId, adminUserId),
+    orderBy: desc(executiveProfiles.createdAt),
+    with: {
+      yearGroup: { columns: { id: true, label: true, active: true } },
+    },
+  });
+}
+
+export function createProfile(values: NewExecutiveProfile) {
+  return db.insert(executiveProfiles).values(values).returning();
+}
+
+export function updateProfile(
+  id: string,
+  values: Partial<
+    Pick<
+      NewExecutiveProfile,
+      "name" | "position" | "bio" | "avatarUrl" | "socialLinks" | "adminUserId" | "displayOrder" | "yearGroupId"
+    >
+  >
+) {
+  return db
+    .update(executiveProfiles)
+    .set({ ...values, updatedAt: new Date() })
+    .where(eq(executiveProfiles.id, id))
+    .returning();
+}
+
+export function deleteProfile(id: string) {
+  return db.delete(executiveProfiles).where(eq(executiveProfiles.id, id)).returning();
+}
+
+// ---------- Executives: achievements ----------
+
+export function listAchievementsForAdmin({
+  yearGroupId,
+  profileId,
+}: { yearGroupId?: string; profileId?: string } = {}) {
+  const conditions = [];
+  if (yearGroupId) conditions.push(eq(executiveAchievements.yearGroupId, yearGroupId));
+  if (profileId) conditions.push(eq(executiveAchievements.profileId, profileId));
+  return db.query.executiveAchievements.findMany({
+    where: conditions.length > 0 ? and(...conditions) : undefined,
+    orderBy: desc(executiveAchievements.achievedAt),
+    with: {
+      yearGroup: { columns: { id: true, label: true } },
+      profile: { columns: { id: true, name: true } },
+    },
+  });
+}
+
+export function getAchievementById(id: string) {
+  return db.query.executiveAchievements.findFirst({
+    where: eq(executiveAchievements.id, id),
+  });
+}
+
+export function createAchievement(values: NewExecutiveAchievement) {
+  return db.insert(executiveAchievements).values(values).returning();
+}
+
+export function updateAchievement(
+  id: string,
+  values: Partial<
+    Pick<NewExecutiveAchievement, "title" | "description" | "achievedAt" | "imageUrl" | "profileId">
+  >
+) {
+  return db
+    .update(executiveAchievements)
+    .set({ ...values, updatedAt: new Date() })
+    .where(eq(executiveAchievements.id, id))
+    .returning();
+}
+
+export function deleteAchievement(id: string) {
+  return db.delete(executiveAchievements).where(eq(executiveAchievements.id, id)).returning();
 }

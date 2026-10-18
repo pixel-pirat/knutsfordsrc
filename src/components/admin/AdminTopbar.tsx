@@ -6,15 +6,10 @@ import Link from "next/link";
 import { UserAvatar } from "@/components/UserAvatar";
 import { HubIcon } from "@/components/icons";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import type { PublicAdmin } from "@/lib/types";
 
-export function AdminTopbar({
-  admin,
-  onMenuClick,
-}: {
-  admin: PublicAdmin;
-  onMenuClick: () => void;
-}) {
+export function AdminTopbar({ admin }: { admin: PublicAdmin }) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -37,16 +32,7 @@ export function AdminTopbar({
 
   return (
     <header className="flex h-16 items-center gap-3 border-b border-black/5 dark:border-white/10 bg-white dark:bg-neutral-900 px-4 sm:px-6">
-      <button
-        type="button"
-        onClick={onMenuClick}
-        aria-label="Toggle sidebar"
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-neutral-600 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/10 lg:hidden"
-      >
-        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
-          <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
-        </svg>
-      </button>
+      <SidebarTrigger className="-ml-1 shrink-0 text-neutral-600 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/10" />
 
       <span className="rounded-full bg-neutral-100 dark:bg-neutral-800 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
         {admin.role === "super_admin" ? "Super Admin" : "Admin"}

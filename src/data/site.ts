@@ -316,6 +316,7 @@ export const footerColumns = [
       { label: "Market", href: "/market" },
       { label: "News", href: "/news" },
       { label: "Gallery", href: "/gallery" },
+      { label: "Know Your Executives", href: "/about/executives" },
     ],
   },
   {

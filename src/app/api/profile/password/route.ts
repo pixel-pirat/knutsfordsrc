@@ -20,6 +20,9 @@ export async function POST(request: Request) {
   }
 
   const { currentPassword, newPassword } = parsed.data;
+  if (!student.passwordHash) {
+    return NextResponse.json({ error: "Current password is incorrect" }, { status: 401 });
+  }
   const valid = await verifyPassword(currentPassword, student.passwordHash);
   if (!valid) {
     return NextResponse.json({ error: "Current password is incorrect" }, { status: 401 });

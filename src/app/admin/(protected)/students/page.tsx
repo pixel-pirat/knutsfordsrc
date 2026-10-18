@@ -45,7 +45,17 @@ export default async function StudentsPage({
       </div>
 
       <StudentsTable
-        students={students}
+        students={students.map((s) => ({
+          id: s.id,
+          indexNumber: s.indexNumber,
+          firstName: s.firstName,
+          lastName: s.lastName,
+          email: s.email,
+          phone: s.phone,
+          program: s.program,
+          level: s.level,
+          avatarUrl: s.avatarUrl,
+        }))}
         canCreate={hasPermission(admin, "create_student")}
         initialQuery={q ?? ""}
         page={page}

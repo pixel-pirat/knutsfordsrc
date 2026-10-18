@@ -24,6 +24,21 @@ export const PERMISSIONS = [
     label: "View Audit Trail",
     description: "View the full activity log of admin actions",
   },
+  {
+    key: "manage_events",
+    label: "Manage Events",
+    description: "Create, edit and remove campus events shown to students",
+  },
+  {
+    key: "manage_news",
+    label: "Manage News",
+    description: "Create, edit and remove news posts shown to students",
+  },
+  {
+    key: "manage_executives",
+    label: "Manage Executives",
+    description: "Manage executive year groups, profiles and achievements",
+  },
 ] as const;
 
 export type PermissionKey = (typeof PERMISSIONS)[number]["key"];

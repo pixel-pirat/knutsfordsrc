@@ -1,6 +1,14 @@
-import { eq } from "drizzle-orm";
+import { and, desc, eq, gte, or, isNull } from "drizzle-orm";
 import { db } from "./index";
-import { students, type NewStudent } from "./schema";
+import {
+  students,
+  events,
+  newsPosts,
+  executiveYearGroups,
+  executiveProfiles,
+  executiveAchievements,
+  type NewStudent,
+} from "./schema";
 import { getSession } from "@/lib/auth";
 
 export function getStudentByIndexNumber(indexNumber: string) {
@@ -91,6 +99,102 @@ export async function getCurrentStudent() {
   if (!session) return null;
   const student = await getStudentById(session.studentId);
   return student ?? null;
+}
+
+export function listUpcomingEvents({ limit = 50 } = {}) {
+  const now = new Date();
+  return db.query.events.findMany({
+    where: and(
+      eq(events.published, true),
+      or(
+        gte(events.endsAt, now),
+        and(isNull(events.endsAt), gte(events.startsAt, now))
+      )
+    ),
+    orderBy: (events, { asc }) => asc(events.startsAt),
+    limit,
+  });
+}
+
+export function listPublishedNews({ limit = 30 } = {}) {
+  return db.query.newsPosts.findMany({
+    where: eq(newsPosts.published, true),
+    orderBy: desc(newsPosts.publishedAt),
+    limit,
+  });
+}
+
+// ---------- Executives (public) ----------
+
+export function listYearGroupsPublic() {
+  return db.query.executiveYearGroups.findMany({
+    where: eq(executiveYearGroups.active, true),
+    orderBy: desc(executiveYearGroups.createdAt),
+  });
+}
+
+export function getYearGroupPublic(id: string) {
+  return db.query.executiveYearGroups.findFirst({
+    where: and(eq(executiveYearGroups.id, id), eq(executiveYearGroups.active, true)),
+  });
+}
+
+export function listProfilesForYearGroupPublic(yearGroupId: string) {
+  return db.query.executiveProfiles.findMany({
+    where: eq(executiveProfiles.yearGroupId, yearGroupId),
+    orderBy: (executiveProfiles, { asc }) => asc(executiveProfiles.displayOrder),
+    columns: {
+      id: true,
+      name: true,
+      position: true,
+      bio: true,
+      avatarUrl: true,
+      socialLinks: true,
+    },
+  });
+}
+
+export function getProfilePublic(id: string) {
+  return db.query.executiveProfiles.findFirst({
+    where: eq(executiveProfiles.id, id),
+    columns: {
+      id: true,
+      name: true,
+      position: true,
+      bio: true,
+      avatarUrl: true,
+      socialLinks: true,
+    },
+    with: {
+      yearGroup: { columns: { id: true, label: true, active: true } },
+      achievements: {
+        orderBy: desc(executiveAchievements.achievedAt),
+        columns: { id: true, title: true, description: true, achievedAt: true, imageUrl: true },
+      },
+    },
+  });
+}
+
+export function listAchievementsPublic({
+  yearGroupId,
+  limit = 50,
+}: { yearGroupId?: string; limit?: number } = {}) {
+  return db.query.executiveAchievements.findMany({
+    where: yearGroupId ? eq(executiveAchievements.yearGroupId, yearGroupId) : undefined,
+    orderBy: desc(executiveAchievements.achievedAt),
+    limit,
+    columns: {
+      id: true,
+      title: true,
+      description: true,
+      achievedAt: true,
+      imageUrl: true,
+    },
+    with: {
+      yearGroup: { columns: { id: true, label: true } },
+      profile: { columns: { id: true, name: true, avatarUrl: true } },
+    },
+  });
 }
 
 export function getStudentPublicSnapshot(id: string) {

@@ -32,6 +32,7 @@ export async function GET(
       profileCompleted: student.profileCompleted,
       avatarUrl: student.avatarUrl,
       createdAt: student.createdAt,
+      hasPassword: Boolean(student.passwordHash),
       permits: student.permits.map((p) => ({
         id: p.id,
         referenceNumber: p.referenceNumber,
