@@ -8,6 +8,7 @@ import {
   jsonb,
   numeric,
   integer,
+  unique,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -19,6 +20,28 @@ export const permitStatusEnum = pgEnum("permit_status", [
   "expired",
 ]);
 export const cardStatusEnum = pgEnum("card_status", ["pending", "active"]);
+export const hallBookingStatusEnum = pgEnum("hall_booking_status", [
+  "booked",
+  "attended",
+  "cancelled",
+]);
+export const participationStatusEnum = pgEnum("participation_status", [
+  "registered",
+  "confirmed",
+  "declined",
+]);
+export const tournamentFormatEnum = pgEnum("tournament_format", [
+  "single_elimination",
+  "round_robin",
+  "group_knockout",
+]);
+export const tournamentStatusEnum = pgEnum("tournament_status", [
+  "draft",
+  "active",
+  "completed",
+]);
+export const matchStageEnum = pgEnum("match_stage", ["group", "knockout"]);
+export const matchStatusEnum = pgEnum("match_status", ["pending", "completed"]);
 
 export const adminUsers = pgTable("admin_users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -51,6 +74,7 @@ export const students = pgTable("students", {
   studyMode: studyModeEnum("study_mode"),
   profileCompleted: boolean("profile_completed").notNull().default(false),
   avatarUrl: text("avatar_url"),
+  hallId: uuid("hall_id").references(() => halls.id, { onDelete: "set null" }),
   createdByAdminId: uuid("created_by_admin_id").references(
     () => adminUsers.id
   ),
@@ -218,6 +242,227 @@ export const auditLogs = pgTable("audit_logs", {
     .defaultNow(),
 });
 
+// ---------------------------------------------------------------------------
+// Halls
+// ---------------------------------------------------------------------------
+
+export const halls = pgTable("halls", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull().unique(),
+  description: text("description"),
+  wardenName: text("warden_name"),
+  location: text("location"),
+  contactEmail: text("contact_email"),
+  capacity: integer("capacity"),
+  imageUrl: text("image_url"),
+  active: boolean("active").notNull().default(true),
+  createdBy: uuid("created_by")
+    .notNull()
+    .references(() => adminUsers.id),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const hallEvents = pgTable("hall_events", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  hallId: uuid("hall_id").references(() => halls.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  description: text("description"),
+  location: text("location"),
+  startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
+  endsAt: timestamp("ends_at", { withTimezone: true }),
+  capacity: integer("capacity"),
+  bookingRequired: boolean("booking_required").notNull().default(true),
+  imageUrl: text("image_url"),
+  published: boolean("published").notNull().default(true),
+  createdBy: uuid("created_by")
+    .notNull()
+    .references(() => adminUsers.id),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const hallEventBookings = pgTable(
+  "hall_event_bookings",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    eventId: uuid("event_id")
+      .notNull()
+      .references(() => hallEvents.id, { onDelete: "cascade" }),
+    studentId: uuid("student_id")
+      .notNull()
+      .references(() => students.id, { onDelete: "cascade" }),
+    status: hallBookingStatusEnum("status").notNull().default("booked"),
+    bookedAt: timestamp("booked_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [unique("hall_event_booking_unique").on(t.eventId, t.studentId)]
+);
+
+export const hallMessages = pgTable("hall_messages", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  hallId: uuid("hall_id").references(() => halls.id, { onDelete: "cascade" }),
+  subject: text("subject").notNull(),
+  body: text("body").notNull(),
+  recipientCount: integer("recipient_count").notNull().default(0),
+  failedCount: integer("failed_count").notNull().default(0),
+  sentBy: uuid("sent_by")
+    .notNull()
+    .references(() => adminUsers.id),
+  sentAt: timestamp("sent_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ---------------------------------------------------------------------------
+// Sports
+// ---------------------------------------------------------------------------
+
+export const sportEvents = pgTable("sport_events", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  title: text("title").notNull(),
+  sport: text("sport").notNull(),
+  description: text("description"),
+  venue: text("venue"),
+  startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
+  endsAt: timestamp("ends_at", { withTimezone: true }),
+  imageUrl: text("image_url"),
+  published: boolean("published").notNull().default(true),
+  createdBy: uuid("created_by")
+    .notNull()
+    .references(() => adminUsers.id),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const sportParticipations = pgTable(
+  "sport_participations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    eventId: uuid("event_id")
+      .notNull()
+      .references(() => sportEvents.id, { onDelete: "cascade" }),
+    studentId: uuid("student_id")
+      .notNull()
+      .references(() => students.id, { onDelete: "cascade" }),
+    status: participationStatusEnum("status").notNull().default("registered"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [unique("sport_participation_unique").on(t.eventId, t.studentId)]
+);
+
+export const sportTournaments = pgTable("sport_tournaments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  sport: text("sport"),
+  description: text("description"),
+  format: tournamentFormatEnum("format").notNull().default("single_elimination"),
+  status: tournamentStatusEnum("status").notNull().default("draft"),
+  eventId: uuid("event_id").references(() => sportEvents.id, {
+    onDelete: "set null",
+  }),
+  numberOfGroups: integer("number_of_groups"),
+  qualifiersPerGroup: integer("qualifiers_per_group"),
+  bracketRounds: integer("bracket_rounds"),
+  championName: text("champion_name"),
+  createdBy: uuid("created_by")
+    .notNull()
+    .references(() => adminUsers.id),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const tournamentParticipants = pgTable(
+  "tournament_participants",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tournamentId: uuid("tournament_id")
+      .notNull()
+      .references(() => sportTournaments.id, { onDelete: "cascade" }),
+    studentId: uuid("student_id")
+      .notNull()
+      .references(() => students.id, { onDelete: "cascade" }),
+    seed: integer("seed").notNull().default(0),
+    groupLabel: text("group_label"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [unique("tournament_participant_unique").on(t.tournamentId, t.studentId)]
+);
+
+export const sportMatches = pgTable("sport_matches", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  tournamentId: uuid("tournament_id")
+    .notNull()
+    .references(() => sportTournaments.id, { onDelete: "cascade" }),
+  stage: matchStageEnum("stage").notNull().default("knockout"),
+  groupLabel: text("group_label"),
+  round: integer("round").notNull().default(1),
+  matchIndex: integer("match_index").notNull().default(0),
+  participantAId: uuid("participant_a_id").references(
+    () => tournamentParticipants.id,
+    { onDelete: "set null" }
+  ),
+  participantBId: uuid("participant_b_id").references(
+    () => tournamentParticipants.id,
+    { onDelete: "set null" }
+  ),
+  scoreA: integer("score_a"),
+  scoreB: integer("score_b"),
+  winnerId: uuid("winner_id").references(() => tournamentParticipants.id, {
+    onDelete: "set null",
+  }),
+  status: matchStatusEnum("status").notNull().default("pending"),
+  scheduledAt: timestamp("scheduled_at", { withTimezone: true }),
+  venue: text("venue"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const sportAnnouncements = pgTable("sport_announcements", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  title: text("title").notNull(),
+  body: text("body").notNull(),
+  eventId: uuid("event_id").references(() => sportEvents.id, {
+    onDelete: "set null",
+  }),
+  recipientCount: integer("recipient_count").notNull().default(0),
+  failedCount: integer("failed_count").notNull().default(0),
+  published: boolean("published").notNull().default(true),
+  createdBy: uuid("created_by")
+    .notNull()
+    .references(() => adminUsers.id),
+  sentAt: timestamp("sent_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const adminUsersRelations = relations(adminUsers, ({ many }) => ({
   studentsCreated: many(students),
   permitsIssued: many(permits),
@@ -283,8 +528,148 @@ export const studentsRelations = relations(students, ({ one, many }) => ({
     fields: [students.createdByAdminId],
     references: [adminUsers.id],
   }),
+  hall: one(halls, {
+    fields: [students.hallId],
+    references: [halls.id],
+  }),
   permits: many(permits),
 }));
+
+export const hallsRelations = relations(halls, ({ one, many }) => ({
+  createdBy: one(adminUsers, {
+    fields: [halls.createdBy],
+    references: [adminUsers.id],
+  }),
+  students: many(students),
+  events: many(hallEvents),
+  messages: many(hallMessages),
+}));
+
+export const hallEventsRelations = relations(hallEvents, ({ one, many }) => ({
+  hall: one(halls, {
+    fields: [hallEvents.hallId],
+    references: [halls.id],
+  }),
+  creator: one(adminUsers, {
+    fields: [hallEvents.createdBy],
+    references: [adminUsers.id],
+  }),
+  bookings: many(hallEventBookings),
+}));
+
+export const hallEventBookingsRelations = relations(
+  hallEventBookings,
+  ({ one }) => ({
+    event: one(hallEvents, {
+      fields: [hallEventBookings.eventId],
+      references: [hallEvents.id],
+    }),
+    student: one(students, {
+      fields: [hallEventBookings.studentId],
+      references: [students.id],
+    }),
+  })
+);
+
+export const hallMessagesRelations = relations(hallMessages, ({ one }) => ({
+  hall: one(halls, {
+    fields: [hallMessages.hallId],
+    references: [halls.id],
+  }),
+  sender: one(adminUsers, {
+    fields: [hallMessages.sentBy],
+    references: [adminUsers.id],
+  }),
+}));
+
+export const sportEventsRelations = relations(sportEvents, ({ one, many }) => ({
+  creator: one(adminUsers, {
+    fields: [sportEvents.createdBy],
+    references: [adminUsers.id],
+  }),
+  participations: many(sportParticipations),
+  tournaments: many(sportTournaments),
+}));
+
+export const sportParticipationsRelations = relations(
+  sportParticipations,
+  ({ one }) => ({
+    event: one(sportEvents, {
+      fields: [sportParticipations.eventId],
+      references: [sportEvents.id],
+    }),
+    student: one(students, {
+      fields: [sportParticipations.studentId],
+      references: [students.id],
+    }),
+  })
+);
+
+export const sportTournamentsRelations = relations(
+  sportTournaments,
+  ({ one, many }) => ({
+    creator: one(adminUsers, {
+      fields: [sportTournaments.createdBy],
+      references: [adminUsers.id],
+    }),
+    event: one(sportEvents, {
+      fields: [sportTournaments.eventId],
+      references: [sportEvents.id],
+    }),
+    participants: many(tournamentParticipants),
+    matches: many(sportMatches),
+  })
+);
+
+export const tournamentParticipantsRelations = relations(
+  tournamentParticipants,
+  ({ one }) => ({
+    tournament: one(sportTournaments, {
+      fields: [tournamentParticipants.tournamentId],
+      references: [sportTournaments.id],
+    }),
+    student: one(students, {
+      fields: [tournamentParticipants.studentId],
+      references: [students.id],
+    }),
+  })
+);
+
+export const sportMatchesRelations = relations(sportMatches, ({ one }) => ({
+  tournament: one(sportTournaments, {
+    fields: [sportMatches.tournamentId],
+    references: [sportTournaments.id],
+  }),
+  participantA: one(tournamentParticipants, {
+    fields: [sportMatches.participantAId],
+    references: [tournamentParticipants.id],
+    relationName: "match_participant_a",
+  }),
+  participantB: one(tournamentParticipants, {
+    fields: [sportMatches.participantBId],
+    references: [tournamentParticipants.id],
+    relationName: "match_participant_b",
+  }),
+  winner: one(tournamentParticipants, {
+    fields: [sportMatches.winnerId],
+    references: [tournamentParticipants.id],
+    relationName: "match_winner",
+  }),
+}));
+
+export const sportAnnouncementsRelations = relations(
+  sportAnnouncements,
+  ({ one }) => ({
+    creator: one(adminUsers, {
+      fields: [sportAnnouncements.createdBy],
+      references: [adminUsers.id],
+    }),
+    event: one(sportEvents, {
+      fields: [sportAnnouncements.eventId],
+      references: [sportEvents.id],
+    }),
+  })
+);
 
 export const permitsRelations = relations(permits, ({ one }) => ({
   student: one(students, {
@@ -324,3 +709,23 @@ export type ExecutiveProfile = typeof executiveProfiles.$inferSelect;
 export type NewExecutiveProfile = typeof executiveProfiles.$inferInsert;
 export type ExecutiveAchievement = typeof executiveAchievements.$inferSelect;
 export type NewExecutiveAchievement = typeof executiveAchievements.$inferInsert;
+export type Hall = typeof halls.$inferSelect;
+export type NewHall = typeof halls.$inferInsert;
+export type HallEvent = typeof hallEvents.$inferSelect;
+export type NewHallEvent = typeof hallEvents.$inferInsert;
+export type HallEventBooking = typeof hallEventBookings.$inferSelect;
+export type NewHallEventBooking = typeof hallEventBookings.$inferInsert;
+export type HallMessage = typeof hallMessages.$inferSelect;
+export type NewHallMessage = typeof hallMessages.$inferInsert;
+export type SportEvent = typeof sportEvents.$inferSelect;
+export type NewSportEvent = typeof sportEvents.$inferInsert;
+export type SportParticipation = typeof sportParticipations.$inferSelect;
+export type NewSportParticipation = typeof sportParticipations.$inferInsert;
+export type SportTournament = typeof sportTournaments.$inferSelect;
+export type NewSportTournament = typeof sportTournaments.$inferInsert;
+export type TournamentParticipant = typeof tournamentParticipants.$inferSelect;
+export type NewTournamentParticipant = typeof tournamentParticipants.$inferInsert;
+export type SportMatch = typeof sportMatches.$inferSelect;
+export type NewSportMatch = typeof sportMatches.$inferInsert;
+export type SportAnnouncement = typeof sportAnnouncements.$inferSelect;
+export type NewSportAnnouncement = typeof sportAnnouncements.$inferInsert;

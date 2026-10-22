@@ -55,6 +55,7 @@ export default async function StudentsPage({
           program: s.program,
           level: s.level,
           avatarUrl: s.avatarUrl,
+          hallName: s.hall?.name ?? null,
         }))}
         canCreate={hasPermission(admin, "create_student")}
         initialQuery={q ?? ""}

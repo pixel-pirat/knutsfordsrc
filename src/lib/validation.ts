@@ -70,6 +70,7 @@ export const adminStudentCreateSchema = z.object({
   level: z.enum(["100", "200", "300", "400"]).optional().or(z.literal("")),
   studyMode: studyModeSchema.optional().or(z.literal("")),
   avatarUrl: z.url().optional().or(z.literal("")),
+  hallId: z.uuid().optional().or(z.literal("")),
 });
 
 export const adminStudentUpdateSchema = z.object({
@@ -82,6 +83,7 @@ export const adminStudentUpdateSchema = z.object({
   level: z.enum(["100", "200", "300", "400"]).optional().or(z.literal("")),
   studyMode: studyModeSchema.optional().or(z.literal("")),
   avatarUrl: z.url().optional().or(z.literal("")),
+  hallId: z.uuid().optional().or(z.literal("")),
 });
 
 export const paymentMethodSchema = z.enum(["Cash", "MoMo", "Bank Payment", "Free Card"]);
@@ -200,4 +202,101 @@ export const executiveSelfAchievementSchema = z.object({
   description: z.string().trim().max(3000).optional().or(z.literal("")),
   achievedAt: z.string().trim().optional().or(z.literal("")),
   imageUrl: z.url().optional().or(z.literal("")),
+});
+
+// ---------------------------------------------------------------------------
+// Halls, hall events & communications
+// ---------------------------------------------------------------------------
+
+export const hallSchema = z.object({
+  name: z.string().trim().min(1, "Hall name is required").max(120),
+  description: z.string().trim().max(4000).optional().or(z.literal("")),
+  wardenName: z.string().trim().max(120).optional().or(z.literal("")),
+  location: z.string().trim().max(200).optional().or(z.literal("")),
+  contactEmail: z.email("Enter a valid email address").optional().or(z.literal("")),
+  capacity: z.coerce.number().int().min(0).max(1_000_000).optional(),
+  imageUrl: z.url().optional().or(z.literal("")),
+  active: z.boolean().optional(),
+});
+
+export const hallEventSchema = z.object({
+  hallId: z.uuid("Select a hall, or leave as All Halls").optional().or(z.literal("")),
+  title: z.string().trim().min(1, "Title is required").max(200),
+  description: z.string().trim().max(5000).optional().or(z.literal("")),
+  location: z.string().trim().max(200).optional().or(z.literal("")),
+  startsAt: z.string().trim().min(1, "Start date & time is required"),
+  endsAt: z.string().trim().optional().or(z.literal("")),
+  capacity: z.coerce.number().int().min(0).max(1_000_000).optional(),
+  bookingRequired: z.boolean().optional(),
+  imageUrl: z.url().optional().or(z.literal("")),
+  published: z.boolean().optional(),
+});
+
+export const hallMessageSchema = z.object({
+  hallId: z.uuid("Select a hall").optional().or(z.literal("")),
+  subject: z.string().trim().min(1, "Subject is required").max(200),
+  body: z.string().trim().min(1, "Message body is required").max(20000),
+});
+
+export const bookingStatusSchema = z.object({
+  bookingId: z.uuid("Invalid booking"),
+  status: z.enum(["booked", "attended", "cancelled"]),
+});
+
+// ---------------------------------------------------------------------------
+// Sports
+// ---------------------------------------------------------------------------
+
+export const sportEventSchema = z.object({
+  title: z.string().trim().min(1, "Title is required").max(200),
+  sport: z.string().trim().min(1, "Sport is required").max(120),
+  description: z.string().trim().max(5000).optional().or(z.literal("")),
+  venue: z.string().trim().max(200).optional().or(z.literal("")),
+  startsAt: z.string().trim().min(1, "Start date & time is required"),
+  endsAt: z.string().trim().optional().or(z.literal("")),
+  imageUrl: z.url().optional().or(z.literal("")),
+  published: z.boolean().optional(),
+});
+
+export const participationStatusUpdateSchema = z.object({
+  participationId: z.uuid("Invalid registration"),
+  status: z.enum(["registered", "confirmed", "declined"]),
+});
+
+export const tournamentFormatValues = [
+  "single_elimination",
+  "round_robin",
+  "group_knockout",
+] as const;
+
+export const tournamentCreateSchema = z.object({
+  name: z.string().trim().min(1, "Tournament name is required").max(200),
+  sport: z.string().trim().max(120).optional().or(z.literal("")),
+  description: z.string().trim().max(5000).optional().or(z.literal("")),
+  format: z.enum(tournamentFormatValues),
+  eventId: z.uuid("Invalid event").optional().or(z.literal("")),
+  numberOfGroups: z.coerce.number().int().min(2).max(8).optional(),
+  qualifiersPerGroup: z.coerce.number().int().min(1).max(4).optional(),
+});
+
+export const tournamentUpdateSchema = tournamentCreateSchema.partial().extend({
+  status: z.enum(["draft", "active", "completed"]).optional(),
+});
+
+export const tournamentParticipantsSchema = z.object({
+  studentIds: z.array(z.uuid()).min(1, "Select at least one student"),
+});
+
+export const matchResultSchema = z.object({
+  scoreA: z.coerce.number().int().min(0).max(999).nullable().optional(),
+  scoreB: z.coerce.number().int().min(0).max(999).nullable().optional(),
+  winnerId: z.uuid("Invalid participant").nullable().optional(),
+  scheduledAt: z.string().trim().nullable().optional(),
+  venue: z.string().trim().max(200).nullable().optional(),
+});
+
+export const sportAnnouncementSchema = z.object({
+  title: z.string().trim().min(1, "Title is required").max(200),
+  body: z.string().trim().min(1, "Message body is required").max(20000),
+  eventId: z.uuid("Invalid event").optional().or(z.literal("")),
 });

@@ -120,6 +120,29 @@ const icons: Record<string, ReactElement> = {
       <circle cx="12" cy="12" r="2.75" fill="none" stroke="currentColor" strokeWidth="1.5" />
     </>
   ),
+  hall: (
+    <path
+      d="M4 20V5.5A1.5 1.5 0 015.5 4h6A1.5 1.5 0 0113 5.5V20M13 9h5.5A1.5 1.5 0 0120 10.5V20M3 20h18M6.5 7.5h4M6.5 11h4M6.5 14.5h4M15.5 12h2M15.5 15.5h2"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  ),
+  ball: (
+    <>
+      <circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      <path
+        d="M12 3.5l3 2.3-1.2 3.6h-3.6L9 5.8l3-2.3zM8 13.8l-2.8 1.2M16 13.8l2.8 1.2M9.5 21.3L12 18l2.5 3.3M12 18a6 6 0 01-4-6.2M12 18a6 6 0 004-6.2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </>
+  ),
   flag: (
     <path
       d="M5 3v18M5 4h11l-2 3.5L16 11H5"

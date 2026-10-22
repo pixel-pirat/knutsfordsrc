@@ -20,8 +20,18 @@ export async function POST(request: Request) {
     );
   }
 
-  const { indexNumber, firstName, lastName, email, phone, program, level, studyMode, avatarUrl } =
-    parsed.data;
+  const {
+    indexNumber,
+    firstName,
+    lastName,
+    email,
+    phone,
+    program,
+    level,
+    studyMode,
+    avatarUrl,
+    hallId,
+  } = parsed.data;
 
   const existing = await getStudentByIndexNumber(indexNumber);
   if (existing) {
@@ -48,6 +58,7 @@ export async function POST(request: Request) {
     avatarUrl: avatarUrl || null,
     profileCompleted,
     createdByAdminId: admin.id,
+    hallId: hallId || null,
   });
 
   await logAudit({

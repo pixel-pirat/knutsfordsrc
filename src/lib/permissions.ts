@@ -39,6 +39,28 @@ export const PERMISSIONS = [
     label: "Manage Executives",
     description: "Manage executive year groups, profiles and achievements",
   },
+  {
+    key: "manage_halls",
+    label: "Manage Halls",
+    description: "Create and manage hall profiles and their student members",
+  },
+  {
+    key: "manage_hall_events",
+    label: "Manage Hall Events",
+    description:
+      "Create hall events and programs, track bookings and attendance",
+  },
+  {
+    key: "manage_hall_comms",
+    label: "Manage Hall Communications",
+    description: "Send hall-specific announcements to hall members",
+  },
+  {
+    key: "manage_sports",
+    label: "Manage Sports",
+    description:
+      "Create sports events, confirm participation, run tournaments and send updates",
+  },
 ] as const;
 
 export type PermissionKey = (typeof PERMISSIONS)[number]["key"];

@@ -32,6 +32,7 @@ export async function GET(
       profileCompleted: student.profileCompleted,
       avatarUrl: student.avatarUrl,
       createdAt: student.createdAt,
+      hallId: student.hallId,
       hasPassword: Boolean(student.passwordHash),
       permits: student.permits.map((p) => ({
         id: p.id,
@@ -74,6 +75,7 @@ export async function PATCH(
     level,
     studyMode,
     avatarUrl,
+    hallId,
   } = parsed.data;
 
   const conflict = await getStudentByIndexNumber(indexNumber);
@@ -94,6 +96,7 @@ export async function PATCH(
     level: level || null,
     studyMode: studyMode || null,
     ...(avatarUrl ? { avatarUrl } : {}),
+    hallId: hallId || null,
   });
 
   if (!updated) {
@@ -105,7 +108,10 @@ export async function PATCH(
     action: "student.update",
     targetType: "student",
     targetId: updated.id,
-    metadata: { indexNumber: updated.indexNumber },
+    metadata: {
+      indexNumber: updated.indexNumber,
+      hallId: hallId || null,
+    },
   });
 
   return NextResponse.json({
@@ -120,6 +126,7 @@ export async function PATCH(
       level: updated.level,
       studyMode: updated.studyMode,
       avatarUrl: updated.avatarUrl,
+      hallId: updated.hallId,
     },
   });
 }

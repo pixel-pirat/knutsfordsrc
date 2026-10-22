@@ -46,6 +46,7 @@ type StudentRow = {
   program: string | null;
   level: string | null;
   avatarUrl: string | null;
+  hallName: string | null;
 };
 
 export function StudentsTable({
@@ -142,10 +143,11 @@ export function StudentsTable({
             <TableHeader>
               <TableRow className="hover:bg-transparent!">
                 <TableHead className="w-[26%] px-3.5">Student</TableHead>
-                <TableHead className="w-[22%] px-3.5">Programme</TableHead>
-                <TableHead className="w-[10%] px-3.5">Level</TableHead>
-                <TableHead className="w-[24%] px-3.5">Email</TableHead>
-                <TableHead className="w-[14%] px-3.5">Phone</TableHead>
+                <TableHead className="w-[18%] px-3.5">Programme</TableHead>
+                <TableHead className="w-[8%] px-3.5">Level</TableHead>
+                <TableHead className="w-[12%] px-3.5">Hall</TableHead>
+                <TableHead className="w-[20%] px-3.5">Email</TableHead>
+                <TableHead className="w-[12%] px-3.5">Phone</TableHead>
                 <TableHead className="w-[4%] px-3.5" />
               </TableRow>
             </TableHeader>
@@ -186,6 +188,9 @@ export function StudentsTable({
                   </TableCell>
                   <TableCell className="truncate px-3.5 text-neutral-700 dark:text-neutral-300">
                     {s.level ?? "—"}
+                  </TableCell>
+                  <TableCell className="truncate px-3.5 text-neutral-700 dark:text-neutral-300">
+                    {s.hallName ?? "—"}
                   </TableCell>
                   <TableCell className="truncate px-3.5 text-neutral-500 dark:text-neutral-400">
                     {s.email ?? "—"}

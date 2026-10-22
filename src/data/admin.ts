@@ -94,6 +94,28 @@ export const adminNav: AdminNavEntry[] = [
     ],
   },
   {
+    label: "Hall Updates",
+    href: "#",
+    icon: "hall",
+    items: [
+      { label: "Halls", href: "/admin/halls", icon: "hall", permission: "manage_halls" },
+      { label: "Events", href: "/admin/hall-events", icon: "calendar", permission: "manage_hall_events" },
+      { label: "Communications", href: "/admin/communications", icon: "newspaper", permission: "manage_hall_comms" },
+    ],
+  },
+  {
+    label: "Sports",
+    href: "#",
+    icon: "trophy",
+    permission: "manage_sports",
+    items: [
+      { label: "Sport Events", href: "/admin/sports/events", icon: "trophy", permission: "manage_sports" },
+      { label: "Tournaments", href: "/admin/sports/tournaments", icon: "gamepad", permission: "manage_sports" },
+      { label: "Schedule", href: "/admin/sports/schedule", icon: "calendar", permission: "manage_sports" },
+      { label: "Announcements", href: "/admin/sports/announcements", icon: "newspaper", permission: "manage_sports" },
+    ],
+  },
+  {
     label: "Settings",
     href: "#",
     icon: "gear",

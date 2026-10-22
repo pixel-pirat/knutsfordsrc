@@ -273,6 +273,9 @@ export function searchStudents(query: string, { limit = 50, offset = 0 } = {}) {
     orderBy: desc(students.createdAt),
     limit,
     offset,
+    with: {
+      hall: { columns: { name: true } },
+    },
   });
 }
 
@@ -359,6 +362,9 @@ export function listStudents({ limit = 50, offset = 0 } = {}) {
     orderBy: desc(students.createdAt),
     limit,
     offset,
+    with: {
+      hall: { columns: { name: true } },
+    },
   });
 }
 

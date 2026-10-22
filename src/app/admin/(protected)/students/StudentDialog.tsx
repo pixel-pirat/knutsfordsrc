@@ -34,6 +34,7 @@ type FormState = {
   level: string;
   studyMode: string;
   avatarUrl: string;
+  hallId: string;
 };
 
 const emptyForm: FormState = {
@@ -46,6 +47,7 @@ const emptyForm: FormState = {
   level: "",
   studyMode: "",
   avatarUrl: "",
+  hallId: "",
 };
 
 export function StudentDialog({
@@ -68,6 +70,7 @@ export function StudentDialog({
   const [tempPassword, setTempPassword] = useState<string | null>(null);
   const [welcomeEmailSent, setWelcomeEmailSent] = useState(false);
   const [programs, setPrograms] = useState<{ id: string; name: string }[]>([]);
+  const [halls, setHalls] = useState<{ id: string; name: string }[]>([]);
 
   // Reset transient UI state when the dialog opens for a (possibly new) student,
   // following React's "adjust state during render" pattern rather than an effect.
@@ -94,6 +97,10 @@ export function StudentDialog({
       .then((res) => res.json())
       .then((data) => setPrograms(data.programs ?? []))
       .catch(() => {});
+    fetch("/api/admin/halls/options")
+      .then((res) => res.json())
+      .then((data) => setHalls(data.halls ?? []))
+      .catch(() => {});
   }, [open]);
 
   useEffect(() => {
@@ -111,6 +118,7 @@ export function StudentDialog({
           level: data.student.level ?? "",
           studyMode: data.student.studyMode ?? "",
           avatarUrl: data.student.avatarUrl ?? "",
+          hallId: data.student.hallId ?? "",
         });
       })
       .finally(() => setLoading(false));
@@ -218,6 +226,7 @@ export function StudentDialog({
                 setField={setField}
                 fieldErrors={fieldErrors}
                 programs={programs}
+                halls={halls}
                 showAvatar
               />
               {formError && (
@@ -278,6 +287,7 @@ export function StudentDialog({
                   setField={setField}
                   fieldErrors={fieldErrors}
                   programs={programs}
+                  halls={halls}
                   showAvatar
                 />
                 {formError && (
@@ -307,12 +317,14 @@ function StudentFormFields({
   setField,
   fieldErrors,
   programs,
+  halls,
   showAvatar,
 }: {
   form: FormState;
   setField: <K extends keyof FormState>(key: K, value: FormState[K]) => void;
   fieldErrors: Record<string, string>;
   programs: { id: string; name: string }[];
+  halls: { id: string; name: string }[];
   showAvatar?: boolean;
 }) {
   return (
@@ -440,6 +452,27 @@ function StudentFormFields({
             </SelectContent>
           </Select>
         </div>
+      </div>
+      <div>
+        <Label>Hall</Label>
+        <Select value={form.hallId || "NONE"} onValueChange={(v) => setField("hallId", v === "NONE" ? "" : (v ?? ""))}>
+          <SelectTrigger className="mt-1.5 w-full">
+            <SelectValue placeholder="Select hall" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="NONE">Not assigned</SelectItem>
+            {halls.map((h) => (
+              <SelectItem key={h.id} value={h.id}>
+                {h.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {halls.length === 0 && (
+          <p className="mt-1 text-xs text-neutral-400 dark:text-neutral-500">
+            No halls configured yet
+          </p>
+        )}
       </div>
     </div>
   );

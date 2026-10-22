@@ -70,6 +70,7 @@ export function updateStudentByAdmin(
       | "level"
       | "studyMode"
       | "avatarUrl"
+      | "hallId"
     >
   >
 ) {

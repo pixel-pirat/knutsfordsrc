@@ -13,6 +13,76 @@ export function isEmailConfigured() {
   return Boolean(process.env.RESEND_API_KEY);
 }
 
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function nl2br(value: string) {
+  return escapeHtml(value).replace(/\n/g, "<br />");
+}
+
+/**
+ * Broadcast an announcement to a list of recipients. Sends one email per
+ * recipient (skipping missing addresses) so recipients aren't visible to
+ * each other, and reports how many went out.
+ */
+export async function sendBroadcastEmail({
+  toList,
+  subject,
+  heading,
+  body,
+}: {
+  toList: { email: string; name: string }[];
+  subject: string;
+  heading: string;
+  body: string;
+}) {
+  const client = getClient();
+  if (!client) {
+    return { sent: 0, failed: toList.length, error: "Email sending is not configured yet." };
+  }
+
+  const recipients = toList.filter((r): r is { email: string; name: string } =>
+    Boolean(r.email)
+  );
+
+  let sent = 0;
+  let failed = recipients.length;
+  let lastError: string | null = null;
+
+  for (const recipient of recipients) {
+    try {
+      const { error } = await client.emails.send({
+        from: FROM_ADDRESS,
+        to: recipient.email,
+        subject,
+        html: `
+          <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+            <h2 style="color: #14120c;">${escapeHtml(heading)}</h2>
+            <p style="color: #555;">Hi ${escapeHtml(recipient.name)},</p>
+            <div style="color: #333; line-height: 1.6;">${nl2br(body)}</div>
+            <p style="color: #888; font-size: 12px; margin-top: 24px;">Knutsford University SRC</p>
+          </div>
+        `,
+      });
+      if (error) {
+        lastError = error.message;
+        continue;
+      }
+      sent++;
+      failed--;
+    } catch (err) {
+      lastError = err instanceof Error ? err.message : "Unknown error";
+    }
+  }
+
+  return { sent, failed, error: lastError ?? null };
+}
+
 export async function sendPermitEmail({
   to,
   studentName,
