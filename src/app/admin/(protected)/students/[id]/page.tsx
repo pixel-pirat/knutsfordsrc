@@ -9,8 +9,10 @@ import { StudentDetailClient } from "./StudentDetailClient";
 
 export default async function StudentDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ from?: string }>;
 }) {
   const admin = await getCurrentAdmin();
   if (!admin || !hasPermission(admin, "view_students")) {
@@ -18,6 +20,10 @@ export default async function StudentDetailPage({
   }
 
   const { id } = await params;
+  const { from } = await searchParams;
+  // Only allow internal admin paths as the back target.
+  const backHref =
+    from && from.startsWith("/admin/") && !from.startsWith("//") ? from : "/admin/students";
   const student = await getStudentWithPermits(id);
 
   if (!student) {
@@ -65,6 +71,7 @@ export default async function StudentDetailPage({
       }))}
       qrDataUrl={qrDataUrl}
       canEdit={hasPermission(admin, "create_student")}
+      backHref={backHref}
     />
   );
 }

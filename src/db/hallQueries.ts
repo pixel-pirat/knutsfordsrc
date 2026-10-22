@@ -39,10 +39,10 @@ export async function listHallsWithCounts() {
       imageUrl: halls.imageUrl,
       createdAt: halls.createdAt,
       memberCount: sql<number>`(
-        select count(*)::int from ${students} s where s.hall_id = ${halls.id}
+        select count(*)::int from ${students} s where s.hall_id = "halls"."id"
       )`,
       eventCount: sql<number>`(
-        select count(*)::int from ${hallEvents} e where e.hall_id = ${halls.id}
+        select count(*)::int from ${hallEvents} e where e.hall_id = "halls"."id"
       )`,
     })
     .from(halls)

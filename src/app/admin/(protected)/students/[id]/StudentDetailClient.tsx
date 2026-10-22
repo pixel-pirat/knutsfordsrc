@@ -51,11 +51,13 @@ export function StudentDetailClient({
   permits,
   qrDataUrl,
   canEdit,
+  backHref = "/admin/students",
 }: {
   student: StudentDetail;
   permits: PermitRow[];
   qrDataUrl: string;
   canEdit: boolean;
+  backHref?: string;
 }) {
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
@@ -91,7 +93,7 @@ export function StudentDetailClient({
         setConfirmingDelete(false);
         return;
       }
-      router.push("/admin/students");
+      router.push(backHref);
       router.refresh();
     } catch {
       setDeleteError("Failed to delete student");
@@ -125,10 +127,10 @@ export function StudentDetailClient({
   return (
     <div>
       <Link
-        href="/admin/students"
+        href={backHref}
         className="text-sm text-neutral-500 dark:text-neutral-400 transition-colors hover:text-ink"
       >
-        ← Back to students
+        {backHref === "/admin/students" ? "← Back to students" : "← Back"}
       </Link>
 
       <div className="mt-4 mb-6 flex flex-wrap items-center justify-between gap-4">

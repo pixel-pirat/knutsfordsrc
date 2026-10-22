@@ -134,7 +134,7 @@ export default async function AdminHallDetailPage({
                   </p>
                 </div>
                 <Link
-                  href={`/admin/students/${s.id}`}
+                  href={`/admin/students/${s.id}?from=/admin/halls/${hall.id}`}
                   className="text-xs font-semibold text-gold-dark dark:text-gold-light hover:underline"
                 >
                   View
