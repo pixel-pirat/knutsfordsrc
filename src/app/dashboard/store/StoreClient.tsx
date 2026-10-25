@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Store } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,7 +12,6 @@ import { ImageUpload } from "@/components/ImageUpload";
 import type {
   MarketplaceApplication,
   MarketplaceApplicationEvent,
-  MarketplaceStore,
 } from "@/db/schema";
 import {
   APPLICATION_STATUS_LABELS,
@@ -21,20 +19,10 @@ import {
   AVAILABILITY_LABELS,
   CATEGORY_LABELS,
   FULFILMENT_LABELS,
-  STORE_STATUS_LABELS,
-  STORE_STATUS_STYLES,
   formatMarketplaceDate,
 } from "@/lib/marketplace";
-
-type StudentSummary = {
-  firstName: string;
-  lastName: string;
-  indexNumber: string;
-  email: string | null;
-  phone: string | null;
-  program: string | null;
-  level: string | null;
-};
+import { StoreForm } from "./StoreForm";
+import type { StudentSummary } from "./types";
 
 const CATEGORY_OPTIONS = ["products", "services", "both"] as const;
 const AVAILABILITY_OPTIONS = [
@@ -54,12 +42,10 @@ const EDITABLE_STATUSES = ["additional_info_required", "rejected"];
 export function StoreClient({
   student,
   application,
-  store,
   events,
 }: {
   student: StudentSummary;
   application: MarketplaceApplication | null;
-  store: MarketplaceStore | null;
   events: MarketplaceApplicationEvent[];
 }) {
   const needsApplication =
@@ -89,19 +75,12 @@ export function StoreClient({
             />
           )}
 
-          {application?.status === "approved" && !store && (
+          {application?.status === "approved" && (
             <StoreForm
               mode="create"
               student={student}
               application={application}
             />
-          )}
-
-          {store && (
-            <>
-              <StoreSummary store={store} />
-              <StoreForm mode="edit" student={student} store={store} />
-            </>
           )}
         </div>
 
@@ -169,7 +148,7 @@ export function StoreClient({
               <Step number={3} done={application?.status === "approved"}>
                 Set up your storefront
               </Step>
-              <Step number={4} done={!!store}>
+              <Step number={4} done={false}>
                 Publish listings and start selling
               </Step>
             </ol>
@@ -286,7 +265,7 @@ function Step({
             : "bg-black/5 text-neutral-400 dark:bg-white/10 dark:text-neutral-500"
         }`}
       >
-        {done ? "✓" : number}
+        {done ? "âœ“" : number}
       </span>
       <span className={done ? "text-neutral-500 dark:text-neutral-400" : ""}>
         {children}
@@ -535,335 +514,6 @@ function ApplicationForm({
               ? "Resubmit application"
               : "Submit application"}
         </Button>
-      </form>
-    </section>
-  );
-}
-
-function StoreSummary({ store }: { store: MarketplaceStore }) {
-  return (
-    <section className="rounded-2xl bg-white p-6 ring-1 ring-black/5 dark:bg-neutral-900 dark:ring-white/10">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:text-neutral-500">
-            Your storefront
-          </p>
-          <h2 className="mt-1 text-xl font-extrabold text-ink dark:text-neutral-100">
-            {store.name}
-          </h2>
-          <p className="text-sm text-neutral-500 dark:text-neutral-400">
-            {CATEGORY_LABELS[store.category] ?? store.category}
-          </p>
-        </div>
-        <Badge
-          variant="outline"
-          className={STORE_STATUS_STYLES[store.status]}
-        >
-          {STORE_STATUS_LABELS[store.status] ?? store.status}
-        </Badge>
-      </div>
-
-      {store.status === "suspended" && store.statusReason && (
-        <p className="mt-3 rounded-xl bg-red-50 px-3 py-2.5 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-400">
-          {store.statusReason}
-        </p>
-      )}
-
-      <p className="mt-4 whitespace-pre-line text-sm text-neutral-600 dark:text-neutral-300">
-        {store.description || "No store description yet."}
-      </p>
-
-      <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-        <div>
-          <dt className="text-xs text-neutral-400 dark:text-neutral-500">
-            Fulfilment
-          </dt>
-          <dd className="text-neutral-700 dark:text-neutral-300">
-            {store.fulfilmentMethods
-              .map((method) => FULFILMENT_LABELS[method] ?? method)
-              .join(", ") || "—"}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-xs text-neutral-400 dark:text-neutral-500">
-            Operating hours
-          </dt>
-          <dd className="text-neutral-700 dark:text-neutral-300">
-            {store.operatingHours || "—"}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-xs text-neutral-400 dark:text-neutral-500">
-            Pickup location
-          </dt>
-          <dd className="text-neutral-700 dark:text-neutral-300">
-            {store.pickupLocation || "—"}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-xs text-neutral-400 dark:text-neutral-500">
-            Contact
-          </dt>
-          <dd className="break-all text-neutral-700 dark:text-neutral-300">
-            {store.contactEmail || store.contactPhone || "—"}
-          </dd>
-        </div>
-      </dl>
-
-      <p className="mt-4 rounded-xl bg-gold/10 px-3 py-2.5 text-xs text-neutral-600 dark:text-neutral-300">
-        Product listings, inventory and orders are coming in the next phase of
-        the marketplace. Your storefront is ready in the meantime.
-      </p>
-    </section>
-  );
-}
-
-function StoreForm({
-  mode,
-  student,
-  application,
-  store,
-}: {
-  mode: "create" | "edit";
-  student: StudentSummary;
-  application?: MarketplaceApplication;
-  store?: MarketplaceStore;
-}) {
-  const router = useRouter();
-  const [form, setForm] = useState({
-    name: store?.name ?? application?.storeName ?? "",
-    description: store?.description ?? application?.description ?? "",
-    category: store?.category ?? application?.category ?? "products",
-    logoUrl: store?.logoUrl ?? "",
-    contactEmail: store?.contactEmail ?? student.email ?? "",
-    contactPhone: store?.contactPhone ?? application?.contactNumber ?? "",
-    fulfilmentMethods:
-      store?.fulfilmentMethods?.length
-        ? store.fulfilmentMethods
-        : application?.fulfilmentMethods?.length
-          ? application.fulfilmentMethods
-          : ["campus_pickup"],
-    operatingHours: store?.operatingHours ?? "",
-    pickupLocation: store?.pickupLocation ?? "",
-  });
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
-
-  function toggleFulfilment(method: string) {
-    setForm((current) => ({
-      ...current,
-      fulfilmentMethods: current.fulfilmentMethods.includes(method)
-        ? current.fulfilmentMethods.filter((m) => m !== method)
-        : [...current.fulfilmentMethods, method],
-    }));
-  }
-
-  async function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    setError(null);
-    setSaved(false);
-    setSubmitting(true);
-    try {
-      const res = await fetch("/api/marketplace/store", {
-        method: mode === "create" ? "POST" : "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          logoUrl: form.logoUrl || undefined,
-          description: form.description || undefined,
-          contactEmail: form.contactEmail || undefined,
-          contactPhone: form.contactPhone || undefined,
-          operatingHours: form.operatingHours || undefined,
-          pickupLocation: form.pickupLocation || undefined,
-        }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setError(data.error ?? "Could not save your store.");
-        return;
-      }
-      setSaved(true);
-      router.refresh();
-    } catch {
-      setError("Could not save your store. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  return (
-    <section className="rounded-2xl bg-white p-6 ring-1 ring-black/5 dark:bg-neutral-900 dark:ring-white/10">
-      <h2 className="text-sm font-bold text-ink dark:text-neutral-100">
-        {mode === "create" ? "Set up your store" : "Store settings"}
-      </h2>
-      <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-        {mode === "create"
-          ? "Your seller application is approved. Fill in your storefront details to go live."
-          : "Keep your storefront details, contact information and availability up to date."}
-      </p>
-
-      <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-        <div>
-          <Label>Store logo</Label>
-          <div className="mt-2">
-            <ImageUpload
-              imageUrl={form.logoUrl}
-              onUploaded={(url) => setForm({ ...form, logoUrl: url })}
-              onRemove={() => setForm({ ...form, logoUrl: "" })}
-            />
-          </div>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <Label htmlFor="shop-name">Store name</Label>
-            <Input
-              id="shop-name"
-              className="mt-1.5"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              maxLength={80}
-            />
-          </div>
-          <div>
-            <Label htmlFor="shop-category">Category</Label>
-            <select
-              id="shop-category"
-              value={form.category}
-              onChange={(e) =>
-                setForm({ ...form, category: e.target.value as typeof form.category })
-              }
-              className="mt-1.5 h-9 w-full rounded-lg border border-black/10 bg-transparent px-3 text-sm text-ink outline-none focus:border-gold dark:border-white/10 dark:bg-neutral-900 dark:text-neutral-100"
-            >
-              {CATEGORY_OPTIONS.map((value) => (
-                <option key={value} value={value}>
-                  {CATEGORY_LABELS[value]}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <Label htmlFor="shop-description">Store description</Label>
-          <Textarea
-            id="shop-description"
-            className="mt-1.5"
-            rows={3}
-            maxLength={2000}
-            value={form.description}
-            onChange={(e) =>
-              setForm({ ...form, description: e.target.value })
-            }
-            placeholder="Introduce your store to customers"
-          />
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <Label htmlFor="shop-email">Contact email</Label>
-            <Input
-              id="shop-email"
-              type="email"
-              className="mt-1.5"
-              value={form.contactEmail}
-              onChange={(e) =>
-                setForm({ ...form, contactEmail: e.target.value })
-              }
-              placeholder="store@example.com"
-            />
-          </div>
-          <div>
-            <Label htmlFor="shop-phone">Contact phone</Label>
-            <Input
-              id="shop-phone"
-              className="mt-1.5"
-              value={form.contactPhone}
-              onChange={(e) =>
-                setForm({ ...form, contactPhone: e.target.value })
-              }
-              maxLength={30}
-            />
-          </div>
-        </div>
-
-        <div>
-          <Label>Fulfilment methods</Label>
-          <div className="mt-2 grid gap-2 sm:grid-cols-2">
-            {FULFILMENT_OPTIONS.map((method) => (
-              <label
-                key={method}
-                className="flex items-center gap-2 rounded-lg border border-black/10 px-3 py-2 text-sm text-neutral-700 dark:border-white/10 dark:text-neutral-300"
-              >
-                <input
-                  type="checkbox"
-                  checked={form.fulfilmentMethods.includes(method)}
-                  onChange={() => toggleFulfilment(method)}
-                />
-                {FULFILMENT_LABELS[method]}
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <Label htmlFor="shop-hours">Operating hours</Label>
-            <Input
-              id="shop-hours"
-              className="mt-1.5"
-              value={form.operatingHours}
-              onChange={(e) =>
-                setForm({ ...form, operatingHours: e.target.value })
-              }
-              placeholder="e.g. Mon–Fri, 9am–5pm"
-              maxLength={200}
-            />
-          </div>
-          <div>
-            <Label htmlFor="shop-pickup">Pickup location</Label>
-            <Input
-              id="shop-pickup"
-              className="mt-1.5"
-              value={form.pickupLocation}
-              onChange={(e) =>
-                setForm({ ...form, pickupLocation: e.target.value })
-              }
-              placeholder="e.g. Unity Hall reception"
-              maxLength={200}
-            />
-          </div>
-        </div>
-
-        {error && (
-          <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-400">
-            {error}
-          </p>
-        )}
-        {saved && (
-          <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-950/40 dark:text-green-400">
-            Store saved.
-          </p>
-        )}
-
-        <div className="flex flex-wrap items-center gap-3">
-          <Button type="submit" disabled={submitting}>
-            {submitting
-              ? "Saving…"
-              : mode === "create"
-                ? "Create store"
-                : "Save changes"}
-          </Button>
-          {mode === "create" && (
-            <Link
-              href="/dashboard/market"
-              className="text-sm font-semibold text-neutral-500 hover:underline dark:text-neutral-400"
-            >
-              Back to marketplace
-            </Link>
-          )}
-        </div>
       </form>
     </section>
   );

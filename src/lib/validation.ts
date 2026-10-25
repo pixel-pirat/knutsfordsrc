@@ -408,3 +408,73 @@ export const marketplaceStoreStatusSchema = z.object({
   action: z.enum(["suspend", "reactivate", "close"]),
   reason: z.string().trim().max(500).optional().or(z.literal("")),
 });
+
+const listingNameSchema = z
+  .string()
+  .trim()
+  .min(2, "Name is required")
+  .max(120);
+const listingDescriptionSchema = z
+  .string()
+  .trim()
+  .min(10, "Add a description of at least 10 characters")
+  .max(3000);
+const listingCategorySchema = z
+  .string()
+  .trim()
+  .min(2, "Category is required")
+  .max(60);
+const listingPriceSchema = z
+  .number()
+  .min(0.01, "Enter a price greater than zero")
+  .max(1_000_000);
+
+export const productListingSchema = z
+  .object({
+    name: listingNameSchema,
+    description: listingDescriptionSchema,
+    category: listingCategorySchema,
+    imageUrl: z.url().optional().or(z.literal("")),
+    price: listingPriceSchema,
+    discountPrice: z.number().min(0).max(1_000_000).nullable().optional(),
+    stockQuantity: z.number().int().min(0).max(1_000_000),
+    lowStockThreshold: z.number().int().min(0).max(100_000),
+    availability: z.enum(["ready_stock", "preorder", "made_to_order"]),
+    fulfilmentMethods: z
+      .array(z.enum(marketplaceFulfilmentValues))
+      .min(1, "Select at least one fulfilment method"),
+    published: z.boolean(),
+    resubmit: z.boolean().optional(),
+  })
+  .refine(
+    (data) => data.discountPrice == null || data.discountPrice < data.price,
+    {
+      message: "Discount price must be lower than the regular price",
+      path: ["discountPrice"],
+    }
+  );
+
+export const serviceListingSchema = z.object({
+  name: listingNameSchema,
+  description: listingDescriptionSchema,
+  category: listingCategorySchema,
+  imageUrl: z.url().optional().or(z.literal("")),
+  price: listingPriceSchema,
+  pricingUnit: z.string().trim().max(50).optional().or(z.literal("")),
+  durationMinutes: z.number().int().min(0).max(1440).nullable().optional(),
+  availability: z.string().trim().max(200).optional().or(z.literal("")),
+  bookingRequired: z.boolean(),
+  deliveryMethod: z.enum(["physical", "virtual", "on_campus"]),
+  published: z.boolean(),
+  resubmit: z.boolean().optional(),
+});
+
+export const inventoryUpdateSchema = z.object({
+  stockQuantity: z.number().int().min(0).max(1_000_000),
+  lowStockThreshold: z.number().int().min(0).max(100_000),
+});
+
+export const listingModerationSchema = z.object({
+  action: z.enum(["flag", "remove", "restore"]),
+  reason: z.string().trim().max(500).optional().or(z.literal("")),
+});

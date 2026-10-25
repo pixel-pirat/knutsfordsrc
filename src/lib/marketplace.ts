@@ -47,6 +47,35 @@ export const FULFILMENT_LABELS: Record<string, string> = {
   service_appointment: "Service appointment",
 };
 
+export const MODERATION_STATUS_LABELS: Record<string, string> = {
+  active: "Active",
+  pending_review: "Needs review",
+  removed: "Removed",
+};
+
+export const MODERATION_STATUS_STYLES: Record<string, string> = {
+  active: "border-green-200 bg-green-50 text-green-700",
+  pending_review: "border-orange-200 bg-orange-50 text-orange-700",
+  removed: "border-red-200 bg-red-50 text-red-700",
+};
+
+export const PRODUCT_AVAILABILITY_LABELS: Record<string, string> = {
+  ready_stock: "Ready stock",
+  preorder: "Pre-order",
+  made_to_order: "Made to order",
+};
+
+export const SERVICE_DELIVERY_LABELS: Record<string, string> = {
+  physical: "Physical",
+  virtual: "Virtual",
+  on_campus: "On campus",
+};
+
+export const LISTING_TYPE_LABELS: Record<string, string> = {
+  product: "Product",
+  service: "Service",
+};
+
 export function formatMarketplaceDate(date: Date | string) {
   return new Date(date).toLocaleDateString("en-GB", {
     day: "numeric",

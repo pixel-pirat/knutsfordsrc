@@ -68,6 +68,19 @@ export const marketplaceStoreStatusEnum = pgEnum("marketplace_store_status", [
   "suspended",
   "closed",
 ]);
+export const marketplaceListingStatusEnum = pgEnum("marketplace_listing_status", [
+  "active",
+  "pending_review",
+  "removed",
+]);
+export const marketplaceProductAvailabilityEnum = pgEnum(
+  "marketplace_product_availability",
+  ["ready_stock", "preorder", "made_to_order"]
+);
+export const marketplaceServiceDeliveryEnum = pgEnum(
+  "marketplace_service_delivery",
+  ["physical", "virtual", "on_campus"]
+);
 
 export const adminUsers = pgTable("admin_users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -451,6 +464,77 @@ export const marketplaceStores = pgTable("marketplace_stores", {
   pickupLocation: text("pickup_location"),
   status: marketplaceStoreStatusEnum("status").notNull().default("active"),
   statusReason: text("status_reason"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const marketplaceProducts = pgTable("marketplace_products", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  storeId: uuid("store_id")
+    .notNull()
+    .references(() => marketplaceStores.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  category: text("category").notNull(),
+  imageUrl: text("image_url"),
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+  discountPrice: numeric("discount_price", { precision: 10, scale: 2 }),
+  stockQuantity: integer("stock_quantity").notNull().default(0),
+  lowStockThreshold: integer("low_stock_threshold").notNull().default(5),
+  availability: marketplaceProductAvailabilityEnum("availability")
+    .notNull()
+    .default("ready_stock"),
+  fulfilmentMethods: jsonb("fulfilment_methods")
+    .$type<string[]>()
+    .notNull()
+    .default([]),
+  published: boolean("published").notNull().default(true),
+  moderationStatus: marketplaceListingStatusEnum("moderation_status")
+    .notNull()
+    .default("active"),
+  moderationReason: text("moderation_reason"),
+  moderatedBy: uuid("moderated_by").references(() => adminUsers.id, {
+    onDelete: "set null",
+  }),
+  moderatedAt: timestamp("moderated_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const marketplaceServices = pgTable("marketplace_services", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  storeId: uuid("store_id")
+    .notNull()
+    .references(() => marketplaceStores.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  category: text("category").notNull(),
+  imageUrl: text("image_url"),
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+  pricingUnit: text("pricing_unit"),
+  durationMinutes: integer("duration_minutes"),
+  availability: text("availability"),
+  bookingRequired: boolean("booking_required").notNull().default(true),
+  deliveryMethod: marketplaceServiceDeliveryEnum("delivery_method")
+    .notNull()
+    .default("on_campus"),
+  published: boolean("published").notNull().default(true),
+  moderationStatus: marketplaceListingStatusEnum("moderation_status")
+    .notNull()
+    .default("active"),
+  moderationReason: text("moderation_reason"),
+  moderatedBy: uuid("moderated_by").references(() => adminUsers.id, {
+    onDelete: "set null",
+  }),
+  moderatedAt: timestamp("moderated_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -862,6 +946,10 @@ export type NewMarketplaceApplicationEvent =
   typeof marketplaceApplicationEvents.$inferInsert;
 export type MarketplaceStore = typeof marketplaceStores.$inferSelect;
 export type NewMarketplaceStore = typeof marketplaceStores.$inferInsert;
+export type MarketplaceProduct = typeof marketplaceProducts.$inferSelect;
+export type NewMarketplaceProduct = typeof marketplaceProducts.$inferInsert;
+export type MarketplaceService = typeof marketplaceServices.$inferSelect;
+export type NewMarketplaceService = typeof marketplaceServices.$inferInsert;
 export type SportEvent = typeof sportEvents.$inferSelect;
 export type NewSportEvent = typeof sportEvents.$inferInsert;
 export type SportParticipation = typeof sportParticipations.$inferSelect;

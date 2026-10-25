@@ -62,6 +62,12 @@ export function describeAuditEntry(entry: AuditEntry): string {
       return `Reactivated store "${m.storeName ?? ""}"`;
     case "marketplace.store.close":
       return `Closed store "${m.storeName ?? ""}"`;
+    case "marketplace.listing.flag":
+      return `Flagged marketplace listing "${m.name ?? ""}" from ${m.storeName ?? "a store"}`;
+    case "marketplace.listing.remove":
+      return `Removed marketplace listing "${m.name ?? ""}" from ${m.storeName ?? "a store"}`;
+    case "marketplace.listing.restore":
+      return `Restored marketplace listing "${m.name ?? ""}" from ${m.storeName ?? "a store"}`;
     default:
       return `${entry.action} — ${entry.targetType}`;
   }

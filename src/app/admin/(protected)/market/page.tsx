@@ -2,12 +2,13 @@ import Link from "next/link";
 import {
   Store,
   ClipboardCheck,
-  UserCheck,
-  Ban,
+  PackageCheck,
+  Flag,
   ArrowRight,
 } from "lucide-react";
 import { getCurrentAdmin } from "@/db/adminQueries";
 import { getMarketplaceOverview } from "@/db/marketplaceQueries";
+import { getMarketplaceListingStats } from "@/db/listingQueries";
 import { hasPermission } from "@/lib/permissions";
 import { AccessRestricted } from "@/components/admin/AccessRestricted";
 import { Badge } from "@/components/ui/badge";
@@ -36,7 +37,7 @@ const managementLinks = [
   },
   {
     title: "Products & Services",
-    description: "Moderate marketplace listings (Phase 2)",
+    description: "Moderate product and service listings",
     href: "/admin/market/products",
   },
   {
@@ -67,7 +68,10 @@ export default async function MarketplaceOverviewPage() {
     return <AccessRestricted />;
   }
 
-  const overview = await getMarketplaceOverview();
+  const [overview, listingStats] = await Promise.all([
+    getMarketplaceOverview(),
+    getMarketplaceListingStats(),
+  ]);
 
   return (
     <div>
@@ -87,8 +91,16 @@ export default async function MarketplaceOverviewPage() {
           label="Pending Applications"
           value={overview.pending}
         />
-        <StatCard icon={UserCheck} label="Approved Sellers" value={overview.approved} />
-        <StatCard icon={Ban} label="Suspended Stores" value={overview.suspended} />
+        <StatCard
+          icon={PackageCheck}
+          label="Active Listings"
+          value={listingStats.activeListings}
+        />
+        <StatCard
+          icon={Flag}
+          label="Needs Review"
+          value={listingStats.pendingListings}
+        />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">

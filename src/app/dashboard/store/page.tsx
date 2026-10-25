@@ -4,7 +4,9 @@ import {
   getStoreForStudent,
   listApplicationEvents,
 } from "@/db/marketplaceQueries";
+import { getSellerListingSummary } from "@/db/listingQueries";
 import { StoreClient } from "./StoreClient";
+import { StoreOverview } from "./StoreOverview";
 
 export default async function MyStorePage() {
   const student = await getCurrentStudent();
@@ -12,6 +14,12 @@ export default async function MyStorePage() {
 
   const application = await getApplicationForStudent(student.id);
   const store = await getStoreForStudent(student.id);
+
+  if (store) {
+    const summary = await getSellerListingSummary(store.id);
+    return <StoreOverview store={store} summary={summary} />;
+  }
+
   const events = application ? await listApplicationEvents(application.id) : [];
 
   return (
@@ -26,7 +34,6 @@ export default async function MyStorePage() {
         level: student.level,
       }}
       application={application ?? null}
-      store={store ?? null}
       events={events}
     />
   );
