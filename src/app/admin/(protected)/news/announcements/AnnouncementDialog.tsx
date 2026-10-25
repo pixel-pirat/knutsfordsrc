@@ -19,19 +19,34 @@ export type AnnouncementRow = {
   text: string;
   linkUrl: string | null;
   active: boolean;
+  startsAt: string | null;
+  endsAt: string | null;
+  status: "live" | "scheduled" | "expired" | "hidden";
 };
 
 type FormState = {
   text: string;
   linkUrl: string;
   active: boolean;
+  startsAt: string;
+  endsAt: string;
 };
 
 const emptyForm: FormState = {
   text: "",
   linkUrl: "",
   active: true,
+  startsAt: "",
+  endsAt: "",
 };
+
+function toDateTimeLocal(iso: string | null) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
 
 export function AnnouncementDialog({
   announcement,
@@ -63,6 +78,8 @@ export function AnnouncementDialog({
               text: announcement.text,
               linkUrl: announcement.linkUrl ?? "",
               active: announcement.active,
+              startsAt: toDateTimeLocal(announcement.startsAt),
+              endsAt: toDateTimeLocal(announcement.endsAt),
             }
           : emptyForm
       );
@@ -78,7 +95,11 @@ export function AnnouncementDialog({
     setFormError(null);
     setFieldErrors({});
 
-    const parsed = announcementSchema.safeParse(form);
+    const parsed = announcementSchema.safeParse({
+      ...form,
+      startsAt: form.startsAt ? new Date(form.startsAt).toISOString() : "",
+      endsAt: form.endsAt ? new Date(form.endsAt).toISOString() : "",
+    });
     if (!parsed.success) {
       const errors: Record<string, string> = {};
       for (const issue of parsed.error.issues) {
@@ -117,7 +138,7 @@ export function AnnouncementDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
             {mode === "create" ? "New Announcement" : "Edit Announcement"}
@@ -167,6 +188,37 @@ export function AnnouncementDialog({
               </p>
             )}
           </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <Label htmlFor="announcement-startsAt">Show from (optional)</Label>
+              <Input
+                id="announcement-startsAt"
+                type="datetime-local"
+                className="mt-1.5"
+                value={form.startsAt}
+                onChange={(e) => setField("startsAt", e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="announcement-endsAt">Show until (optional)</Label>
+              <Input
+                id="announcement-endsAt"
+                type="datetime-local"
+                className="mt-1.5"
+                value={form.endsAt}
+                onChange={(e) => setField("endsAt", e.target.value)}
+              />
+              {fieldErrors.endsAt && (
+                <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                  {fieldErrors.endsAt}
+                </p>
+              )}
+            </div>
+          </div>
+          <p className="-mt-2 text-xs text-neutral-400 dark:text-neutral-500">
+            Leave both blank to keep showing it until you hide or remove it.
+          </p>
 
           <label className="flex items-center gap-2.5 text-sm text-ink dark:text-neutral-100">
             <input

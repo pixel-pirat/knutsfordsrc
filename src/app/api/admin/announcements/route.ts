@@ -12,6 +12,12 @@ import {
 } from "@/db/announcementQueries";
 import { logAudit } from "@/db/adminQueries";
 
+function parseOptionalDate(value: string | undefined) {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date;
+}
+
 export async function GET() {
   const { error } = await requireAdmin("manage_news");
   if (error) return error;
@@ -33,12 +39,23 @@ export async function POST(request: Request) {
     );
   }
 
+  const startsAt = parseOptionalDate(parsed.data.startsAt);
+  const endsAt = parseOptionalDate(parsed.data.endsAt);
+  if (startsAt === undefined || endsAt === undefined) {
+    return NextResponse.json(
+      { error: "Enter valid schedule dates" },
+      { status: 400 }
+    );
+  }
+
   const sortOrder = await getNextAnnouncementSortOrder();
   const [announcement] = await createAnnouncement({
     text: parsed.data.text,
     linkUrl: parsed.data.linkUrl || null,
     active: parsed.data.active ?? true,
     sortOrder,
+    startsAt,
+    endsAt,
     createdBy: admin.id,
   });
 

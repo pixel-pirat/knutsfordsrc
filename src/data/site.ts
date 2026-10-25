@@ -66,45 +66,6 @@ export const hubFeatures: HubFeature[] = [
   },
 ];
 
-export type EventItem = {
-  title: string;
-  location: string;
-  time: string;
-  day: string;
-  month: string;
-  image: string;
-};
-
-export const upcomingEvents: EventItem[] = [
-  {
-    title: "Tech Summit Africa",
-    location: "Main Auditorium",
-    time: "10:00am - 4:00pm",
-    day: "24",
-    month: "SEPT",
-    image:
-      "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=200&h=200&fit=crop&q=80",
-  },
-  {
-    title: "Freshers' Welcome Night",
-    location: "Knutsford Quad",
-    time: "6:00pm - 10:00pm",
-    day: "29",
-    month: "SEPT",
-    image:
-      "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=200&h=200&fit=crop&q=80",
-  },
-  {
-    title: "SRC Town Hall Meeting",
-    location: "Senate Hall",
-    time: "2:00pm - 4:00pm",
-    day: "03",
-    month: "OCT",
-    image:
-      "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=200&h=200&fit=crop&q=80",
-  },
-];
-
 export type Product = {
   name: string;
   category: string;

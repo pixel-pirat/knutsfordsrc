@@ -173,6 +173,8 @@ export const announcements = pgTable("announcements", {
   linkUrl: text("link_url"),
   active: boolean("active").notNull().default(true),
   sortOrder: integer("sort_order").notNull().default(0),
+  startsAt: timestamp("starts_at", { withTimezone: true }),
+  endsAt: timestamp("ends_at", { withTimezone: true }),
   createdBy: uuid("created_by")
     .notNull()
     .references(() => adminUsers.id),

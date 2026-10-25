@@ -1,5 +1,9 @@
 import Link from "next/link";
-import { listAnnouncementsForAdmin } from "@/db/announcementQueries";
+import {
+  DEFAULT_TICKER_SPEED,
+  getTickerAnnouncements,
+  getTickerSpeed,
+} from "@/db/announcementQueries";
 import { breakingNews } from "@/data/site";
 
 type TickerItem = { id: string; text: string; linkUrl: string | null };
@@ -12,25 +16,29 @@ const defaultItems = (): TickerItem[] =>
   }));
 
 export async function NewsTicker() {
-  let items: TickerItem[] = [];
+  let configured = false;
+  let rows: Awaited<ReturnType<typeof getTickerAnnouncements>>["items"] = [];
+  let speed = DEFAULT_TICKER_SPEED;
 
   try {
-    const rows = await listAnnouncementsForAdmin();
-    // Before the first announcement is created, keep the built-in headlines so
-    // the homepage ticker isn't empty.
-    items =
-      rows.length > 0
-        ? rows
-            .filter((row) => row.active)
-            .map((row) => ({
-              id: row.id,
-              text: row.text,
-              linkUrl: row.linkUrl,
-            }))
-        : defaultItems();
+    const [data, savedSpeed] = await Promise.all([
+      getTickerAnnouncements(),
+      getTickerSpeed(),
+    ]);
+    configured = data.configured;
+    rows = data.items;
+    speed = savedSpeed;
   } catch {
-    items = defaultItems();
+    configured = false;
   }
+
+  const items: TickerItem[] = configured
+    ? rows.map((row) => ({
+        id: row.id,
+        text: row.text,
+        linkUrl: row.linkUrl,
+      }))
+    : defaultItems();
 
   if (items.length === 0) return null;
 
@@ -45,7 +53,10 @@ export async function NewsTicker() {
         LATEST
       </div>
       <div className="relative flex min-w-0 flex-1 items-center overflow-hidden">
-        <div className="animate-marquee flex w-max shrink-0 items-center gap-10 py-3.5 pl-8 whitespace-nowrap">
+        <div
+          className="animate-marquee flex w-max shrink-0 items-center gap-10 py-3.5 pl-8 whitespace-nowrap"
+          style={{ animationDuration: `${speed}s` }}
+        >
           {looped.map((item, i) => (
             <span
               key={`${item.id}-${i}`}

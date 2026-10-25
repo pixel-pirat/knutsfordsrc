@@ -161,7 +161,7 @@ export const newsSchema = z.object({
   published: z.boolean().optional(),
 });
 
-export const announcementSchema = z.object({
+const announcementBaseSchema = z.object({
   text: z.string().trim().min(1, "Announcement text is required").max(200),
   linkUrl: z
     .string()
@@ -173,6 +173,22 @@ export const announcementSchema = z.object({
     )
     .optional(),
   active: z.boolean().optional(),
+  startsAt: z.string().trim().optional().or(z.literal("")),
+  endsAt: z.string().trim().optional().or(z.literal("")),
+});
+
+export const announcementSchema = announcementBaseSchema.refine(
+  (data) =>
+    !data.startsAt ||
+    !data.endsAt ||
+    new Date(data.endsAt).getTime() > new Date(data.startsAt).getTime(),
+  { message: "End must be after start", path: ["endsAt"] }
+);
+
+export const announcementUpdateSchema = announcementBaseSchema.partial();
+
+export const tickerSpeedSchema = z.object({
+  speed: z.number().int().min(5).max(120),
 });
 
 export const announcementReorderSchema = z.object({

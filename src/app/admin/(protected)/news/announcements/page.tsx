@@ -1,5 +1,9 @@
 import { getCurrentAdmin } from "@/db/adminQueries";
-import { listAnnouncementsForAdmin } from "@/db/announcementQueries";
+import {
+  getAnnouncementStatus,
+  getTickerSpeed,
+  listAnnouncementsForAdmin,
+} from "@/db/announcementQueries";
 import { hasPermission } from "@/lib/permissions";
 import { AccessRestricted } from "@/components/admin/AccessRestricted";
 import { AnnouncementsClient } from "./AnnouncementsClient";
@@ -10,7 +14,10 @@ export default async function AdminAnnouncementsPage() {
     return <AccessRestricted />;
   }
 
-  const announcements = await listAnnouncementsForAdmin();
+  const [announcements, tickerSpeed] = await Promise.all([
+    listAnnouncementsForAdmin(),
+    getTickerSpeed(),
+  ]);
 
   return (
     <AnnouncementsClient
@@ -19,7 +26,11 @@ export default async function AdminAnnouncementsPage() {
         text: a.text,
         linkUrl: a.linkUrl,
         active: a.active,
+        startsAt: a.startsAt ? a.startsAt.toISOString() : null,
+        endsAt: a.endsAt ? a.endsAt.toISOString() : null,
+        status: getAnnouncementStatus(a),
       }))}
+      tickerSpeed={tickerSpeed}
     />
   );
 }
