@@ -27,6 +27,16 @@ const icons: Record<string, ReactElement> = {
       strokeLinejoin="round"
     />
   ),
+  bag: (
+    <path
+      d="M6 8h12l1 12H5L6 8zM9 8V6a3 3 0 016 0v2M9 12v1a3 3 0 006 0v-1"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  ),
   id: (
     <path
       d="M3.5 6h17a1 1 0 011 1v10a1 1 0 01-1 1h-17a1 1 0 01-1-1V7a1 1 0 011-1zM8 15.5c0-1.5 1.3-2.5 3-2.5s3 1 3 2.5M9.5 10.5a1.5 1.5 0 103 0 1.5 1.5 0 00-3 0zM15 10h3M15 13h3"

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navLinks } from "@/data/site";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { CartLink } from "@/components/market/CartLink";
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -67,6 +68,7 @@ export function Header() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
+          <CartLink />
           <ThemeToggle />
           <Link
             href={authed ? "/dashboard" : "/login"}
@@ -77,6 +79,7 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-1 lg:hidden">
+          <CartLink />
           <ThemeToggle />
           <button
             type="button"

@@ -76,6 +76,125 @@ export const LISTING_TYPE_LABELS: Record<string, string> = {
   service: "Service",
 };
 
+export const MAX_LISTING_QUANTITY = 20;
+
+export const ORDER_STATUS_LABELS: Record<string, string> = {
+  pending: "Pending seller confirmation",
+  confirmed: "Confirmed",
+  preparing: "Preparing",
+  ready: "Ready",
+  fulfilled: "Completed",
+  cancelled: "Cancelled",
+};
+
+export const ORDER_STATUS_STYLES: Record<string, string> = {
+  pending: "border-amber-200 bg-amber-50 text-amber-700",
+  confirmed: "border-blue-200 bg-blue-50 text-blue-700",
+  preparing: "border-indigo-200 bg-indigo-50 text-indigo-700",
+  ready: "border-purple-200 bg-purple-50 text-purple-700",
+  fulfilled: "border-green-200 bg-green-50 text-green-700",
+  cancelled: "border-red-200 bg-red-50 text-red-700",
+};
+
+export const PAYMENT_STATUS_LABELS: Record<string, string> = {
+  unpaid: "Payment pending",
+  pending_confirmation: "Awaiting payment confirmation",
+  paid: "Paid",
+  refunded: "Refunded",
+};
+
+export const PAYMENT_STATUS_STYLES: Record<string, string> = {
+  unpaid: "border-amber-200 bg-amber-50 text-amber-700",
+  pending_confirmation: "border-blue-200 bg-blue-50 text-blue-700",
+  paid: "border-green-200 bg-green-50 text-green-700",
+  refunded: "border-neutral-200 bg-neutral-100 text-neutral-600",
+};
+
+export type MarketplaceListingType = "product" | "service";
+
+export type PublicStoreInfo = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  logoUrl: string | null;
+  category: string;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  fulfilmentMethods: string[];
+  operatingHours: string | null;
+  pickupLocation: string | null;
+  sellerFirstName: string;
+  sellerProgram: string | null;
+  sellerLevel: string | null;
+};
+
+export type PublicStore = PublicStoreInfo & {
+  listingCount: number;
+  productCount: number;
+  serviceCount: number;
+};
+
+export type PublicListing = {
+  key: string;
+  id: string;
+  type: MarketplaceListingType;
+  name: string;
+  description: string;
+  category: string;
+  imageUrl: string | null;
+  price: number;
+  compareAtPrice: number | null;
+  priceUnit: string | null;
+  durationMinutes: number | null;
+  stockQuantity: number | null;
+  availability: string;
+  inStock: boolean;
+  bookingRequired: boolean;
+  deliveryMethod: "physical" | "virtual" | "on_campus" | null;
+  fulfilmentMethods: string[];
+  createdAt: string;
+  store: PublicStoreInfo;
+};
+
+export type BuyerOrderItem = {
+  id: string;
+  listingType: string;
+  listingId: string;
+  name: string;
+  imageUrl: string | null;
+  unitPrice: number;
+  quantity: number;
+  lineTotal: number;
+};
+
+export type BuyerOrderSummary = {
+  id: string;
+  orderNumber: string;
+  checkoutGroupId: string;
+  storeId: string;
+  storeName: string;
+  storeSlug: string;
+  subtotal: number;
+  status: string;
+  paymentStatus: string;
+  fulfilmentMethod: string;
+  createdAt: string;
+  itemCount: number;
+};
+
+export type BuyerOrderDetail = BuyerOrderSummary & {
+  storePickupLocation: string | null;
+  storeContactEmail: string | null;
+  storeContactPhone: string | null;
+  buyerName: string;
+  buyerPhone: string;
+  buyerEmail: string | null;
+  deliveryAddress: string | null;
+  buyerNote: string | null;
+  items: BuyerOrderItem[];
+};
+
 export function formatMarketplaceDate(date: Date | string) {
   return new Date(date).toLocaleDateString("en-GB", {
     day: "numeric",

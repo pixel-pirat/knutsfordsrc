@@ -9,6 +9,7 @@ import {
   numeric,
   integer,
   unique,
+  index,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -80,6 +81,18 @@ export const marketplaceProductAvailabilityEnum = pgEnum(
 export const marketplaceServiceDeliveryEnum = pgEnum(
   "marketplace_service_delivery",
   ["physical", "virtual", "on_campus"]
+);
+export const marketplaceOrderStatusEnum = pgEnum("marketplace_order_status", [
+  "pending",
+  "confirmed",
+  "preparing",
+  "ready",
+  "fulfilled",
+  "cancelled",
+]);
+export const marketplacePaymentStatusEnum = pgEnum(
+  "marketplace_payment_status",
+  ["unpaid", "pending_confirmation", "paid", "refunded"]
 );
 
 export const adminUsers = pgTable("admin_users", {
@@ -543,6 +556,66 @@ export const marketplaceServices = pgTable("marketplace_services", {
     .defaultNow(),
 });
 
+export const marketplaceOrders = pgTable(
+  "marketplace_orders",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orderNumber: text("order_number").notNull().unique(),
+    checkoutGroupId: uuid("checkout_group_id").notNull(),
+    storeId: uuid("store_id")
+      .notNull()
+      .references(() => marketplaceStores.id, { onDelete: "restrict" }),
+    buyerStudentId: uuid("buyer_student_id")
+      .notNull()
+      .references(() => students.id, { onDelete: "restrict" }),
+    buyerName: text("buyer_name").notNull(),
+    buyerPhone: text("buyer_phone").notNull(),
+    buyerEmail: text("buyer_email"),
+    fulfilmentMethod: text("fulfilment_method").notNull(),
+    deliveryAddress: text("delivery_address"),
+    buyerNote: text("buyer_note"),
+    subtotal: numeric("subtotal", { precision: 10, scale: 2 }).notNull(),
+    status: marketplaceOrderStatusEnum("status")
+      .notNull()
+      .default("pending"),
+    paymentStatus: marketplacePaymentStatusEnum("payment_status")
+      .notNull()
+      .default("unpaid"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("marketplace_orders_buyer_idx").on(table.buyerStudentId),
+    index("marketplace_orders_store_idx").on(table.storeId),
+    index("marketplace_orders_group_idx").on(table.checkoutGroupId),
+  ]
+);
+
+export const marketplaceOrderItems = pgTable(
+  "marketplace_order_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orderId: uuid("order_id")
+      .notNull()
+      .references(() => marketplaceOrders.id, { onDelete: "cascade" }),
+    listingType: text("listing_type").notNull(),
+    listingId: uuid("listing_id").notNull(),
+    name: text("name").notNull(),
+    imageUrl: text("image_url"),
+    unitPrice: numeric("unit_price", { precision: 10, scale: 2 }).notNull(),
+    quantity: integer("quantity").notNull(),
+    lineTotal: numeric("line_total", { precision: 10, scale: 2 }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [index("marketplace_order_items_order_idx").on(table.orderId)]
+);
+
 // ---------------------------------------------------------------------------
 // Sports
 // ---------------------------------------------------------------------------
@@ -950,6 +1023,10 @@ export type MarketplaceProduct = typeof marketplaceProducts.$inferSelect;
 export type NewMarketplaceProduct = typeof marketplaceProducts.$inferInsert;
 export type MarketplaceService = typeof marketplaceServices.$inferSelect;
 export type NewMarketplaceService = typeof marketplaceServices.$inferInsert;
+export type MarketplaceOrder = typeof marketplaceOrders.$inferSelect;
+export type NewMarketplaceOrder = typeof marketplaceOrders.$inferInsert;
+export type MarketplaceOrderItem = typeof marketplaceOrderItems.$inferSelect;
+export type NewMarketplaceOrderItem = typeof marketplaceOrderItems.$inferInsert;
 export type SportEvent = typeof sportEvents.$inferSelect;
 export type NewSportEvent = typeof sportEvents.$inferInsert;
 export type SportParticipation = typeof sportParticipations.$inferSelect;

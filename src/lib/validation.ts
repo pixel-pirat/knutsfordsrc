@@ -478,3 +478,33 @@ export const listingModerationSchema = z.object({
   action: z.enum(["flag", "remove", "restore"]),
   reason: z.string().trim().max(500).optional().or(z.literal("")),
 });
+
+export const marketplaceCheckoutSchema = z.object({
+  phone: contactNumberSchema,
+  email: z.email("Enter a valid email address").optional().or(z.literal("")),
+  items: z
+    .array(
+      z.object({
+        type: z.enum(["product", "service"]),
+        id: z.uuid("Invalid listing"),
+        quantity: z.number().int().min(1).max(99),
+      })
+    )
+    .min(1, "Your cart is empty")
+    .max(50, "Too many items in one checkout"),
+  stores: z
+    .array(
+      z.object({
+        storeId: z.uuid("Invalid store"),
+        fulfilmentMethod: z.enum(marketplaceFulfilmentValues),
+        deliveryAddress: z
+          .string()
+          .trim()
+          .max(500)
+          .optional()
+          .or(z.literal("")),
+        note: z.string().trim().max(500).optional().or(z.literal("")),
+      })
+    )
+    .min(1, "Choose a fulfilment method for every store"),
+});

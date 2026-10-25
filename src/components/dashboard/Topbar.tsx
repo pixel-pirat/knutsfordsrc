@@ -6,6 +6,7 @@ import Link from "next/link";
 import { UserAvatar } from "@/components/UserAvatar";
 import { HubIcon } from "@/components/icons";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { CartLink } from "@/components/market/CartLink";
 import type { PublicStudent } from "@/lib/types";
 
 export function Topbar({
@@ -60,6 +61,7 @@ export function Topbar({
       </div>
 
       <div className="ml-auto flex items-center gap-2 sm:gap-4">
+        <CartLink />
         <ThemeToggle />
         <button
           type="button"

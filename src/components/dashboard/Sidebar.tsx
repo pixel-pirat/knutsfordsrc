@@ -8,6 +8,13 @@ import { HubIcon } from "@/components/icons";
 
 export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
+  const activeHref = [...dashboardNav]
+    .sort((a, b) => b.href.length - a.href.length)
+    .find((item) =>
+      item.href === "/dashboard"
+        ? pathname === item.href
+        : pathname.startsWith(item.href)
+    )?.href;
 
   return (
     <div className="flex h-full flex-col bg-neutral-50 dark:bg-neutral-900">
@@ -35,10 +42,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
 
       <nav className="flex-1 space-y-1 px-3 pb-6">
         {dashboardNav.map((item) => {
-          const active =
-            item.href === "/dashboard"
-              ? pathname === "/dashboard"
-              : pathname.startsWith(item.href);
+          const active = activeHref === item.href;
           return (
             <Link
               key={item.href}

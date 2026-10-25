@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { listUpcomingEvents } from "@/db/queries";
-import { marketProducts } from "@/data/site";
-import { StarIcon } from "./icons";
+import { listPublicListings } from "@/db/marketplacePublicQueries";
+import { formatCurrency } from "@/lib/permits";
 
 function formatDay(date: Date) {
   return {
@@ -28,8 +28,11 @@ function formatTimeRange(startsAt: Date, endsAt: Date | null) {
 }
 
 export async function EventsMarket() {
-  const events = await listUpcomingEvents({ limit: 3 });
-  const featuredProducts = marketProducts.slice(0, 3);
+  const [events, listings] = await Promise.all([
+    listUpcomingEvents({ limit: 3 }),
+    listPublicListings(),
+  ]);
+  const featuredListings = listings.slice(0, 3);
 
   return (
     <section className="bg-white dark:bg-neutral-900">
@@ -121,29 +124,63 @@ export async function EventsMarket() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5">
-            {featuredProducts.map((product, i) => (
-              <div key={product.name + i}>
-                <div className="relative aspect-square overflow-hidden rounded-2xl bg-neutral-200 ring-1 ring-black/5 dark:ring-white/10">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    className="object-cover transition-transform duration-300 hover:scale-105"
-                  />
-                </div>
-                <h3 className="mt-3 text-sm font-semibold text-ink dark:text-neutral-100 sm:text-base">
-                  {product.name}
-                </h3>
-                <p className="text-sm font-bold text-ink dark:text-neutral-100">{product.price}</p>
-                <div className="mt-1 flex items-center gap-1 text-xs text-neutral-500 dark:text-neutral-400 sm:text-sm">
-                  <StarIcon className="h-3.5 w-3.5 text-gold" />
-                  <span>{product.rating}</span>
-                  <span>({product.reviews})</span>
-                </div>
-              </div>
-            ))}
-          </div>
+          {featuredListings.length === 0 ? (
+            <div className="rounded-2xl bg-neutral-50 px-6 py-14 text-center ring-1 ring-black/5 dark:bg-neutral-900 dark:ring-white/10">
+              <p className="text-sm font-semibold text-ink dark:text-neutral-100">
+                No listings yet.
+              </p>
+              <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+                Verified student stores will appear here as they publish.
+              </p>
+              <Link
+                href="/market"
+                className="mt-4 inline-flex rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-white dark:bg-gold dark:text-ink"
+              >
+                Visit the marketplace
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-5">
+              {featuredListings.map((listing) => (
+                <Link
+                  key={listing.key}
+                  href={`/market/listings/${listing.type}/${listing.id}`}
+                  className="group"
+                >
+                  <div className="relative aspect-square overflow-hidden rounded-2xl bg-neutral-200 ring-1 ring-black/5 dark:bg-neutral-800 dark:ring-white/10">
+                    {listing.imageUrl ? (
+                      // Seller-supplied images may come from any HTTPS host.
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={listing.imageUrl}
+                        alt={listing.name}
+                        loading="lazy"
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:text-neutral-500">
+                        {listing.type}
+                      </div>
+                    )}
+                  </div>
+                  <h3 className="mt-3 line-clamp-1 text-sm font-semibold text-ink transition-colors group-hover:text-gold-dark dark:text-neutral-100 dark:group-hover:text-gold-light sm:text-base">
+                    {listing.name}
+                  </h3>
+                  <p className="text-sm font-bold text-ink dark:text-neutral-100">
+                    {formatCurrency(listing.price)}
+                    {listing.priceUnit ? (
+                      <span className="ml-1 text-[11px] font-medium text-neutral-400 dark:text-neutral-500">
+                        / {listing.priceUnit}
+                      </span>
+                    ) : null}
+                  </p>
+                  <p className="mt-1 truncate text-xs text-neutral-500 dark:text-neutral-400 sm:text-sm">
+                    {listing.store.name}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>
