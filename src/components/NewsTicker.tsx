@@ -1,7 +1,40 @@
+import Link from "next/link";
+import { listAnnouncementsForAdmin } from "@/db/announcementQueries";
 import { breakingNews } from "@/data/site";
 
-export function NewsTicker() {
-  const items = [...breakingNews, ...breakingNews];
+type TickerItem = { id: string; text: string; linkUrl: string | null };
+
+const defaultItems = (): TickerItem[] =>
+  breakingNews.map((text, index) => ({
+    id: `default-${index}`,
+    text,
+    linkUrl: null,
+  }));
+
+export async function NewsTicker() {
+  let items: TickerItem[] = [];
+
+  try {
+    const rows = await listAnnouncementsForAdmin();
+    // Before the first announcement is created, keep the built-in headlines so
+    // the homepage ticker isn't empty.
+    items =
+      rows.length > 0
+        ? rows
+            .filter((row) => row.active)
+            .map((row) => ({
+              id: row.id,
+              text: row.text,
+              linkUrl: row.linkUrl,
+            }))
+        : defaultItems();
+  } catch {
+    items = defaultItems();
+  }
+
+  if (items.length === 0) return null;
+
+  const looped = [...items, ...items];
 
   return (
     <div className="flex items-stretch bg-ink">
@@ -13,12 +46,21 @@ export function NewsTicker() {
       </div>
       <div className="relative flex min-w-0 flex-1 items-center overflow-hidden">
         <div className="animate-marquee flex w-max shrink-0 items-center gap-10 py-3.5 pl-8 whitespace-nowrap">
-          {items.map((headline, i) => (
+          {looped.map((item, i) => (
             <span
-              key={i}
+              key={`${item.id}-${i}`}
               className="flex items-center gap-10 text-sm text-neutral-200"
             >
-              {headline}
+              {item.linkUrl ? (
+                <Link
+                  href={item.linkUrl}
+                  className="transition-colors hover:text-gold"
+                >
+                  {item.text}
+                </Link>
+              ) : (
+                item.text
+              )}
               <span className="text-gold">&#9679;</span>
             </span>
           ))}

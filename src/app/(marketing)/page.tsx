@@ -5,6 +5,9 @@ import { EventsMarket } from "@/components/EventsMarket";
 import { Gallery } from "@/components/Gallery";
 import { Footer } from "@/components/Footer";
 
+// The ticker reads live announcements, so render this page per request.
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   return (
     <>

@@ -36,6 +36,7 @@ export const adminNav: AdminNavEntry[] = [
     items: [
       { label: "New Broadcast", href: "/admin/news?new=1", icon: "newspaper", permission: "manage_news" },
       { label: "Broadcasts", href: "/admin/news", icon: "newspaper", permission: "manage_news" },
+      { label: "Announcements", href: "/admin/news/announcements", icon: "newspaper", permission: "manage_news" },
       { label: "Documents", href: "/admin/news/documents", icon: "book", permission: "manage_news" },
       { label: "Suggestion Box", href: "/admin/news/suggestions", icon: "flag", permission: "manage_news" },
     ],

@@ -167,6 +167,23 @@ export const newsPosts = pgTable("news_posts", {
     .defaultNow(),
 });
 
+export const announcements = pgTable("announcements", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  text: text("text").notNull(),
+  linkUrl: text("link_url"),
+  active: boolean("active").notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdBy: uuid("created_by")
+    .notNull()
+    .references(() => adminUsers.id),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export const executiveYearGroups = pgTable("executive_year_groups", {
   id: uuid("id").primaryKey().defaultRandom(),
   label: text("label").notNull().unique(),
@@ -703,6 +720,8 @@ export type Event = typeof events.$inferSelect;
 export type NewEvent = typeof events.$inferInsert;
 export type NewsPost = typeof newsPosts.$inferSelect;
 export type NewNewsPost = typeof newsPosts.$inferInsert;
+export type Announcement = typeof announcements.$inferSelect;
+export type NewAnnouncement = typeof announcements.$inferInsert;
 export type ExecutiveYearGroup = typeof executiveYearGroups.$inferSelect;
 export type NewExecutiveYearGroup = typeof executiveYearGroups.$inferInsert;
 export type ExecutiveProfile = typeof executiveProfiles.$inferSelect;

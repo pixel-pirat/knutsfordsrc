@@ -161,6 +161,24 @@ export const newsSchema = z.object({
   published: z.boolean().optional(),
 });
 
+export const announcementSchema = z.object({
+  text: z.string().trim().min(1, "Announcement text is required").max(200),
+  linkUrl: z
+    .string()
+    .trim()
+    .max(500)
+    .refine(
+      (value) => value === "" || value.startsWith("/") || /^https?:\/\//i.test(value),
+      "Use a path (/news) or full URL (https://…)"
+    )
+    .optional(),
+  active: z.boolean().optional(),
+});
+
+export const announcementReorderSchema = z.object({
+  ids: z.array(z.uuid()).min(1, "No announcements to reorder"),
+});
+
 export const yearGroupSchema = z.object({
   label: z.string().trim().min(1, "Label is required").max(60),
   description: z.string().trim().max(2000).optional().or(z.literal("")),
