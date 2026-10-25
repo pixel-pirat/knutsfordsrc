@@ -48,6 +48,20 @@ export function describeAuditEntry(entry: AuditEntry): string {
       return `Set current semester to ${m.currentSemester ?? ""} (${m.academicYear ?? ""})`;
     case "settings.update_permit_config":
       return `Updated permit defaults (${m.currency ?? "GHS"} ${m.defaultAmount ?? ""})`;
+    case "marketplace.application.start_review":
+      return `Started reviewing store application "${m.storeName ?? ""}"`;
+    case "marketplace.application.request_info":
+      return `Requested more information for store application "${m.storeName ?? ""}"`;
+    case "marketplace.application.approve":
+      return `Approved store application "${m.storeName ?? ""}"`;
+    case "marketplace.application.reject":
+      return `Rejected store application "${m.storeName ?? ""}"`;
+    case "marketplace.store.suspend":
+      return `Suspended store "${m.storeName ?? ""}"`;
+    case "marketplace.store.reactivate":
+      return `Reactivated store "${m.storeName ?? ""}"`;
+    case "marketplace.store.close":
+      return `Closed store "${m.storeName ?? ""}"`;
     default:
       return `${entry.action} — ${entry.targetType}`;
   }

@@ -42,6 +42,32 @@ export const tournamentStatusEnum = pgEnum("tournament_status", [
 ]);
 export const matchStageEnum = pgEnum("match_stage", ["group", "knockout"]);
 export const matchStatusEnum = pgEnum("match_status", ["pending", "completed"]);
+export const marketplaceCategoryEnum = pgEnum("marketplace_category", [
+  "products",
+  "services",
+  "both",
+]);
+export const marketplaceAvailabilityEnum = pgEnum("marketplace_availability", [
+  "in_stock",
+  "made_to_order",
+  "service_on_demand",
+]);
+export const marketplaceApplicationStatusEnum = pgEnum(
+  "marketplace_application_status",
+  [
+    "pending_review",
+    "under_review",
+    "additional_info_required",
+    "approved",
+    "rejected",
+  ]
+);
+export const marketplaceStoreStatusEnum = pgEnum("marketplace_store_status", [
+  "active",
+  "inactive",
+  "suspended",
+  "closed",
+]);
 
 export const adminUsers = pgTable("admin_users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -341,6 +367,96 @@ export const hallMessages = pgTable("hall_messages", {
     .notNull()
     .references(() => adminUsers.id),
   sentAt: timestamp("sent_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ---------------------------------------------------------------------------
+// Marketplace
+// ---------------------------------------------------------------------------
+
+export const marketplaceApplications = pgTable("marketplace_applications", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  studentId: uuid("student_id")
+    .notNull()
+    .unique()
+    .references(() => students.id, { onDelete: "cascade" }),
+  contactNumber: text("contact_number").notNull(),
+  storeName: text("store_name").notNull(),
+  category: marketplaceCategoryEnum("category").notNull(),
+  description: text("description").notNull(),
+  offerings: text("offerings").notNull(),
+  availability: marketplaceAvailabilityEnum("availability").notNull(),
+  fulfilmentMethods: jsonb("fulfilment_methods")
+    .$type<string[]>()
+    .notNull()
+    .default([]),
+  evidenceUrl: text("evidence_url"),
+  evidenceNotes: text("evidence_notes"),
+  declarationAccepted: boolean("declaration_accepted").notNull().default(false),
+  status: marketplaceApplicationStatusEnum("status")
+    .notNull()
+    .default("pending_review"),
+  decisionReason: text("decision_reason"),
+  adminNotes: text("admin_notes"),
+  reviewedBy: uuid("reviewed_by").references(() => adminUsers.id, {
+    onDelete: "set null",
+  }),
+  reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+  submittedAt: timestamp("submitted_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const marketplaceApplicationEvents = pgTable(
+  "marketplace_application_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    applicationId: uuid("application_id")
+      .notNull()
+      .references(() => marketplaceApplications.id, { onDelete: "cascade" }),
+    actorType: text("actor_type").notNull(),
+    actorId: uuid("actor_id"),
+    actorName: text("actor_name").notNull(),
+    status: marketplaceApplicationStatusEnum("status").notNull(),
+    note: text("note"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  }
+);
+
+export const marketplaceStores = pgTable("marketplace_stores", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  studentId: uuid("student_id")
+    .notNull()
+    .unique()
+    .references(() => students.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  description: text("description"),
+  category: marketplaceCategoryEnum("category").notNull(),
+  logoUrl: text("logo_url"),
+  contactEmail: text("contact_email"),
+  contactPhone: text("contact_phone"),
+  fulfilmentMethods: jsonb("fulfilment_methods")
+    .$type<string[]>()
+    .notNull()
+    .default([]),
+  operatingHours: text("operating_hours"),
+  pickupLocation: text("pickup_location"),
+  status: marketplaceStoreStatusEnum("status").notNull().default("active"),
+  statusReason: text("status_reason"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 // ---------------------------------------------------------------------------
@@ -738,6 +854,14 @@ export type HallEventBooking = typeof hallEventBookings.$inferSelect;
 export type NewHallEventBooking = typeof hallEventBookings.$inferInsert;
 export type HallMessage = typeof hallMessages.$inferSelect;
 export type NewHallMessage = typeof hallMessages.$inferInsert;
+export type MarketplaceApplication = typeof marketplaceApplications.$inferSelect;
+export type NewMarketplaceApplication = typeof marketplaceApplications.$inferInsert;
+export type MarketplaceApplicationEvent =
+  typeof marketplaceApplicationEvents.$inferSelect;
+export type NewMarketplaceApplicationEvent =
+  typeof marketplaceApplicationEvents.$inferInsert;
+export type MarketplaceStore = typeof marketplaceStores.$inferSelect;
+export type NewMarketplaceStore = typeof marketplaceStores.$inferInsert;
 export type SportEvent = typeof sportEvents.$inferSelect;
 export type NewSportEvent = typeof sportEvents.$inferInsert;
 export type SportParticipation = typeof sportParticipations.$inferSelect;

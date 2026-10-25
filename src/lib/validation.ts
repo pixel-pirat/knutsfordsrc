@@ -334,3 +334,77 @@ export const sportAnnouncementSchema = z.object({
   body: z.string().trim().min(1, "Message body is required").max(20000),
   eventId: z.uuid("Invalid event").optional().or(z.literal("")),
 });
+
+export const marketplaceCategoryValues = ["products", "services", "both"] as const;
+export const marketplaceAvailabilityValues = [
+  "in_stock",
+  "made_to_order",
+  "service_on_demand",
+] as const;
+export const marketplaceFulfilmentValues = [
+  "campus_pickup",
+  "delivery",
+  "digital",
+  "service_appointment",
+] as const;
+
+const contactNumberSchema = z
+  .string()
+  .trim()
+  .min(7, "Enter a valid contact number")
+  .max(30);
+
+export const marketplaceApplicationSchema = z.object({
+  contactNumber: contactNumberSchema,
+  storeName: z
+    .string()
+    .trim()
+    .min(2, "Store name is required")
+    .max(80)
+    .regex(/^[\w\s&'’.,-]+$/u, "Use letters, numbers and basic punctuation only"),
+  category: z.enum(marketplaceCategoryValues),
+  description: z
+    .string()
+    .trim()
+    .min(20, "Tell us a bit more about your business (at least 20 characters)")
+    .max(2000),
+  offerings: z
+    .string()
+    .trim()
+    .min(5, "List what you plan to sell")
+    .max(1000),
+  availability: z.enum(marketplaceAvailabilityValues),
+  fulfilmentMethods: z
+    .array(z.enum(marketplaceFulfilmentValues))
+    .min(1, "Select at least one fulfilment method"),
+  evidenceUrl: z.url().optional().or(z.literal("")),
+  evidenceNotes: z.string().trim().max(1000).optional().or(z.literal("")),
+  declarationAccepted: z
+    .boolean()
+    .refine((value) => value === true, "You must accept the marketplace declaration"),
+});
+
+export const marketplaceStoreSchema = z.object({
+  name: z.string().trim().min(2, "Store name is required").max(80),
+  description: z.string().trim().max(2000).optional().or(z.literal("")),
+  category: z.enum(marketplaceCategoryValues),
+  logoUrl: z.url().optional().or(z.literal("")),
+  contactEmail: z.email("Enter a valid email").optional().or(z.literal("")),
+  contactPhone: z.string().trim().max(30).optional().or(z.literal("")),
+  fulfilmentMethods: z
+    .array(z.enum(marketplaceFulfilmentValues))
+    .min(1, "Select at least one fulfilment method"),
+  operatingHours: z.string().trim().max(200).optional().or(z.literal("")),
+  pickupLocation: z.string().trim().max(200).optional().or(z.literal("")),
+});
+
+export const marketplaceDecisionSchema = z.object({
+  action: z.enum(["start_review", "request_info", "approve", "reject"]),
+  reason: z.string().trim().max(1000).optional().or(z.literal("")),
+  adminNotes: z.string().trim().max(1000).optional().or(z.literal("")),
+});
+
+export const marketplaceStoreStatusSchema = z.object({
+  action: z.enum(["suspend", "reactivate", "close"]),
+  reason: z.string().trim().max(500).optional().or(z.literal("")),
+});

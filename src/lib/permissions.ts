@@ -61,6 +61,12 @@ export const PERMISSIONS = [
     description:
       "Create sports events, confirm participation, run tournaments and send updates",
   },
+  {
+    key: "manage_market",
+    label: "Manage Marketplace",
+    description:
+      "Review seller applications, manage stores and oversee marketplace activity",
+  },
 ] as const;
 
 export type PermissionKey = (typeof PERMISSIONS)[number]["key"];
