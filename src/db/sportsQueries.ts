@@ -290,6 +290,33 @@ export async function removeTournamentParticipant(participantId: string) {
     .returning();
 }
 
+export function getTournamentParticipantForStudent(
+  tournamentId: string,
+  studentId: string
+) {
+  return db.query.tournamentParticipants.findFirst({
+    where: and(
+      eq(tournamentParticipants.tournamentId, tournamentId),
+      eq(tournamentParticipants.studentId, studentId)
+    ),
+  });
+}
+
+export function removeTournamentParticipantForStudent(
+  tournamentId: string,
+  studentId: string
+) {
+  return db
+    .delete(tournamentParticipants)
+    .where(
+      and(
+        eq(tournamentParticipants.tournamentId, tournamentId),
+        eq(tournamentParticipants.studentId, studentId)
+      )
+    )
+    .returning();
+}
+
 /** Search students not yet in this tournament, for the picker. */
 export async function searchStudentsForTournament(
   tournamentId: string,

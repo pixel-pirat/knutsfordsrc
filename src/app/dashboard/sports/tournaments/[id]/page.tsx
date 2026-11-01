@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getCurrentStudent } from "@/db/queries";
 import {
   getTournamentById,
   listMatchesForTournament,
@@ -7,11 +8,18 @@ import {
   listTournamentStandings,
 } from "@/db/sportsQueries";
 import { roundLabel } from "@/lib/tournament";
+import { TournamentRegisterButton } from "./TournamentRegisterButton";
 
 const FORMAT_LABELS: Record<string, string> = {
   single_elimination: "Knockout",
   round_robin: "League",
   group_knockout: "Groups + knockout",
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  draft: "Registration open",
+  active: "In progress",
+  completed: "Completed",
 };
 
 export default async function StudentTournamentPage({
@@ -20,6 +28,7 @@ export default async function StudentTournamentPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const student = await getCurrentStudent();
 
   const tournament = await getTournamentById(id);
   if (!tournament) notFound();
@@ -31,6 +40,9 @@ export default async function StudentTournamentPage({
   ]);
 
   const namesById = new Map(participants.map((p) => [p.id, `${p.firstName} ${p.lastName}`]));
+  const isRegistered = Boolean(
+    student && participants.some((p) => p.studentId === student.id)
+  );
 
   const groupMatches = matches.filter((m) => m.stage === "group");
   const knockoutMatches = matches.filter((m) => m.stage === "knockout");
@@ -45,21 +57,32 @@ export default async function StudentTournamentPage({
 
   return (
     <div>
-      <div className="mb-6">
-        <Link
-          href="/dashboard/sports"
-          className="text-sm font-medium text-gold-dark dark:text-gold-light hover:underline"
-        >
-          ← Sports
-        </Link>
-        <h1 className="mt-2 text-2xl font-extrabold text-ink dark:text-neutral-100 sm:text-3xl">
-          {tournament.name}
-        </h1>
-        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
-          {FORMAT_LABELS[tournament.format] ?? tournament.format} ·{" "}
-          {participants.length} participants
-          {tournament.championName ? ` · 🏆 Champion: ${tournament.championName}` : ""}
-        </p>
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <Link
+            href="/dashboard/sports"
+            className="text-sm font-medium text-gold-dark dark:text-gold-light hover:underline"
+          >
+            ← Sports
+          </Link>
+          <h1 className="mt-2 text-2xl font-extrabold text-ink dark:text-neutral-100 sm:text-3xl">
+            {tournament.name}
+          </h1>
+          <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+            {FORMAT_LABELS[tournament.format] ?? tournament.format} ·{" "}
+            {STATUS_LABELS[tournament.status] ?? tournament.status} ·{" "}
+            {participants.length} participants
+            {tournament.championName ? ` · 🏆 Champion: ${tournament.championName}` : ""}
+          </p>
+          {isRegistered && (
+            <span className="mt-2 inline-flex rounded-md border border-green-200 bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700 dark:border-green-800 dark:bg-green-950/40">
+              You&apos;re registered
+            </span>
+          )}
+        </div>
+        {student && tournament.status === "draft" && (
+          <TournamentRegisterButton tournamentId={tournament.id} registered={isRegistered} />
+        )}
       </div>
 
       {standings.length > 0 && (

@@ -8,6 +8,12 @@ import {
 } from "@/db/sportsQueries";
 import { SportRegisterButton } from "./SportRegisterButton";
 
+const TOURNAMENT_STATUS_LABELS: Record<string, string> = {
+  draft: "Registration open",
+  active: "In progress",
+  completed: "Completed",
+};
+
 function formatDateTime(value: Date) {
   return new Date(value).toLocaleString("en-GB", {
     weekday: "short",
@@ -127,8 +133,14 @@ export default async function SportsPage() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:text-neutral-500">
-                    {t.status.replace("_", " ")}
+                  <p
+                    className={`text-xs font-semibold uppercase tracking-wide ${
+                      t.status === "draft"
+                        ? "text-green-600 dark:text-green-400"
+                        : "text-neutral-400 dark:text-neutral-500"
+                    }`}
+                  >
+                    {TOURNAMENT_STATUS_LABELS[t.status] ?? t.status}
                   </p>
                   {t.championName && (
                     <p className="text-xs font-bold text-gold-dark dark:text-gold-light">
