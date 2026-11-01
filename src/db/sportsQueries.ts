@@ -912,6 +912,66 @@ export async function listStudentSportEvents(
     .limit(limit);
 }
 
+export async function listPublicSportEvents({ limit = 50 } = {}) {
+  const now = new Date();
+  return db
+    .select({
+      id: sportEvents.id,
+      title: sportEvents.title,
+      sport: sportEvents.sport,
+      description: sportEvents.description,
+      venue: sportEvents.venue,
+      startsAt: sportEvents.startsAt,
+      endsAt: sportEvents.endsAt,
+      imageUrl: sportEvents.imageUrl,
+    })
+    .from(sportEvents)
+    .where(
+      and(
+        eq(sportEvents.published, true),
+        sql`coalesce(${sportEvents.endsAt}, ${sportEvents.startsAt}) >= ${now.toISOString()}`
+      )
+    )
+    .orderBy(desc(sportEvents.startsAt))
+    .limit(limit);
+}
+
+export async function listRecentSportResults({ limit = 12 } = {}) {
+  return db
+    .select({
+      id: sportMatches.id,
+      tournamentId: sportMatches.tournamentId,
+      tournamentName: sportTournaments.name,
+      sport: sportTournaments.sport,
+      stage: sportMatches.stage,
+      groupLabel: sportMatches.groupLabel,
+      round: sportMatches.round,
+      scoreA: sportMatches.scoreA,
+      scoreB: sportMatches.scoreB,
+      updatedAt: sportMatches.updatedAt,
+      nameA: sql<string | null>`(
+        select s.first_name || ' ' || s.last_name
+        from ${tournamentParticipants} tp
+        join ${students} s on s.id = tp.student_id
+        where tp.id = ${sportMatches.participantAId}
+      )`,
+      nameB: sql<string | null>`(
+        select s.first_name || ' ' || s.last_name
+        from ${tournamentParticipants} tp
+        join ${students} s on s.id = tp.student_id
+        where tp.id = ${sportMatches.participantBId}
+      )`,
+    })
+    .from(sportMatches)
+    .innerJoin(
+      sportTournaments,
+      eq(sportMatches.tournamentId, sportTournaments.id)
+    )
+    .where(eq(sportMatches.status, "completed"))
+    .orderBy(desc(sportMatches.updatedAt))
+    .limit(limit);
+}
+
 export function listPublicTournaments() {
   return db
     .select({

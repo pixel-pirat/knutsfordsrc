@@ -5,6 +5,7 @@ export const navLinks: NavLink[] = [
   { label: "About", href: "/about" },
   { label: "Market", href: "/market" },
   { label: "News", href: "/news" },
+  { label: "Sports", href: "/sports" },
   { label: "Gallery", href: "/gallery" },
   { label: "Games", href: "/games", badge: "Soon" },
 ];
@@ -193,6 +194,7 @@ export const footerColumns = [
       { label: "About", href: "/about" },
       { label: "Market", href: "/market" },
       { label: "News", href: "/news" },
+      { label: "Sports", href: "/sports" },
       { label: "Gallery", href: "/gallery" },
       { label: "Know Your Executives", href: "/about/executives" },
     ],
