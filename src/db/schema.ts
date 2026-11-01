@@ -94,6 +94,29 @@ export const marketplacePaymentStatusEnum = pgEnum(
   "marketplace_payment_status",
   ["unpaid", "pending_confirmation", "paid", "refunded"]
 );
+export const marketplaceComplaintCategoryEnum = pgEnum(
+  "marketplace_complaint_category",
+  [
+    "product_not_delivered",
+    "misleading_listing",
+    "unavailable_product",
+    "payment_dispute",
+    "poor_service",
+    "seller_misconduct",
+    "refund_issue",
+  ]
+);
+export const marketplaceComplaintStatusEnum = pgEnum(
+  "marketplace_complaint_status",
+  [
+    "open",
+    "awaiting_seller_response",
+    "under_investigation",
+    "resolved",
+    "rejected",
+    "escalated",
+  ]
+);
 
 export const adminUsers = pgTable("admin_users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -475,6 +498,7 @@ export const marketplaceStores = pgTable("marketplace_stores", {
     .default([]),
   operatingHours: text("operating_hours"),
   pickupLocation: text("pickup_location"),
+  paymentInstructions: text("payment_instructions"),
   status: marketplaceStoreStatusEnum("status").notNull().default("active"),
   statusReason: text("status_reason"),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -575,6 +599,14 @@ export const marketplaceOrders = pgTable(
     deliveryAddress: text("delivery_address"),
     buyerNote: text("buyer_note"),
     subtotal: numeric("subtotal", { precision: 10, scale: 2 }).notNull(),
+    paymentInstructions: text("payment_instructions"),
+    paymentReference: text("payment_reference"),
+    paymentSubmittedAt: timestamp("payment_submitted_at", {
+      withTimezone: true,
+    }),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
+    cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
+    cancellationReason: text("cancellation_reason"),
     status: marketplaceOrderStatusEnum("status")
       .notNull()
       .default("pending"),
@@ -609,11 +641,110 @@ export const marketplaceOrderItems = pgTable(
     unitPrice: numeric("unit_price", { precision: 10, scale: 2 }).notNull(),
     quantity: integer("quantity").notNull(),
     lineTotal: numeric("line_total", { precision: 10, scale: 2 }).notNull(),
+    stockTracked: boolean("stock_tracked").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
   },
   (table) => [index("marketplace_order_items_order_idx").on(table.orderId)]
+);
+
+export const marketplaceOrderEvents = pgTable(
+  "marketplace_order_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orderId: uuid("order_id")
+      .notNull()
+      .references(() => marketplaceOrders.id, { onDelete: "cascade" }),
+    actorType: text("actor_type").notNull(),
+    actorId: uuid("actor_id"),
+    actorName: text("actor_name").notNull(),
+    eventType: text("event_type").notNull(),
+    status: text("status"),
+    paymentStatus: text("payment_status"),
+    note: text("note"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("marketplace_order_events_order_idx").on(
+      table.orderId,
+      table.createdAt
+    ),
+  ]
+);
+
+export const marketplaceComplaints = pgTable(
+  "marketplace_complaints",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    referenceNumber: text("reference_number").notNull().unique(),
+    orderId: uuid("order_id")
+      .notNull()
+      .references(() => marketplaceOrders.id, { onDelete: "restrict" }),
+    storeId: uuid("store_id")
+      .notNull()
+      .references(() => marketplaceStores.id, { onDelete: "restrict" }),
+    complainantStudentId: uuid("complainant_student_id")
+      .notNull()
+      .references(() => students.id, { onDelete: "restrict" }),
+    complainantName: text("complainant_name").notNull(),
+    complainantPhone: text("complainant_phone").notNull(),
+    complainantEmail: text("complainant_email"),
+    category: marketplaceComplaintCategoryEnum("category").notNull(),
+    subject: text("subject").notNull(),
+    description: text("description").notNull(),
+    evidence: text("evidence"),
+    status: marketplaceComplaintStatusEnum("status")
+      .notNull()
+      .default("open"),
+    assignedAdminId: uuid("assigned_admin_id").references(
+      () => adminUsers.id,
+      { onDelete: "set null" }
+    ),
+    resolutionNotes: text("resolution_notes"),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("marketplace_complaints_order_idx").on(table.orderId),
+    index("marketplace_complaints_store_idx").on(table.storeId),
+    index("marketplace_complaints_complainant_idx").on(
+      table.complainantStudentId
+    ),
+    index("marketplace_complaints_status_idx").on(table.status),
+  ]
+);
+
+export const marketplaceComplaintEvents = pgTable(
+  "marketplace_complaint_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    complaintId: uuid("complaint_id")
+      .notNull()
+      .references(() => marketplaceComplaints.id, { onDelete: "cascade" }),
+    actorType: text("actor_type").notNull(),
+    actorId: uuid("actor_id"),
+    actorName: text("actor_name").notNull(),
+    eventType: text("event_type").notNull(),
+    status: text("status"),
+    note: text("note"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("marketplace_complaint_events_complaint_idx").on(
+      table.complaintId,
+      table.createdAt
+    ),
+  ]
 );
 
 // ---------------------------------------------------------------------------

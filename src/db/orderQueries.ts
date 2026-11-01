@@ -1,21 +1,42 @@
 import { randomUUID } from "node:crypto";
-import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  ilike,
+  inArray,
+  or,
+  sql,
+  type SQL,
+} from "drizzle-orm";
 import { db } from "./index";
 import {
+  marketplaceOrderEvents,
   marketplaceOrderItems,
   marketplaceOrders,
   marketplaceProducts,
   marketplaceServices,
   marketplaceStores,
+  students,
   type NewMarketplaceOrder,
   type NewMarketplaceOrderItem,
 } from "./schema";
 import type {
+  AdminOrderDetail,
+  AdminOrderSummary,
   BuyerOrderDetail,
   BuyerOrderItem,
   BuyerOrderSummary,
   MarketplaceListingType,
+  MarketplaceOrderEvent,
+  SellerOrderDetail,
+  SellerOrderSummary,
 } from "@/lib/marketplace";
+import type {
+  MarketplaceOrderStatus,
+  MarketplacePaymentStatus,
+} from "@/lib/orderWorkflow";
 
 export type CheckoutItemInput = {
   type: MarketplaceListingType;
@@ -73,6 +94,7 @@ type CheckoutListing = {
   storeSlug: string;
   storeFulfilmentMethods: string[];
   storePickupLocation: string | null;
+  storePaymentInstructions: string | null;
   itemFulfilmentMethods: string[];
   availability: string | null;
   stockQuantity: number | null;
@@ -116,6 +138,7 @@ async function loadCheckoutListings(items: CheckoutItemInput[]) {
             storeSlug: marketplaceStores.slug,
             storeFulfilmentMethods: marketplaceStores.fulfilmentMethods,
             storePickupLocation: marketplaceStores.pickupLocation,
+            storePaymentInstructions: marketplaceStores.paymentInstructions,
           })
           .from(marketplaceProducts)
           .innerJoin(
@@ -144,6 +167,7 @@ async function loadCheckoutListings(items: CheckoutItemInput[]) {
             storeSlug: marketplaceStores.slug,
             storeFulfilmentMethods: marketplaceStores.fulfilmentMethods,
             storePickupLocation: marketplaceStores.pickupLocation,
+            storePaymentInstructions: marketplaceStores.paymentInstructions,
           })
           .from(marketplaceServices)
           .innerJoin(
@@ -176,6 +200,7 @@ async function loadCheckoutListings(items: CheckoutItemInput[]) {
       storeSlug: row.storeSlug,
       storeFulfilmentMethods: row.storeFulfilmentMethods,
       storePickupLocation: row.storePickupLocation,
+      storePaymentInstructions: row.storePaymentInstructions,
       itemFulfilmentMethods: row.itemFulfilmentMethods,
       availability: row.availability,
       stockQuantity: row.stockQuantity,
@@ -195,6 +220,7 @@ async function loadCheckoutListings(items: CheckoutItemInput[]) {
       storeSlug: row.storeSlug,
       storeFulfilmentMethods: row.storeFulfilmentMethods,
       storePickupLocation: row.storePickupLocation,
+      storePaymentInstructions: row.storePaymentInstructions,
       itemFulfilmentMethods: [],
       availability: row.availability,
       stockQuantity: null,
@@ -248,6 +274,7 @@ export async function createMarketplaceOrders(
     storeName: string;
     storeSlug: string;
     storePickupLocation: string | null;
+    paymentInstructions: string | null;
     config: CheckoutStoreInput;
     items: { listing: CheckoutListing; quantity: number }[];
   };
@@ -310,6 +337,7 @@ export async function createMarketplaceOrders(
       storeName: listing.storeName,
       storeSlug: listing.storeSlug,
       storePickupLocation: listing.storePickupLocation,
+      paymentInstructions: listing.storePaymentInstructions,
       config,
       items: [],
     };
@@ -329,6 +357,7 @@ export async function createMarketplaceOrders(
   const now = new Date();
   const orderRows: NewMarketplaceOrder[] = [];
   const itemRows: NewMarketplaceOrderItem[] = [];
+  const eventRows: (typeof marketplaceOrderEvents.$inferInsert)[] = [];
   const createdOrders: CreatedCheckout["orders"] = [];
   const stockUpdates: { id: string; quantity: number }[] = [];
   let totalCents = 0;
@@ -357,10 +386,23 @@ export async function createMarketplaceOrders(
           : null,
       buyerNote: group.config.note?.trim() || null,
       subtotal: (subtotalCents / 100).toFixed(2),
+      paymentInstructions: group.paymentInstructions,
       status: "pending",
       paymentStatus: "unpaid",
       createdAt: now,
       updatedAt: now,
+    });
+
+    eventRows.push({
+      orderId,
+      actorType: "buyer",
+      actorId: input.student.id,
+      actorName: `${input.student.firstName} ${input.student.lastName}`,
+      eventType: "placed",
+      status: "pending",
+      paymentStatus: "unpaid",
+      note: `Order placed with ${group.storeName}.`,
+      createdAt: now,
     });
 
     for (const item of group.items) {
@@ -374,6 +416,9 @@ export async function createMarketplaceOrders(
         unitPrice: (item.listing.priceCents / 100).toFixed(2),
         quantity: item.quantity,
         lineTotal: (lineTotalCents / 100).toFixed(2),
+        stockTracked:
+          item.listing.type === "product" &&
+          item.listing.availability === "ready_stock",
       });
 
       if (
@@ -396,6 +441,7 @@ export async function createMarketplaceOrders(
   try {
     await db.insert(marketplaceOrders).values(orderRows);
     await db.insert(marketplaceOrderItems).values(itemRows);
+    await db.insert(marketplaceOrderEvents).values(eventRows);
 
     await Promise.all(
       stockUpdates.map((update) =>
@@ -433,16 +479,25 @@ const orderColumns = {
   storePickupLocation: marketplaceStores.pickupLocation,
   storeContactEmail: marketplaceStores.contactEmail,
   storeContactPhone: marketplaceStores.contactPhone,
+  storePaymentInstructions: marketplaceStores.paymentInstructions,
   subtotal: marketplaceOrders.subtotal,
   status: marketplaceOrders.status,
   paymentStatus: marketplaceOrders.paymentStatus,
   fulfilmentMethod: marketplaceOrders.fulfilmentMethod,
   deliveryAddress: marketplaceOrders.deliveryAddress,
   buyerNote: marketplaceOrders.buyerNote,
+  buyerStudentId: marketplaceOrders.buyerStudentId,
+  paymentInstructions: marketplaceOrders.paymentInstructions,
+  paymentReference: marketplaceOrders.paymentReference,
+  paymentSubmittedAt: marketplaceOrders.paymentSubmittedAt,
+  paidAt: marketplaceOrders.paidAt,
+  cancelledAt: marketplaceOrders.cancelledAt,
+  cancellationReason: marketplaceOrders.cancellationReason,
   buyerName: marketplaceOrders.buyerName,
   buyerPhone: marketplaceOrders.buyerPhone,
   buyerEmail: marketplaceOrders.buyerEmail,
   createdAt: marketplaceOrders.createdAt,
+  updatedAt: marketplaceOrders.updatedAt,
 };
 
 type OrderRow = {
@@ -455,16 +510,25 @@ type OrderRow = {
   storePickupLocation: string | null;
   storeContactEmail: string | null;
   storeContactPhone: string | null;
+  storePaymentInstructions: string | null;
   subtotal: string;
   status: string;
   paymentStatus: string;
   fulfilmentMethod: string;
   deliveryAddress: string | null;
   buyerNote: string | null;
+  buyerStudentId: string;
+  paymentInstructions: string | null;
+  paymentReference: string | null;
+  paymentSubmittedAt: Date | null;
+  paidAt: Date | null;
+  cancelledAt: Date | null;
+  cancellationReason: string | null;
   buyerName: string;
   buyerPhone: string;
   buyerEmail: string | null;
   createdAt: Date;
+  updatedAt: Date;
 };
 
 function mapOrderItem(
@@ -485,22 +549,41 @@ function mapOrderItem(
 async function withItems(rows: OrderRow[]): Promise<BuyerOrderDetail[]> {
   if (rows.length === 0) return [];
 
-  const itemRows = await db
-    .select()
-    .from(marketplaceOrderItems)
-    .where(
-      inArray(
-        marketplaceOrderItems.orderId,
-        rows.map((row) => row.id)
-      )
-    )
-    .orderBy(asc(marketplaceOrderItems.createdAt));
+  const orderIds = rows.map((row) => row.id);
+  const [itemRows, eventRows] = await Promise.all([
+    db
+      .select()
+      .from(marketplaceOrderItems)
+      .where(inArray(marketplaceOrderItems.orderId, orderIds))
+      .orderBy(asc(marketplaceOrderItems.createdAt)),
+    db
+      .select()
+      .from(marketplaceOrderEvents)
+      .where(inArray(marketplaceOrderEvents.orderId, orderIds))
+      .orderBy(asc(marketplaceOrderEvents.createdAt)),
+  ]);
 
   const itemsByOrder = new Map<string, BuyerOrderItem[]>();
   for (const row of itemRows) {
     const items = itemsByOrder.get(row.orderId) ?? [];
     items.push(mapOrderItem(row));
     itemsByOrder.set(row.orderId, items);
+  }
+
+  const eventsByOrder = new Map<string, MarketplaceOrderEvent[]>();
+  for (const row of eventRows) {
+    const events = eventsByOrder.get(row.orderId) ?? [];
+    events.push({
+      id: row.id,
+      actorType: row.actorType,
+      actorName: row.actorName,
+      eventType: row.eventType,
+      status: row.status,
+      paymentStatus: row.paymentStatus,
+      note: row.note,
+      createdAt: row.createdAt.toISOString(),
+    });
+    eventsByOrder.set(row.orderId, events);
   }
 
   return rows.map((row) => {
@@ -515,18 +598,27 @@ async function withItems(rows: OrderRow[]): Promise<BuyerOrderDetail[]> {
       storePickupLocation: row.storePickupLocation,
       storeContactEmail: row.storeContactEmail,
       storeContactPhone: row.storeContactPhone,
+      storePaymentInstructions: row.storePaymentInstructions,
       subtotal: Number(row.subtotal),
       status: row.status,
       paymentStatus: row.paymentStatus,
       fulfilmentMethod: row.fulfilmentMethod,
       deliveryAddress: row.deliveryAddress,
       buyerNote: row.buyerNote,
+      paymentInstructions: row.paymentInstructions,
+      paymentReference: row.paymentReference,
+      paymentSubmittedAt: row.paymentSubmittedAt?.toISOString() ?? null,
+      paidAt: row.paidAt?.toISOString() ?? null,
+      cancelledAt: row.cancelledAt?.toISOString() ?? null,
+      cancellationReason: row.cancellationReason,
       buyerName: row.buyerName,
       buyerPhone: row.buyerPhone,
       buyerEmail: row.buyerEmail,
       createdAt: row.createdAt.toISOString(),
+      updatedAt: row.updatedAt.toISOString(),
       itemCount: items.reduce((total, item) => total + item.quantity, 0),
       items,
+      events: eventsByOrder.get(row.id) ?? [],
     };
   });
 }
@@ -621,4 +713,301 @@ export async function getBuyerOrdersByGroup(
     .orderBy(asc(marketplaceOrders.createdAt));
 
   return withItems(rows);
+}
+
+// ---------------------------------------------------------------------------
+// Seller order management
+// ---------------------------------------------------------------------------
+
+export type OrderFilters = {
+  q?: string;
+  status?: string;
+  paymentStatus?: string;
+};
+
+function sellerOrderWhere(
+  storeId: string,
+  filters: OrderFilters
+): SQL | undefined {
+  const clauses: SQL[] = [eq(marketplaceOrders.storeId, storeId)];
+
+  if (filters.q) {
+    const term = `%${filters.q}%`;
+    const match = or(
+      ilike(marketplaceOrders.orderNumber, term),
+      ilike(marketplaceOrders.buyerName, term),
+      ilike(marketplaceOrders.buyerPhone, term)
+    );
+    if (match) clauses.push(match);
+  }
+  if (filters.status) {
+    clauses.push(
+      eq(
+        marketplaceOrders.status,
+        filters.status as MarketplaceOrderStatus
+      )
+    );
+  }
+  if (filters.paymentStatus) {
+    clauses.push(
+      eq(
+        marketplaceOrders.paymentStatus,
+        filters.paymentStatus as MarketplacePaymentStatus
+      )
+    );
+  }
+
+  return and(...clauses);
+}
+
+async function itemCounts(orderIds: string[]) {
+  if (orderIds.length === 0) return new Map<string, number>();
+  const rows = await db
+    .select({
+      orderId: marketplaceOrderItems.orderId,
+      count: sql<number>`sum(${marketplaceOrderItems.quantity})::int`,
+    })
+    .from(marketplaceOrderItems)
+    .where(inArray(marketplaceOrderItems.orderId, orderIds))
+    .groupBy(marketplaceOrderItems.orderId);
+  return new Map(rows.map((row) => [row.orderId, row.count]));
+}
+
+function sellerSummary(
+  row: OrderRow,
+  count: number
+): SellerOrderSummary {
+  return {
+    id: row.id,
+    orderNumber: row.orderNumber,
+    checkoutGroupId: row.checkoutGroupId,
+    storeId: row.storeId,
+    storeName: row.storeName,
+    storeSlug: row.storeSlug,
+    subtotal: Number(row.subtotal),
+    status: row.status,
+    paymentStatus: row.paymentStatus,
+    fulfilmentMethod: row.fulfilmentMethod,
+    createdAt: row.createdAt.toISOString(),
+    itemCount: count,
+    buyerName: row.buyerName,
+    buyerPhone: row.buyerPhone,
+    buyerEmail: row.buyerEmail,
+  };
+}
+
+export async function getSellerOrders(
+  storeId: string,
+  {
+    filters,
+    limit = 20,
+    offset = 0,
+  }: { filters: OrderFilters; limit?: number; offset?: number }
+): Promise<SellerOrderSummary[]> {
+  const rows = await db
+    .select(orderColumns)
+    .from(marketplaceOrders)
+    .innerJoin(
+      marketplaceStores,
+      eq(marketplaceOrders.storeId, marketplaceStores.id)
+    )
+    .where(sellerOrderWhere(storeId, filters))
+    .orderBy(desc(marketplaceOrders.createdAt))
+    .limit(limit)
+    .offset(offset);
+
+  const counts = await itemCounts(rows.map((row) => row.id));
+  return rows.map((row) => sellerSummary(row, counts.get(row.id) ?? 0));
+}
+
+export async function countSellerOrders(
+  storeId: string,
+  filters: OrderFilters
+) {
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(marketplaceOrders)
+    .where(sellerOrderWhere(storeId, filters));
+  return row?.count ?? 0;
+}
+
+export async function getSellerOrderByNumber(
+  storeId: string,
+  number: string
+): Promise<SellerOrderDetail | null> {
+  const [row] = await db
+    .select(orderColumns)
+    .from(marketplaceOrders)
+    .innerJoin(
+      marketplaceStores,
+      eq(marketplaceOrders.storeId, marketplaceStores.id)
+    )
+    .where(
+      and(
+        eq(marketplaceOrders.storeId, storeId),
+        eq(marketplaceOrders.orderNumber, number)
+      )
+    );
+
+  if (!row) return null;
+  const [order] = await withItems([row]);
+  if (!order) return null;
+
+  const [buyer] = await db
+    .select({ indexNumber: students.indexNumber })
+    .from(students)
+    .where(eq(students.id, row.buyerStudentId));
+
+  return {
+    ...order,
+    buyerIndexNumber: buyer?.indexNumber ?? null,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Admin order oversight
+// ---------------------------------------------------------------------------
+
+const adminOrderColumns = {
+  ...orderColumns,
+  sellerName: sql<string>`${students.firstName} || ' ' || ${students.lastName}`,
+  sellerIndexNumber: students.indexNumber,
+  storeStatus: marketplaceStores.status,
+};
+
+type AdminOrderRow = OrderRow & {
+  sellerName: string;
+  sellerIndexNumber: string;
+  storeStatus: string;
+};
+
+function adminOrderWhere(filters: OrderFilters): SQL | undefined {
+  const clauses: SQL[] = [];
+
+  if (filters.q) {
+    const term = `%${filters.q}%`;
+    const match = or(
+      ilike(marketplaceOrders.orderNumber, term),
+      ilike(marketplaceOrders.buyerName, term),
+      ilike(marketplaceStores.name, term),
+      ilike(students.firstName, term),
+      ilike(students.lastName, term),
+      ilike(students.indexNumber, term)
+    );
+    if (match) clauses.push(match);
+  }
+  if (filters.status) {
+    clauses.push(
+      eq(
+        marketplaceOrders.status,
+        filters.status as MarketplaceOrderStatus
+      )
+    );
+  }
+  if (filters.paymentStatus) {
+    clauses.push(
+      eq(
+        marketplaceOrders.paymentStatus,
+        filters.paymentStatus as MarketplacePaymentStatus
+      )
+    );
+  }
+
+  return clauses.length > 0 ? and(...clauses) : undefined;
+}
+
+function adminSummary(
+  row: AdminOrderRow,
+  count: number
+): AdminOrderSummary {
+  return {
+    id: row.id,
+    orderNumber: row.orderNumber,
+    checkoutGroupId: row.checkoutGroupId,
+    storeId: row.storeId,
+    storeName: row.storeName,
+    storeSlug: row.storeSlug,
+    subtotal: Number(row.subtotal),
+    status: row.status,
+    paymentStatus: row.paymentStatus,
+    fulfilmentMethod: row.fulfilmentMethod,
+    createdAt: row.createdAt.toISOString(),
+    itemCount: count,
+    buyerName: row.buyerName,
+    buyerPhone: row.buyerPhone,
+    buyerEmail: row.buyerEmail,
+    sellerName: row.sellerName,
+    sellerIndexNumber: row.sellerIndexNumber,
+    storeStatus: row.storeStatus,
+  };
+}
+
+export async function getAdminOrders({
+  filters,
+  limit = 20,
+  offset = 0,
+}: {
+  filters: OrderFilters;
+  limit?: number;
+  offset?: number;
+}): Promise<AdminOrderSummary[]> {
+  const rows = await db
+    .select(adminOrderColumns)
+    .from(marketplaceOrders)
+    .innerJoin(
+      marketplaceStores,
+      eq(marketplaceOrders.storeId, marketplaceStores.id)
+    )
+    .innerJoin(students, eq(marketplaceStores.studentId, students.id))
+    .where(adminOrderWhere(filters))
+    .orderBy(desc(marketplaceOrders.createdAt))
+    .limit(limit)
+    .offset(offset);
+
+  const counts = await itemCounts(rows.map((row) => row.id));
+  return rows.map((row) => adminSummary(row, counts.get(row.id) ?? 0));
+}
+
+export async function countAdminOrders(filters: OrderFilters) {
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(marketplaceOrders)
+    .innerJoin(
+      marketplaceStores,
+      eq(marketplaceOrders.storeId, marketplaceStores.id)
+    )
+    .innerJoin(students, eq(marketplaceStores.studentId, students.id))
+    .where(adminOrderWhere(filters));
+  return row?.count ?? 0;
+}
+
+export async function getAdminOrderByNumber(
+  number: string
+): Promise<AdminOrderDetail | null> {
+  const [row] = await db
+    .select(adminOrderColumns)
+    .from(marketplaceOrders)
+    .innerJoin(
+      marketplaceStores,
+      eq(marketplaceOrders.storeId, marketplaceStores.id)
+    )
+    .innerJoin(students, eq(marketplaceStores.studentId, students.id))
+    .where(eq(marketplaceOrders.orderNumber, number));
+
+  if (!row) return null;
+  const [order] = await withItems([row]);
+  if (!order) return null;
+
+  const [buyer] = await db
+    .select({ indexNumber: students.indexNumber })
+    .from(students)
+    .where(eq(students.id, row.buyerStudentId));
+
+  return {
+    ...order,
+    buyerIndexNumber: buyer?.indexNumber ?? null,
+    sellerName: row.sellerName,
+    sellerIndexNumber: row.sellerIndexNumber,
+    storeStatus: row.storeStatus,
+  };
 }

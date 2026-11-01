@@ -17,17 +17,34 @@ import {
 } from "@/lib/marketplace";
 import { formatCurrency } from "@/lib/permits";
 import { OrderStatusBadge, PaymentStatusBadge } from "./OrderStatusBadges";
+import { OrderTimeline } from "./OrderTimeline";
 
 export function BuyerOrderDetail({
   order,
   backHref,
+  backLabel = "My orders",
   basePath,
+  buyerIndexNumber,
+  asideExtra,
+  paymentActions,
+  complaintAction,
+  sellerMeta,
+  showStoreHelp = true,
 }: {
   order: BuyerOrderDetailType;
   backHref: string;
+  backLabel?: string;
   basePath: string;
+  buyerIndexNumber?: string | null;
+  asideExtra?: React.ReactNode;
+  paymentActions?: React.ReactNode;
+  complaintAction?: React.ReactNode;
+  sellerMeta?: React.ReactNode;
+  showStoreHelp?: boolean;
 }) {
   const storeHref = `${basePath}/store/${order.storeSlug}`;
+  const instructions =
+    order.paymentInstructions ?? order.storePaymentInstructions;
 
   return (
     <div>
@@ -36,7 +53,7 @@ export function BuyerOrderDetail({
         className="mb-5 inline-flex items-center gap-1.5 text-sm font-semibold text-neutral-500 transition-colors hover:text-ink dark:text-neutral-400 dark:hover:text-neutral-100"
       >
         <ArrowLeft className="h-4 w-4" />
-        My orders
+        {backLabel}
       </Link>
 
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
@@ -57,6 +74,22 @@ export function BuyerOrderDetail({
           <PaymentStatusBadge paymentStatus={order.paymentStatus} />
         </div>
       </div>
+
+      {order.status === "cancelled" && (
+        <div className="mb-6 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 ring-1 ring-red-200 dark:bg-red-950/30 dark:text-red-400 dark:ring-red-900">
+          <p className="font-semibold">This order was cancelled.</p>
+          {order.cancellationReason && (
+            <p className="mt-1">{order.cancellationReason}</p>
+          )}
+          {order.cancelledAt && (
+            <p className="mt-1 text-xs">
+              {formatMarketplaceDateTime(order.cancelledAt)}
+            </p>
+          )}
+        </div>
+      )}
+
+      {sellerMeta}
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-5">
@@ -141,10 +174,15 @@ export function BuyerOrderDetail({
               </div>
               <div>
                 <dt className="text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:text-neutral-500">
-                  Contact
+                  {showStoreHelp ? "Contact" : "Buyer"}
                 </dt>
                 <dd className="mt-1 font-medium text-ink dark:text-neutral-100">
                   {order.buyerName}
+                  {buyerIndexNumber && (
+                    <span className="block text-xs text-neutral-500 dark:text-neutral-400">
+                      {buyerIndexNumber}
+                    </span>
+                  )}
                   <span className="block text-xs text-neutral-500 dark:text-neutral-400">
                     {order.buyerPhone}
                     {order.buyerEmail ? ` · ${order.buyerEmail}` : ""}
@@ -177,7 +215,7 @@ export function BuyerOrderDetail({
               {order.buyerNote && (
                 <div className="sm:col-span-2">
                   <dt className="text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:text-neutral-500">
-                    Your note
+                    {showStoreHelp ? "Buyer note" : "Your note"}
                   </dt>
                   <dd className="mt-1 whitespace-pre-line text-neutral-600 dark:text-neutral-300">
                     {order.buyerNote}
@@ -186,9 +224,20 @@ export function BuyerOrderDetail({
               )}
             </dl>
           </section>
+
+          <section className="rounded-2xl bg-white p-5 ring-1 ring-black/5 dark:bg-neutral-900 dark:ring-white/10">
+            <h2 className="text-base font-extrabold text-ink dark:text-neutral-100">
+              Order activity
+            </h2>
+            <div className="mt-4">
+              <OrderTimeline events={order.events} />
+            </div>
+          </section>
         </div>
 
         <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
+          {asideExtra}
+
           <section className="rounded-2xl bg-white p-5 ring-1 ring-black/5 dark:bg-neutral-900 dark:ring-white/10">
             <div className="flex items-center gap-2">
               <CreditCard className="h-5 w-5 text-gold-dark dark:text-gold-light" />
@@ -199,48 +248,99 @@ export function BuyerOrderDetail({
             <div className="mt-3">
               <PaymentStatusBadge paymentStatus={order.paymentStatus} />
             </div>
-            <p className="mt-3 text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">
-              Payment is arranged directly with {order.storeName}. The seller
-              will contact you with their payment instructions and confirm when
-              payment is received.
-            </p>
-          </section>
 
-          <section className="rounded-2xl bg-white p-5 ring-1 ring-black/5 dark:bg-neutral-900 dark:ring-white/10">
-            <h2 className="text-base font-extrabold text-ink dark:text-neutral-100">
-              Need help?
-            </h2>
-            <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
-              Contact the store about this order. Keep your order number handy.
-            </p>
-            <div className="mt-3 space-y-2 text-sm">
-              {order.storeContactEmail && (
-                <a
-                  href={`mailto:${order.storeContactEmail}?subject=${encodeURIComponent(
-                    `Order ${order.orderNumber}`
-                  )}`}
-                  className="flex items-center gap-2 text-gold-dark hover:underline dark:text-gold-light"
-                >
-                  <Mail className="h-4 w-4" />
-                  {order.storeContactEmail}
-                </a>
-              )}
-              {order.storeContactPhone && (
-                <a
-                  href={`tel:${order.storeContactPhone}`}
-                  className="flex items-center gap-2 text-gold-dark hover:underline dark:text-gold-light"
-                >
-                  <Phone className="h-4 w-4" />
-                  {order.storeContactPhone}
-                </a>
-              )}
-              {!order.storeContactEmail && !order.storeContactPhone && (
-                <p className="text-neutral-500 dark:text-neutral-400">
-                  The seller will contact you using the details you provided.
+            <div className="mt-4 rounded-xl bg-neutral-50 p-3 text-sm text-neutral-600 ring-1 ring-black/5 dark:bg-neutral-800/60 dark:text-neutral-300 dark:ring-white/10">
+              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:text-neutral-500">
+                Payment instructions
+              </p>
+              {instructions ? (
+                <p className="mt-1.5 whitespace-pre-line leading-relaxed">
+                  {instructions}
+                </p>
+              ) : (
+                <p className="mt-1.5 leading-relaxed">
+                  The seller has not added payment instructions yet. Contact
+                  them using the details below.
                 </p>
               )}
             </div>
+
+            {order.paymentReference && (
+              <div className="mt-3 text-sm text-neutral-600 dark:text-neutral-300">
+                <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:text-neutral-500">
+                  Payment reference
+                </p>
+                <p className="mt-0.5 font-medium">{order.paymentReference}</p>
+                {order.paymentSubmittedAt && (
+                  <p className="text-xs text-neutral-400 dark:text-neutral-500">
+                    Submitted{" "}
+                    {formatMarketplaceDateTime(order.paymentSubmittedAt)}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {order.paidAt && (
+              <p className="mt-3 text-xs font-semibold text-green-700 dark:text-green-400">
+                Payment confirmed{" "}
+                {formatMarketplaceDateTime(order.paidAt)}
+              </p>
+            )}
+
+            {paymentActions}
           </section>
+
+          {complaintAction && (
+            <section className="rounded-2xl bg-white p-5 ring-1 ring-black/5 dark:bg-neutral-900 dark:ring-white/10">
+              <h2 className="text-base font-extrabold text-ink dark:text-neutral-100">
+                Having an issue?
+              </h2>
+              <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+                File a complaint and the SRC will review it alongside the
+                store.
+              </p>
+              <div className="mt-3">{complaintAction}</div>
+            </section>
+          )}
+
+          {showStoreHelp && (
+            <section className="rounded-2xl bg-white p-5 ring-1 ring-black/5 dark:bg-neutral-900 dark:ring-white/10">
+              <h2 className="text-base font-extrabold text-ink dark:text-neutral-100">
+                Need help?
+              </h2>
+              <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+                Contact the store about this order. Keep your order number
+                handy.
+              </p>
+              <div className="mt-3 space-y-2 text-sm">
+                {order.storeContactEmail && (
+                  <a
+                    href={`mailto:${order.storeContactEmail}?subject=${encodeURIComponent(
+                      `Order ${order.orderNumber}`
+                    )}`}
+                    className="flex items-center gap-2 text-gold-dark hover:underline dark:text-gold-light"
+                  >
+                    <Mail className="h-4 w-4" />
+                    {order.storeContactEmail}
+                  </a>
+                )}
+                {order.storeContactPhone && (
+                  <a
+                    href={`tel:${order.storeContactPhone}`}
+                    className="flex items-center gap-2 text-gold-dark hover:underline dark:text-gold-light"
+                  >
+                    <Phone className="h-4 w-4" />
+                    {order.storeContactPhone}
+                  </a>
+                )}
+                {!order.storeContactEmail && !order.storeContactPhone && (
+                  <p className="text-neutral-500 dark:text-neutral-400">
+                    The seller will contact you using the details you provided.
+                  </p>
+                )}
+              </div>
+            </section>
+          )}
         </aside>
       </div>
     </div>

@@ -70,6 +70,7 @@ export async function POST(request: Request) {
     fulfilmentMethods: data.fulfilmentMethods,
     operatingHours: clean(data.operatingHours),
     pickupLocation: clean(data.pickupLocation),
+    paymentInstructions: clean(data.paymentInstructions),
   });
 
   return NextResponse.json({ store }, { status: 201 });
@@ -113,6 +114,7 @@ export async function PATCH(request: Request) {
     fulfilmentMethods: data.fulfilmentMethods,
     operatingHours: clean(data.operatingHours),
     pickupLocation: clean(data.pickupLocation),
+    paymentInstructions: clean(data.paymentInstructions),
   });
 
   return NextResponse.json({ store });

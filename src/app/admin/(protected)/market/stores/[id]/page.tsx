@@ -128,6 +128,16 @@ export default async function StoreDetailPage({
                 {store.description || "No description provided."}
               </p>
             </div>
+
+            <div className="mt-5">
+              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:text-neutral-500">
+                Manual payment instructions
+              </p>
+              <p className="mt-1 whitespace-pre-line text-sm text-neutral-700 dark:text-neutral-300">
+                {store.paymentInstructions ||
+                  "No payment instructions provided."}
+              </p>
+            </div>
           </section>
         </div>
 

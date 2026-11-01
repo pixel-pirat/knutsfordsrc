@@ -7,15 +7,10 @@ import { UserAvatar } from "@/components/UserAvatar";
 import { HubIcon } from "@/components/icons";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { CartLink } from "@/components/market/CartLink";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import type { PublicStudent } from "@/lib/types";
 
-export function Topbar({
-  student,
-  onMenuClick,
-}: {
-  student: PublicStudent;
-  onMenuClick: () => void;
-}) {
+export function Topbar({ student }: { student: PublicStudent }) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -38,16 +33,7 @@ export function Topbar({
 
   return (
     <header className="flex h-16 items-center gap-3 border-b border-black/5 dark:border-white/10 bg-white dark:bg-neutral-900 px-4 sm:px-6">
-      <button
-        type="button"
-        onClick={onMenuClick}
-        aria-label="Toggle sidebar"
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-neutral-600 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/10 lg:hidden"
-      >
-        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
-          <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
-        </svg>
-      </button>
+      <SidebarTrigger className="-ml-1 shrink-0 text-neutral-600 dark:text-neutral-300 hover:bg-black/5 dark:hover:bg-white/10" />
 
       <div className="hidden flex-1 items-center gap-2 rounded-md bg-neutral-100 dark:bg-neutral-800 px-3.5 py-2 text-sm text-neutral-400 dark:text-neutral-500 sm:flex sm:max-w-sm">
         <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8">

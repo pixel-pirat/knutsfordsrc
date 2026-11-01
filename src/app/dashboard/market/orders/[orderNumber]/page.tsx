@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import { BuyerOrderDetail } from "@/components/market/BuyerOrderDetail";
+import { BuyerPaymentActions } from "@/components/market/BuyerPaymentActions";
+import { FileComplaintForm } from "@/components/market/FileComplaintForm";
 import { getBuyerOrderByNumber } from "@/db/orderQueries";
 import { getCurrentStudent } from "@/db/queries";
 
@@ -22,6 +24,14 @@ export default async function DashboardOrderDetailPage({
       order={order}
       backHref="/dashboard/market/orders"
       basePath="/dashboard/market"
+      paymentActions={
+        <BuyerPaymentActions
+          orderNumber={order.orderNumber}
+          paymentStatus={order.paymentStatus}
+          reference={order.paymentReference}
+        />
+      }
+      complaintAction={<FileComplaintForm orderNumber={order.orderNumber} />}
     />
   );
 }

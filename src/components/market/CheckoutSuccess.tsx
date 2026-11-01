@@ -86,6 +86,17 @@ export function CheckoutSuccess({
               )}
             </div>
 
+            {(order.paymentInstructions || order.storePaymentInstructions) && (
+              <div className="mt-4 rounded-xl bg-neutral-50 px-3 py-2.5 text-sm text-neutral-600 ring-1 ring-black/5 dark:bg-neutral-800/60 dark:text-neutral-300 dark:ring-white/10">
+                <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:text-neutral-500">
+                  Payment instructions
+                </p>
+                <p className="mt-1 whitespace-pre-line">
+                  {order.paymentInstructions ?? order.storePaymentInstructions}
+                </p>
+              </div>
+            )}
+
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-black/5 pt-4 dark:border-white/10">
               <Link
                 href={`/market/orders/${order.orderNumber}`}

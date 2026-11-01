@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ClipboardList, ShoppingBag } from "lucide-react";
+import { ClipboardList, Flag, ShoppingBag } from "lucide-react";
 import { MarketplaceCatalog } from "@/components/market/MarketplaceCatalog";
 import type { MarketplaceSearchParams } from "@/components/market/MarketplaceCatalog";
 import { CartLink } from "@/components/market/CartLink";
@@ -38,6 +38,13 @@ export default async function DashboardMarketPage({
           >
             <ShoppingBag className="h-4 w-4" />
             Stores
+          </Link>
+          <Link
+            href="/dashboard/market/complaints"
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-black/10 px-3 text-sm font-semibold text-neutral-600 transition-colors hover:bg-black/[0.03] dark:border-white/10 dark:text-neutral-300 dark:hover:bg-white/[0.05]"
+          >
+            <Flag className="h-4 w-4" />
+            Complaints
           </Link>
           <CartLink className="border border-black/10 dark:border-white/10" />
         </div>

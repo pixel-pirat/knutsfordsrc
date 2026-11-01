@@ -4,6 +4,7 @@ import {
   createMarketplaceOrders,
   MarketplaceCheckoutError,
 } from "@/db/orderQueries";
+import { notifyNewMarketplaceOrder } from "@/lib/orderNotifications";
 import { marketplaceCheckoutSchema } from "@/lib/validation";
 
 export async function POST(request: Request) {
@@ -38,6 +39,13 @@ export async function POST(request: Request) {
         note: store.note || null,
       })),
     });
+
+    const origin = new URL(request.url).origin;
+    await Promise.all(
+      checkout.orders.map((order) =>
+        notifyNewMarketplaceOrder(order.id, origin)
+      )
+    );
 
     return NextResponse.json(checkout, { status: 201 });
   } catch (error) {

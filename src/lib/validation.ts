@@ -396,6 +396,12 @@ export const marketplaceStoreSchema = z.object({
     .min(1, "Select at least one fulfilment method"),
   operatingHours: z.string().trim().max(200).optional().or(z.literal("")),
   pickupLocation: z.string().trim().max(200).optional().or(z.literal("")),
+  paymentInstructions: z
+    .string()
+    .trim()
+    .max(2000)
+    .optional()
+    .or(z.literal("")),
 });
 
 export const marketplaceDecisionSchema = z.object({
@@ -507,4 +513,86 @@ export const marketplaceCheckoutSchema = z.object({
       })
     )
     .min(1, "Choose a fulfilment method for every store"),
+});
+
+export const marketplaceOrderActionSchema = z.discriminatedUnion("action", [
+  z.object({
+    action: z.literal("status"),
+    status: z.enum([
+      "confirmed",
+      "preparing",
+      "ready",
+      "fulfilled",
+      "cancelled",
+    ]),
+    note: z.string().trim().max(500).optional().or(z.literal("")),
+  }),
+  z.object({
+    action: z.literal("payment"),
+    paymentStatus: z.enum([
+      "unpaid",
+      "pending_confirmation",
+      "paid",
+      "refunded",
+    ]),
+    reference: z.string().trim().max(120).optional().or(z.literal("")),
+    note: z.string().trim().max(500).optional().or(z.literal("")),
+  }),
+]);
+
+export const buyerPaymentSubmissionSchema = z.object({
+  reference: z
+    .string()
+    .trim()
+    .min(2, "Enter the payment reference or transaction ID")
+    .max(120),
+  note: z.string().trim().max(500).optional().or(z.literal("")),
+});
+
+export const marketplaceComplaintFileSchema = z.object({
+  category: z.enum([
+    "product_not_delivered",
+    "misleading_listing",
+    "unavailable_product",
+    "payment_dispute",
+    "poor_service",
+    "seller_misconduct",
+    "refund_issue",
+  ]),
+  subject: z.string().trim().min(3, "Give your complaint a short title").max(150),
+  description: z
+    .string()
+    .trim()
+    .min(10, "Describe what happened in a bit more detail")
+    .max(2000),
+  evidence: z.string().trim().max(1000).optional().or(z.literal("")),
+});
+
+export const marketplaceComplaintActionSchema = z.discriminatedUnion(
+  "action",
+  [
+    z.object({
+      action: z.literal("status"),
+      status: z.enum([
+        "awaiting_seller_response",
+        "under_investigation",
+        "resolved",
+        "rejected",
+        "escalated",
+      ]),
+      note: z.string().trim().max(1000).optional().or(z.literal("")),
+    }),
+    z.object({
+      action: z.literal("assign"),
+      assign: z.boolean(),
+    }),
+    z.object({
+      action: z.literal("note"),
+      note: z.string().trim().min(1, "Note cannot be empty").max(1000),
+    }),
+  ]
+);
+
+export const marketplaceComplaintSellerResponseSchema = z.object({
+  note: z.string().trim().min(1, "Enter a response").max(1000),
 });

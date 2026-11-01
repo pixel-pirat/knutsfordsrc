@@ -110,6 +110,111 @@ export const PAYMENT_STATUS_STYLES: Record<string, string> = {
   refunded: "border-neutral-200 bg-neutral-100 text-neutral-600",
 };
 
+export const ORDER_EVENT_LABELS: Record<string, string> = {
+  placed: "Order placed",
+  status_changed: "Order status updated",
+  payment_submitted: "Payment marked as sent",
+  payment_confirmed: "Payment confirmed",
+  payment_reverted: "Payment confirmation removed",
+  payment_refunded: "Payment refunded",
+  note: "Note added",
+};
+
+export const COMPLAINT_CATEGORY_LABELS: Record<string, string> = {
+  product_not_delivered: "Product not delivered",
+  misleading_listing: "Misleading listing",
+  unavailable_product: "Unavailable product",
+  payment_dispute: "Payment dispute",
+  poor_service: "Poor service",
+  seller_misconduct: "Seller misconduct",
+  refund_issue: "Refund issue",
+};
+
+export const COMPLAINT_STATUS_LABELS: Record<string, string> = {
+  open: "Open",
+  awaiting_seller_response: "Awaiting seller response",
+  under_investigation: "Under investigation",
+  resolved: "Resolved",
+  rejected: "Rejected",
+  escalated: "Escalated",
+};
+
+export const COMPLAINT_STATUS_STYLES: Record<string, string> = {
+  open: "border-amber-200 bg-amber-50 text-amber-700",
+  awaiting_seller_response: "border-blue-200 bg-blue-50 text-blue-700",
+  under_investigation: "border-indigo-200 bg-indigo-50 text-indigo-700",
+  resolved: "border-green-200 bg-green-50 text-green-700",
+  rejected: "border-neutral-200 bg-neutral-100 text-neutral-500",
+  escalated: "border-red-200 bg-red-50 text-red-700",
+};
+
+export const COMPLAINT_EVENT_LABELS: Record<string, string> = {
+  filed: "Complaint filed",
+  status_changed: "Status updated",
+  assigned: "Assigned to an administrator",
+  unassigned: "Unassigned",
+  seller_response: "Seller responded",
+  note: "Note added",
+  resolved: "Complaint resolved",
+  rejected: "Complaint rejected",
+};
+
+export type MarketplaceComplaintEvent = {
+  id: string;
+  actorType: string;
+  actorName: string;
+  eventType: string;
+  status: string | null;
+  note: string | null;
+  createdAt: string;
+};
+
+export type BuyerComplaintSummary = {
+  id: string;
+  referenceNumber: string;
+  orderId: string;
+  orderNumber: string;
+  storeId: string;
+  storeName: string;
+  category: string;
+  subject: string;
+  status: string;
+  createdAt: string;
+};
+
+export type BuyerComplaintDetail = BuyerComplaintSummary & {
+  description: string;
+  evidence: string | null;
+  complainantName: string;
+  complainantPhone: string;
+  complainantEmail: string | null;
+  resolutionNotes: string | null;
+  resolvedAt: string | null;
+  updatedAt: string;
+  events: MarketplaceComplaintEvent[];
+};
+
+export type SellerComplaintSummary = BuyerComplaintSummary & {
+  complainantName: string;
+};
+
+export type SellerComplaintDetail = BuyerComplaintDetail;
+
+export type AdminComplaintSummary = BuyerComplaintSummary & {
+  complainantName: string;
+  sellerName: string;
+  sellerIndexNumber: string;
+  assignedAdminId: string | null;
+  assignedAdminName: string | null;
+};
+
+export type AdminComplaintDetail = BuyerComplaintDetail & {
+  sellerName: string;
+  sellerIndexNumber: string;
+  assignedAdminId: string | null;
+  assignedAdminName: string | null;
+};
+
 export type MarketplaceListingType = "product" | "service";
 
 export type PublicStoreInfo = {
@@ -183,16 +288,58 @@ export type BuyerOrderSummary = {
   itemCount: number;
 };
 
+export type MarketplaceOrderEvent = {
+  id: string;
+  actorType: string;
+  actorName: string;
+  eventType: string;
+  status: string | null;
+  paymentStatus: string | null;
+  note: string | null;
+  createdAt: string;
+};
+
 export type BuyerOrderDetail = BuyerOrderSummary & {
   storePickupLocation: string | null;
   storeContactEmail: string | null;
   storeContactPhone: string | null;
+  storePaymentInstructions: string | null;
   buyerName: string;
   buyerPhone: string;
   buyerEmail: string | null;
   deliveryAddress: string | null;
   buyerNote: string | null;
+  paymentInstructions: string | null;
+  paymentReference: string | null;
+  paymentSubmittedAt: string | null;
+  paidAt: string | null;
+  cancelledAt: string | null;
+  cancellationReason: string | null;
+  updatedAt: string;
   items: BuyerOrderItem[];
+  events: MarketplaceOrderEvent[];
+};
+
+export type SellerOrderSummary = BuyerOrderSummary & {
+  buyerName: string;
+  buyerPhone: string;
+  buyerEmail: string | null;
+};
+
+export type SellerOrderDetail = BuyerOrderDetail & {
+  buyerIndexNumber: string | null;
+};
+
+export type AdminOrderSummary = SellerOrderSummary & {
+  sellerName: string;
+  sellerIndexNumber: string;
+  storeStatus: string;
+};
+
+export type AdminOrderDetail = SellerOrderDetail & {
+  sellerName: string;
+  sellerIndexNumber: string;
+  storeStatus: string;
 };
 
 export function formatMarketplaceDate(date: Date | string) {

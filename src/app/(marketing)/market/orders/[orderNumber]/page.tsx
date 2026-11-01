@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { BuyerOrderDetail } from "@/components/market/BuyerOrderDetail";
+import { BuyerPaymentActions } from "@/components/market/BuyerPaymentActions";
 import { getBuyerOrderByNumber } from "@/db/orderQueries";
 import { getCurrentStudent } from "@/db/queries";
 
@@ -34,6 +35,13 @@ export default async function MarketplaceOrderPage({
           order={order}
           backHref="/dashboard/market/orders"
           basePath="/market"
+          paymentActions={
+            <BuyerPaymentActions
+              orderNumber={order.orderNumber}
+              paymentStatus={order.paymentStatus}
+              reference={order.paymentReference}
+            />
+          }
         />
       </div>
     </section>

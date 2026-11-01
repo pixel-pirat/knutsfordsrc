@@ -50,6 +50,7 @@ export function StoreForm({
           : ["campus_pickup"],
     operatingHours: store?.operatingHours ?? "",
     pickupLocation: store?.pickupLocation ?? "",
+    paymentInstructions: store?.paymentInstructions ?? "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -81,6 +82,7 @@ export function StoreForm({
           contactPhone: form.contactPhone || undefined,
           operatingHours: form.operatingHours || undefined,
           pickupLocation: form.pickupLocation || undefined,
+          paymentInstructions: form.paymentInstructions || undefined,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -242,6 +244,25 @@ export function StoreForm({
               maxLength={200}
             />
           </div>
+        </div>
+
+        <div>
+          <Label htmlFor="shop-payment">Manual payment instructions</Label>
+          <Textarea
+            id="shop-payment"
+            className="mt-1.5"
+            rows={4}
+            maxLength={2000}
+            value={form.paymentInstructions}
+            onChange={(e) =>
+              setForm({ ...form, paymentInstructions: e.target.value })
+            }
+            placeholder="e.g. Send Mobile Money to 024 000 0000 (name: Ama Mensah) and submit the transaction ID with your order. Payment can also be made on pickup."
+          />
+          <p className="mt-1.5 text-xs text-neutral-500 dark:text-neutral-400">
+            Shown to buyers after checkout. New orders keep a copy of these
+            instructions, so changing them will not alter past orders.
+          </p>
         </div>
 
         {error && (

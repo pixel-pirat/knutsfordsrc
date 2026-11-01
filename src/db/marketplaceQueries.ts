@@ -182,6 +182,7 @@ export function createStore(
     fulfilmentMethods: string[];
     operatingHours?: string | null;
     pickupLocation?: string | null;
+    paymentInstructions?: string | null;
   }
 ) {
   return db
@@ -205,6 +206,7 @@ export function updateStore(
       | "fulfilmentMethods"
       | "operatingHours"
       | "pickupLocation"
+      | "paymentInstructions"
     >
   >
 ) {
