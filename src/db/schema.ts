@@ -886,6 +886,36 @@ export const sportAnnouncements = pgTable("sport_announcements", {
   sentAt: timestamp("sent_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+// ---------------------------------------------------------------------------
+// Games
+// ---------------------------------------------------------------------------
+
+export const gameKeyEnum = pgEnum("game_key", [
+  "draughts",
+  "breakout",
+  "snake",
+  "2048",
+]);
+
+export const gameScores = pgTable(
+  "game_scores",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    studentId: uuid("student_id")
+      .notNull()
+      .references(() => students.id, { onDelete: "cascade" }),
+    game: gameKeyEnum("game").notNull(),
+    score: integer("score").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("game_scores_student_idx").on(t.studentId),
+    index("game_scores_game_score_idx").on(t.game, t.score),
+  ]
+);
+
 export const adminUsersRelations = relations(adminUsers, ({ many }) => ({
   studentsCreated: many(students),
   permitsIssued: many(permits),
@@ -1170,3 +1200,5 @@ export type SportMatch = typeof sportMatches.$inferSelect;
 export type NewSportMatch = typeof sportMatches.$inferInsert;
 export type SportAnnouncement = typeof sportAnnouncements.$inferSelect;
 export type NewSportAnnouncement = typeof sportAnnouncements.$inferInsert;
+export type GameScore = typeof gameScores.$inferSelect;
+export type NewGameScore = typeof gameScores.$inferInsert;

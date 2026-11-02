@@ -7,7 +7,7 @@ export const navLinks: NavLink[] = [
   { label: "News", href: "/news" },
   { label: "Sports", href: "/sports" },
   { label: "Gallery", href: "/gallery" },
-  { label: "Games", href: "/games", badge: "Soon" },
+  { label: "Games", href: "/games" },
 ];
 
 export const breakingNews = [
@@ -249,29 +249,6 @@ export const aboutValues = [
     title: "Opportunity",
     description:
       "A growing network of employer partners feeding directly into our Jobs & Internships hub.",
-    icon: "vote",
-  },
-];
-
-export const gameModes = [
-  {
-    title: "Trivia Nights",
-    description: "Weekly live trivia battles between halls and faculties.",
-    icon: "trophy",
-  },
-  {
-    title: "Esports Tournaments",
-    description: "Campus-wide brackets in FIFA, Call of Duty and more.",
-    icon: "gamepad",
-  },
-  {
-    title: "Campus Leaderboard",
-    description: "Track your wins and climb the all-student rankings.",
-    icon: "dashboard",
-  },
-  {
-    title: "SRC Quiz Battles",
-    description: "Faculty-versus-faculty knockouts with real prizes.",
     icon: "vote",
   },
 ];

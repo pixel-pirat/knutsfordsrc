@@ -596,3 +596,8 @@ export const marketplaceComplaintActionSchema = z.discriminatedUnion(
 export const marketplaceComplaintSellerResponseSchema = z.object({
   note: z.string().trim().min(1, "Enter a response").max(1000),
 });
+
+export const gameScoreSubmissionSchema = z.object({
+  game: z.enum(["draughts", "breakout", "snake", "2048"]),
+  score: z.number().int().min(0).max(999_999),
+});
