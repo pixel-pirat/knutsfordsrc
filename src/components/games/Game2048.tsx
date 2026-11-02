@@ -8,6 +8,7 @@ import {
   hasMovesLeft,
   hasReached2048,
   move,
+  spawnRandomTile,
   type Direction,
   type Grid,
 } from "@/lib/games/game2048";
@@ -47,8 +48,9 @@ export function Game2048({ personalBest }: { personalBest: number }) {
           setBest((b) => Math.max(b, next));
           return next;
         });
-        if (!won && hasReached2048(result.grid)) setWon(true);
-        return result.grid;
+        const next = spawnRandomTile(result.grid);
+        if (!won && hasReached2048(next)) setWon(true);
+        return next;
       });
     },
     [gameOver, won]
