@@ -895,6 +895,8 @@ export const gameKeyEnum = pgEnum("game_key", [
   "breakout",
   "snake",
   "2048",
+  "typing",
+  "piano",
 ]);
 
 export const gameScores = pgTable(

@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { WeeklyLeaderboardCard } from "@/components/games/WeeklyLeaderboardCard";
+import { getWeeklyLeaderboard } from "@/db/gameQueries";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Games | Knutsford University",
   description:
-    "Take a break with retro arcade games on the Knutsford Student Digital Hub — draughts, breakout, snake and 2048, with a campus leaderboard.",
+    "Take a break with retro arcade games on the Knutsford Student Digital Hub — draughts, breakout, snake, 2048, typing speed and piano tiles — with a weekly campus leaderboard.",
 };
 
 const liveGames = [
@@ -13,9 +17,13 @@ const liveGames = [
   { title: "Breakout", description: "Paddle, ball, bricks — clear the board without losing all your lives.", emoji: "🧱" },
   { title: "Snake", description: "Grow as long as you can without hitting the walls or yourself.", emoji: "🐍" },
   { title: "2048", description: "Slide and merge tiles to reach 2048 and beyond.", emoji: "🔢" },
+  { title: "Typing Speed", description: "Race the clock and see how many words per minute you can hit.", emoji: "⌨️" },
+  { title: "Piano Tiles", description: "Tap the falling black tiles before they slip past — don't miss one.", emoji: "🎹" },
 ];
 
-export default function GamesPage() {
+export default async function GamesPage() {
+  const leaderboard = await getWeeklyLeaderboard(5);
+
   return (
     <>
       <section className="relative isolate overflow-hidden">
@@ -62,7 +70,7 @@ export default function GamesPage() {
             </h2>
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {liveGames.map((mode) => (
               <div
                 key={mode.title}
@@ -81,20 +89,8 @@ export default function GamesPage() {
             ))}
           </div>
 
-          <div className="mt-14 flex flex-col items-center gap-3 rounded-2xl bg-ink px-8 py-10 text-center">
-            <span className="rounded-full bg-gold/15 px-4 py-1.5 text-xs font-semibold tracking-wide text-gold-light">
-              CAMPUS LEADERBOARD
-            </span>
-            <p className="max-w-md text-lg font-semibold text-white">
-              Every score counts toward the campus leaderboard — log in and see
-              where you rank.
-            </p>
-            <Link
-              href="/login"
-              className="mt-2 text-sm font-semibold text-gold-light hover:underline"
-            >
-              Log in to play
-            </Link>
+          <div className="mt-14 mx-auto max-w-md">
+            <WeeklyLeaderboardCard rows={leaderboard} variant="inline" />
           </div>
         </div>
       </section>

@@ -30,6 +30,18 @@ const GAMES = [
     description: "Slide and merge tiles to reach 2048 and beyond.",
     emoji: "🔢",
   },
+  {
+    key: "typing" as const,
+    href: "/dashboard/games/typing",
+    description: "Type the passage as fast and accurately as you can.",
+    emoji: "⌨️",
+  },
+  {
+    key: "piano" as const,
+    href: "/dashboard/games/piano",
+    description: "Tap the falling black tiles before they slip past.",
+    emoji: "🎹",
+  },
 ];
 
 export default async function DashboardGamesPage() {
@@ -58,7 +70,7 @@ export default async function DashboardGamesPage() {
         </Link>
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {GAMES.map((game) => (
           <Link
             key={game.key}

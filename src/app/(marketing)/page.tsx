@@ -4,11 +4,15 @@ import { DigitalHub } from "@/components/DigitalHub";
 import { EventsMarket } from "@/components/EventsMarket";
 import { Gallery } from "@/components/Gallery";
 import { Footer } from "@/components/Footer";
+import { WeeklyLeaderboardCard } from "@/components/games/WeeklyLeaderboardCard";
+import { getWeeklyLeaderboard } from "@/db/gameQueries";
 
 // The ticker reads live announcements, so render this page per request.
 export const dynamic = "force-dynamic";
 
-export default function Home() {
+export default async function Home() {
+  const leaderboard = await getWeeklyLeaderboard(5);
+
   return (
     <>
       <Hero />
@@ -17,6 +21,7 @@ export default function Home() {
       <EventsMarket />
       <Gallery />
       <Footer />
+      <WeeklyLeaderboardCard rows={leaderboard} variant="floating" />
     </>
   );
 }

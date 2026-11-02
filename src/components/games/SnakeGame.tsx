@@ -1,14 +1,25 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { submitScore } from "./submitScore";
 
 const GRID = 20;
 const CELL = 20;
 const CANVAS_SIZE = GRID * CELL;
-const TICK_MS = 120;
+
+type Difficulty = "easy" | "medium" | "hard";
+const TICK_MS_BY_DIFFICULTY: Record<Difficulty, number> = { easy: 160, medium: 120, hard: 80 };
+const STORAGE_KEY = "knutsford-snake-difficulty";
+const DEFAULT_DIFFICULTY: Difficulty = "medium";
 
 type Point = { x: number; y: number };
 
@@ -31,6 +42,12 @@ function randomFood(snake: Point[]): Point {
   return food;
 }
 
+function loadDifficulty(): Difficulty {
+  if (typeof window === "undefined") return DEFAULT_DIFFICULTY;
+  const raw = window.localStorage.getItem(STORAGE_KEY);
+  return raw === "easy" || raw === "medium" || raw === "hard" ? raw : DEFAULT_DIFFICULTY;
+}
+
 const INITIAL_SNAKE: Point[] = [{ x: 10, y: 10 }];
 
 export function SnakeGame({ personalBest }: { personalBest: number }) {
@@ -45,6 +62,19 @@ export function SnakeGame({ personalBest }: { personalBest: number }) {
   const [running, setRunning] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const submittedRef = useRef(false);
+
+  const [difficulty, setDifficulty] = useState<Difficulty>(DEFAULT_DIFFICULTY);
+  const [draftDifficulty, setDraftDifficulty] = useState<Difficulty>(DEFAULT_DIFFICULTY);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    const loaded = loadDifficulty();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time hydration from localStorage, unavailable during SSR
+    setDifficulty(loaded);
+    setDraftDifficulty(loaded);
+    setHydrated(true);
+  }, []);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -98,9 +128,9 @@ export function SnakeGame({ personalBest }: { personalBest: number }) {
 
   useEffect(() => {
     if (!running) return;
-    const interval = setInterval(tick, TICK_MS);
+    const interval = setInterval(tick, TICK_MS_BY_DIFFICULTY[difficulty]);
     return () => clearInterval(interval);
-  }, [running, tick]);
+  }, [running, tick, difficulty]);
 
   const handleDirectionInput = useCallback(
     (next: Point) => {
@@ -143,6 +173,21 @@ export function SnakeGame({ personalBest }: { personalBest: number }) {
     setRunning(true);
   }
 
+  function saveSettings() {
+    setSettingsOpen(false);
+    setDifficulty(draftDifficulty);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, draftDifficulty);
+    } catch {
+      // ignore — setting just won't persist across sessions
+    }
+    setRunning(false);
+    setGameOver(false);
+    restart();
+  }
+
+  if (!hydrated) return null;
+
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="flex w-full max-w-sm items-center justify-between gap-3">
@@ -154,9 +199,21 @@ export function SnakeGame({ personalBest }: { personalBest: number }) {
           <p className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">Best</p>
           <p className="text-lg font-extrabold text-ink dark:text-neutral-100">{best}</p>
         </div>
-        <Button variant="outline" size="sm" onClick={restart}>
-          {gameOver ? "Play again" : "Restart"}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setDraftDifficulty(difficulty);
+              setSettingsOpen(true);
+            }}
+          >
+            <Settings className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" size="sm" onClick={restart}>
+            {gameOver ? "Play again" : "Restart"}
+          </Button>
+        </div>
       </div>
 
       <div className="relative">
@@ -201,8 +258,48 @@ export function SnakeGame({ personalBest }: { personalBest: number }) {
       </div>
 
       <p className="text-center text-xs text-neutral-400 dark:text-neutral-500">
-        Eat the red squares — don&apos;t hit the walls or yourself.
+        Eat the red squares — don&apos;t hit the walls or yourself. Difficulty: {difficulty}.
       </p>
+
+      <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Snake settings</DialogTitle>
+          </DialogHeader>
+
+          <div>
+            <p className="mb-1.5 text-sm font-semibold text-ink dark:text-neutral-100">
+              Difficulty
+            </p>
+            <div className="flex gap-2">
+              {(["easy", "medium", "hard"] as Difficulty[]).map((level) => (
+                <button
+                  key={level}
+                  type="button"
+                  onClick={() => setDraftDifficulty(level)}
+                  className={`flex-1 rounded-lg border px-3 py-2 text-sm font-semibold capitalize transition-colors ${
+                    draftDifficulty === level
+                      ? "border-gold bg-gold/15 text-gold-dark dark:text-gold-light"
+                      : "border-black/10 text-neutral-500 hover:bg-black/[0.03] dark:border-white/10 dark:text-neutral-400 dark:hover:bg-white/[0.05]"
+                  }`}
+                >
+                  {level}
+                </button>
+              ))}
+            </div>
+            <p className="mt-2 text-xs text-neutral-400 dark:text-neutral-500">
+              Changes how fast the snake moves. Starts a new game.
+            </p>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSettingsOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={saveSettings}>Save &amp; restart</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -598,6 +598,6 @@ export const marketplaceComplaintSellerResponseSchema = z.object({
 });
 
 export const gameScoreSubmissionSchema = z.object({
-  game: z.enum(["draughts", "breakout", "snake", "2048"]),
+  game: z.enum(["draughts", "breakout", "snake", "2048", "typing", "piano"]),
   score: z.number().int().min(0).max(999_999),
 });

@@ -1,15 +1,21 @@
-export const GRID_SIZE = 4;
 export type Grid = number[][];
 export type Direction = "up" | "down" | "left" | "right";
+export type Difficulty = "easy" | "medium" | "hard";
 
-export function createEmptyGrid(): Grid {
-  return Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(0));
+export const GRID_SIZE_BY_DIFFICULTY: Record<Difficulty, number> = {
+  easy: 5,
+  medium: 4,
+  hard: 3,
+};
+
+export function createEmptyGrid(size: number): Grid {
+  return Array.from({ length: size }, () => Array(size).fill(0));
 }
 
 function emptyCells(grid: Grid) {
   const cells: { row: number; col: number }[] = [];
-  for (let row = 0; row < GRID_SIZE; row++) {
-    for (let col = 0; col < GRID_SIZE; col++) {
+  for (let row = 0; row < grid.length; row++) {
+    for (let col = 0; col < grid[row].length; col++) {
       if (grid[row][col] === 0) cells.push({ row, col });
     }
   }
@@ -25,8 +31,8 @@ export function spawnRandomTile(grid: Grid): Grid {
   return next;
 }
 
-export function createInitialGrid(): Grid {
-  let grid = createEmptyGrid();
+export function createInitialGrid(size: number): Grid {
+  let grid = createEmptyGrid(size);
   grid = spawnRandomTile(grid);
   grid = spawnRandomTile(grid);
   return grid;
@@ -34,6 +40,7 @@ export function createInitialGrid(): Grid {
 
 /** Slide + merge a single row to the left; returns the new row and the score gained. */
 function collapseRowLeft(row: number[]): { row: number[]; gained: number } {
+  const size = row.length;
   const values = row.filter((v) => v !== 0);
   const merged: number[] = [];
   let gained = 0;
@@ -49,7 +56,7 @@ function collapseRowLeft(row: number[]): { row: number[]; gained: number } {
       i += 1;
     }
   }
-  while (merged.length < GRID_SIZE) merged.push(0);
+  while (merged.length < size) merged.push(0);
   return { row: merged, gained };
 }
 
