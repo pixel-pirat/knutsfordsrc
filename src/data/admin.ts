@@ -87,6 +87,7 @@ export const adminNav: AdminNavEntry[] = [
     items: [
       { label: "Audit Trail", href: "/admin/audit", icon: "flag", permission: "view_audit_log" },
       { label: "Permit / Dues Analytics", href: "/admin/analytics/permits-dues", icon: "wallet", superAdminOnly: true },
+      { label: "Expenses", href: "/admin/expenses", icon: "wallet", superAdminOnly: true },
     ],
   },
   {

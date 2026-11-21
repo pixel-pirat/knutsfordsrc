@@ -4,35 +4,41 @@ import {
   searchStudents,
   countStudents,
   countSearchStudents,
+  type ArchivedFilter,
 } from "@/db/adminQueries";
 import { hasPermission } from "@/lib/permissions";
 import { AccessRestricted } from "@/components/admin/AccessRestricted";
 import { PAGE_SIZE, parsePage } from "@/lib/pagination";
 import { StudentsTable } from "./StudentsTable";
 
+const ARCHIVED_VALUES = new Set(["active", "archived", "all"]);
+
 export default async function StudentsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; page?: string; archived?: string }>;
 }) {
   const admin = await getCurrentAdmin();
   if (!admin || !hasPermission(admin, "view_students")) {
     return <AccessRestricted />;
   }
 
-  const { q, page: pageParam } = await searchParams;
+  const { q, page: pageParam, archived: archivedParam } = await searchParams;
   const query = q?.trim();
   const page = parsePage(pageParam);
   const offset = (page - 1) * PAGE_SIZE;
+  const archived: ArchivedFilter = ARCHIVED_VALUES.has(archivedParam ?? "")
+    ? (archivedParam as ArchivedFilter)
+    : "active";
 
   const [students, total] = query
     ? await Promise.all([
-        searchStudents(query, { limit: PAGE_SIZE, offset }),
-        countSearchStudents(query),
+        searchStudents(query, { limit: PAGE_SIZE, offset, archived }),
+        countSearchStudents(query, archived),
       ])
     : await Promise.all([
-        listStudents({ limit: PAGE_SIZE, offset }),
-        countStudents(),
+        listStudents({ limit: PAGE_SIZE, offset, archived }),
+        countStudents(archived),
       ]);
 
   return (
@@ -56,9 +62,11 @@ export default async function StudentsPage({
           level: s.level,
           avatarUrl: s.avatarUrl,
           hallName: s.hall?.name ?? null,
+          archivedAt: s.archivedAt ? s.archivedAt.toISOString() : null,
         }))}
         canCreate={hasPermission(admin, "create_student")}
         initialQuery={q ?? ""}
+        archived={archived}
         page={page}
         totalPages={Math.max(1, Math.ceil(total / PAGE_SIZE))}
         total={total}

@@ -12,6 +12,7 @@ import {
   executiveYearGroups,
   executiveProfiles,
   executiveAchievements,
+  expenses,
   type NewAdminUser,
   type NewPermit,
   type NewEvent,
@@ -19,6 +20,7 @@ import {
   type NewExecutiveYearGroup,
   type NewExecutiveProfile,
   type NewExecutiveAchievement,
+  type NewExpense,
 } from "./schema";
 
 import { getAdminSession } from "@/lib/adminAuth";
@@ -251,25 +253,41 @@ export async function countPermits({
   return row?.count ?? 0;
 }
 
-export async function countStudents() {
-  const [row] = await db.select({ count: sql<number>`count(*)::int` }).from(students);
+export type ArchivedFilter = "active" | "archived" | "all";
+
+function archivedCondition(archived: ArchivedFilter = "active") {
+  if (archived === "active") return sql`${students.archivedAt} IS NULL`;
+  if (archived === "archived") return sql`${students.archivedAt} IS NOT NULL`;
+  return undefined;
+}
+
+export async function countStudents(archived: ArchivedFilter = "active") {
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(students)
+    .where(archivedCondition(archived));
   return row?.count ?? 0;
 }
 
-function studentSearchCondition(query: string) {
+function studentSearchCondition(query: string, archived: ArchivedFilter = "active") {
   const like = `%${query}%`;
-  return or(
+  const textCondition = or(
     ilike(students.indexNumber, like),
     ilike(students.firstName, like),
     ilike(students.lastName, like),
     ilike(students.email, like),
     ilike(sql`${students.firstName} || ' ' || ${students.lastName}`, like)
   );
+  const arch = archivedCondition(archived);
+  return arch ? and(textCondition, arch) : textCondition;
 }
 
-export function searchStudents(query: string, { limit = 50, offset = 0 } = {}) {
+export function searchStudents(
+  query: string,
+  { limit = 50, offset = 0, archived = "active" as ArchivedFilter } = {}
+) {
   return db.query.students.findMany({
-    where: studentSearchCondition(query),
+    where: studentSearchCondition(query, archived),
     orderBy: desc(students.createdAt),
     limit,
     offset,
@@ -279,21 +297,43 @@ export function searchStudents(query: string, { limit = 50, offset = 0 } = {}) {
   });
 }
 
-export async function countSearchStudents(query: string) {
+export async function countSearchStudents(query: string, archived: ArchivedFilter = "active") {
   const [row] = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(students)
-    .where(studentSearchCondition(query));
+    .where(studentSearchCondition(query, archived));
   return row?.count ?? 0;
 }
 
-export async function permitsIssuedLast14Days() {
+export async function bulkArchiveStudents(ids: string[]) {
+  if (ids.length === 0) return [];
+  return db
+    .update(students)
+    .set({ archivedAt: new Date() })
+    .where(and(inArray(students.id, ids), sql`${students.archivedAt} IS NULL`))
+    .returning({ id: students.id, indexNumber: students.indexNumber });
+}
+
+export async function bulkUnarchiveStudents(ids: string[]) {
+  if (ids.length === 0) return [];
+  return db
+    .update(students)
+    .set({ archivedAt: null })
+    .where(and(inArray(students.id, ids), sql`${students.archivedAt} IS NOT NULL`))
+    .returning({ id: students.id, indexNumber: students.indexNumber });
+}
+
+export async function permitsIssuedInRange(from: Date | null) {
   const rows = await db.execute<{ day: string; count: number; revenue: string }>(sql`
     SELECT
       to_char(d.day, 'DD Mon') AS day,
       COUNT(p.id)::int AS count,
       COALESCE(SUM(p.amount), 0)::text AS revenue
-    FROM generate_series(current_date - interval '13 days', current_date, interval '1 day') AS d(day)
+    FROM generate_series(
+      COALESCE(${from ?? null}::date, (SELECT MIN(issued_at)::date FROM ${permits}), current_date),
+      current_date,
+      interval '1 day'
+    ) AS d(day)
     LEFT JOIN ${permits} p ON date_trunc('day', p.issued_at) = d.day
     GROUP BY d.day
     ORDER BY d.day
@@ -309,14 +349,15 @@ export async function countPermitsThisMonth() {
   return row?.count ?? 0;
 }
 
-export async function totalRevenue() {
+export async function totalRevenue(from: Date | null = null) {
   const [row] = await db
     .select({ total: sql<string>`COALESCE(SUM(${permits.amount}), 0)::text` })
-    .from(permits);
+    .from(permits)
+    .where(from ? sql`${permits.issuedAt} >= ${from}` : undefined);
   return row?.total ?? "0";
 }
 
-export async function getPermitStatusBreakdown() {
+export async function getPermitStatusBreakdown(from: Date | null = null) {
   const notExpired = sql`(${permits.expiresAt} IS NULL OR ${permits.expiresAt} > now())`;
   const expired = sql`(${permits.expiresAt} IS NOT NULL AND ${permits.expiresAt} <= now())`;
   const [row] = await db
@@ -325,11 +366,12 @@ export async function getPermitStatusBreakdown() {
       pending: sql<number>`count(*) FILTER (WHERE ${notExpired} AND ${permits.cardStatus} = 'pending')::int`,
       expired: sql<number>`count(*) FILTER (WHERE ${expired})::int`,
     })
-    .from(permits);
+    .from(permits)
+    .where(from ? sql`${permits.issuedAt} >= ${from}` : undefined);
   return row ?? { active: 0, pending: 0, expired: 0 };
 }
 
-export async function getPaymentMethodBreakdown() {
+export async function getPaymentMethodBreakdown(from: Date | null = null) {
   const rows = await db
     .select({
       method: sql<string>`COALESCE(${permits.paymentMethod}, 'Unspecified')`,
@@ -337,12 +379,13 @@ export async function getPaymentMethodBreakdown() {
       revenue: sql<string>`COALESCE(SUM(${permits.amount}), 0)::text`,
     })
     .from(permits)
+    .where(from ? sql`${permits.issuedAt} >= ${from}` : undefined)
     .groupBy(sql`COALESCE(${permits.paymentMethod}, 'Unspecified')`)
     .orderBy(desc(sql`count(*)`));
   return rows;
 }
 
-export async function getPermitsByIssuer() {
+export async function getPermitsByIssuer(from: Date | null = null) {
   const rows = await db
     .select({
       issuerId: adminUsers.id,
@@ -352,13 +395,57 @@ export async function getPermitsByIssuer() {
     })
     .from(permits)
     .innerJoin(adminUsers, eq(permits.issuedBy, adminUsers.id))
+    .where(from ? sql`${permits.issuedAt} >= ${from}` : undefined)
     .groupBy(adminUsers.id, adminUsers.name)
     .orderBy(desc(sql`count(${permits.id})`));
   return rows;
 }
 
-export function listStudents({ limit = 50, offset = 0 } = {}) {
+export type PermitAnalyticsFilters = {
+  from?: Date | null;
+  program?: string;
+  level?: string;
+  studyMode?: "regular" | "weekend";
+  paymentMethod?: string;
+  status?: PermitStatusFilter;
+};
+
+/** Raw permit+student rows for the dedicated Permit/Dues analytics page — aggregated client-side. */
+export async function getPermitAnalyticsRows(filters: PermitAnalyticsFilters = {}) {
+  const conditions = buildPermitConditions({ status: filters.status });
+  if (filters.from) conditions.push(sql`${permits.issuedAt} >= ${filters.from}`);
+  if (filters.program) conditions.push(eq(students.program, filters.program));
+  if (filters.level) conditions.push(eq(students.level, filters.level));
+  if (filters.studyMode) conditions.push(eq(students.studyMode, filters.studyMode));
+  if (filters.paymentMethod) conditions.push(eq(permits.paymentMethod, filters.paymentMethod));
+
+  return db
+    .select({
+      issuedAt: permits.issuedAt,
+      expiresAt: permits.expiresAt,
+      cardStatus: permits.cardStatus,
+      amount: permits.amount,
+      paymentMethod: permits.paymentMethod,
+      issuerId: adminUsers.id,
+      issuerName: adminUsers.name,
+      program: students.program,
+      level: students.level,
+      studyMode: students.studyMode,
+    })
+    .from(permits)
+    .innerJoin(students, eq(permits.studentId, students.id))
+    .innerJoin(adminUsers, eq(permits.issuedBy, adminUsers.id))
+    .where(conditions.length > 0 ? and(...conditions) : undefined)
+    .orderBy(permits.issuedAt);
+}
+
+export function listStudents({
+  limit = 50,
+  offset = 0,
+  archived = "active" as ArchivedFilter,
+} = {}) {
   return db.query.students.findMany({
+    where: archivedCondition(archived),
     orderBy: desc(students.createdAt),
     limit,
     offset,
@@ -624,4 +711,55 @@ export function updateAchievement(
 
 export function deleteAchievement(id: string) {
   return db.delete(executiveAchievements).where(eq(executiveAchievements.id, id)).returning();
+}
+
+// ---------------------------------------------------------------------------
+// Expenses
+// ---------------------------------------------------------------------------
+
+export function listExpenses({ limit = 50, offset = 0 } = {}) {
+  return db.query.expenses.findMany({
+    orderBy: desc(expenses.incurredAt),
+    limit,
+    offset,
+    with: {
+      creator: { columns: { id: true, name: true } },
+    },
+  });
+}
+
+export async function countExpenses() {
+  const [row] = await db.select({ count: sql<number>`count(*)::int` }).from(expenses);
+  return row?.count ?? 0;
+}
+
+export function getExpenseById(id: string) {
+  return db.query.expenses.findFirst({ where: eq(expenses.id, id) });
+}
+
+export function createExpense(values: NewExpense) {
+  return db.insert(expenses).values(values).returning();
+}
+
+export function updateExpense(
+  id: string,
+  values: Partial<Pick<NewExpense, "description" | "amount" | "category" | "notes" | "incurredAt">>
+) {
+  return db
+    .update(expenses)
+    .set({ ...values, updatedAt: new Date() })
+    .where(eq(expenses.id, id))
+    .returning();
+}
+
+export function deleteExpense(id: string) {
+  return db.delete(expenses).where(eq(expenses.id, id)).returning();
+}
+
+export async function getTotalExpenses(from: Date | null = null) {
+  const [row] = await db
+    .select({ total: sql<string>`COALESCE(SUM(${expenses.amount}), 0)::text` })
+    .from(expenses)
+    .where(from ? sql`${expenses.incurredAt} >= ${from}` : undefined);
+  return row?.total ?? "0";
 }

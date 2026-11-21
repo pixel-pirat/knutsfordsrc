@@ -5,8 +5,9 @@ import {
   countStudents,
   countPermits,
   listAdmins,
-  permitsIssuedLast14Days,
+  permitsIssuedInRange,
   totalRevenue,
+  getTotalExpenses,
   getPermitStatusBreakdown,
   getPermitsByIssuer,
   getPaymentMethodBreakdown,
@@ -16,6 +17,8 @@ import { describeAuditEntry } from "@/lib/audit";
 import { formatCurrency } from "@/lib/permits";
 import { PermitsChart } from "@/components/admin/PermitsChart";
 import { DonutBreakdown, type DonutSegment } from "@/components/admin/DonutBreakdown";
+import { RANGE_OPTIONS, parseRange, rangeFromDate, rangeLabel } from "@/lib/analyticsRange";
+import { AnalyticsFilterBar } from "@/components/admin/AnalyticsFilterBar";
 
 const CATEGORICAL_COLORS = [
   "var(--color-chart-1)",
@@ -39,14 +42,23 @@ const PAYMENT_METHOD_COLORS: Record<string, string> = {
   "Bank Payment": "var(--color-chart-4)",
 };
 
-export default async function AdminOverviewPage() {
+export default async function AdminOverviewPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ range?: string }>;
+}) {
   const admin = await getCurrentAdmin();
+  const { range: rangeParam } = await searchParams;
+  const range = parseRange(rangeParam);
+  const from = rangeFromDate(range);
+
   const [
     studentCount,
     permitCount,
     admins,
     chartData,
-    revenue,
+    grossRevenue,
+    expenseTotal,
     statusBreakdown,
     issuerBreakdown,
     paymentBreakdown,
@@ -55,15 +67,17 @@ export default async function AdminOverviewPage() {
     countStudents(),
     countPermits(),
     listAdmins(),
-    permitsIssuedLast14Days(),
-    totalRevenue(),
-    getPermitStatusBreakdown(),
-    getPermitsByIssuer(),
-    getPaymentMethodBreakdown(),
+    permitsIssuedInRange(from),
+    totalRevenue(from),
+    getTotalExpenses(from),
+    getPermitStatusBreakdown(from),
+    getPermitsByIssuer(from),
+    getPaymentMethodBreakdown(from),
     listAuditLogs({ limit: 6 }),
   ]);
 
   const activeAdmins = admins.filter((a) => a.active).length;
+  const netRevenue = parseFloat(grossRevenue) - parseFloat(expenseTotal);
 
   const statusData: DonutSegment[] = [
     { key: "active", label: "Active", value: statusBreakdown.active, color: "#22c55e" },
@@ -89,21 +103,42 @@ export default async function AdminOverviewPage() {
 
   return (
     <div>
-      <p className="mb-6 text-sm text-neutral-500 dark:text-neutral-400">
+      <p className="mb-4 text-sm text-neutral-500 dark:text-neutral-400">
         Welcome back, <span className="font-semibold text-ink dark:text-neutral-100">{admin?.name}</span>
       </p>
 
+      <AnalyticsFilterBar
+        basePath="/admin"
+        fields={[
+          {
+            key: "range",
+            label: "Range",
+            value: range,
+            options: RANGE_OPTIONS.map((r) => ({ value: r.value, label: r.label })),
+          },
+        ]}
+      />
+
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <StatCard icon={Users} label="Total Students" value={studentCount} />
-        <StatCard icon={IdCard} label="Permits Issued" value={permitCount} />
-        <StatCard icon={CircleDollarSign} label="Revenue Collected" value={formatCurrency(revenue)} />
+        <StatCard icon={IdCard} label={`Permits Issued (${rangeLabel(range)})`} value={permitCount} />
+        <StatCard
+          icon={CircleDollarSign}
+          label={`Net Revenue (${rangeLabel(range)})`}
+          value={formatCurrency(netRevenue)}
+          sublabel={
+            parseFloat(expenseTotal) > 0
+              ? `after ${formatCurrency(expenseTotal)} in expenses`
+              : undefined
+          }
+        />
         <StatCard icon={ShieldCheck} label="Active Admins" value={activeAdmins} />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <div className="rounded-2xl bg-white dark:bg-neutral-900 p-6 ring-1 ring-black/5 dark:ring-white/10 lg:col-span-2">
           <h2 className="text-sm font-bold tracking-wide text-neutral-400 dark:text-neutral-500">
-            PERMITS ISSUED — LAST 14 DAYS
+            PERMITS ISSUED — {rangeLabel(range).toUpperCase()}
           </h2>
           <div className="mt-5">
             <PermitsChart data={chartData} />
@@ -180,10 +215,12 @@ function StatCard({
   icon: Icon,
   label,
   value,
+  sublabel,
 }: {
   icon: LucideIcon;
   label: string;
   value: number | string;
+  sublabel?: string;
 }) {
   return (
     <div className="rounded-2xl bg-white dark:bg-neutral-900 p-5 ring-1 ring-black/5 dark:ring-white/10">
@@ -194,6 +231,9 @@ function StatCard({
       <p className="mt-1 text-xs font-medium text-neutral-500 dark:text-neutral-400 sm:text-sm">
         {label}
       </p>
+      {sublabel && (
+        <p className="mt-0.5 text-[11px] text-neutral-400 dark:text-neutral-500">{sublabel}</p>
+      )}
     </div>
   );
 }

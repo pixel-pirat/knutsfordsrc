@@ -153,6 +153,7 @@ export const students = pgTable("students", {
   createdByAdminId: uuid("created_by_admin_id").references(
     () => adminUsers.id
   ),
+  archivedAt: timestamp("archived_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -189,6 +190,26 @@ export const programs = pgTable("programs", {
   name: text("name").notNull().unique(),
   active: boolean("active").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const expenses = pgTable("expenses", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  description: text("description").notNull(),
+  amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
+  category: text("category"),
+  notes: text("notes"),
+  incurredAt: timestamp("incurred_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  createdBy: uuid("created_by")
+    .notNull()
+    .references(() => adminUsers.id),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
 });
@@ -925,6 +946,14 @@ export const adminUsersRelations = relations(adminUsers, ({ many }) => ({
   eventsCreated: many(events),
   newsPostsCreated: many(newsPosts),
   executiveProfiles: many(executiveProfiles),
+  expensesLogged: many(expenses),
+}));
+
+export const expensesRelations = relations(expenses, ({ one }) => ({
+  creator: one(adminUsers, {
+    fields: [expenses.createdBy],
+    references: [adminUsers.id],
+  }),
 }));
 
 export const executiveYearGroupsRelations = relations(
@@ -1204,3 +1233,5 @@ export type SportAnnouncement = typeof sportAnnouncements.$inferSelect;
 export type NewSportAnnouncement = typeof sportAnnouncements.$inferInsert;
 export type GameScore = typeof gameScores.$inferSelect;
 export type NewGameScore = typeof gameScores.$inferInsert;
+export type Expense = typeof expenses.$inferSelect;
+export type NewExpense = typeof expenses.$inferInsert;

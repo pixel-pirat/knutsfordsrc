@@ -68,6 +68,16 @@ export function describeAuditEntry(entry: AuditEntry): string {
       return `Removed marketplace listing "${m.name ?? ""}" from ${m.storeName ?? "a store"}`;
     case "marketplace.listing.restore":
       return `Restored marketplace listing "${m.name ?? ""}" from ${m.storeName ?? "a store"}`;
+    case "student.bulk_archive":
+      return `Archived ${m.count ?? 0} student${m.count === 1 ? "" : "s"} as graduated`;
+    case "student.bulk_unarchive":
+      return `Unarchived ${m.count ?? 0} student${m.count === 1 ? "" : "s"}`;
+    case "expense.create":
+      return `Logged expense "${m.description ?? ""}" (GHS ${m.amount ?? ""})`;
+    case "expense.update":
+      return `Updated expense "${m.description ?? ""}"`;
+    case "expense.delete":
+      return `Deleted expense "${m.description ?? ""}"`;
     default:
       return `${entry.action} — ${entry.targetType}`;
   }

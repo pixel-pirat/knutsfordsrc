@@ -1011,3 +1011,54 @@ export async function getAdminOrderByNumber(
     storeStatus: row.storeStatus,
   };
 }
+
+// ---------------------------------------------------------------------------
+// Admin marketplace analytics
+// ---------------------------------------------------------------------------
+
+export type OrderAnalyticsFilters = {
+  from?: Date | null;
+  storeId?: string;
+  status?: string;
+  paymentStatus?: string;
+};
+
+export type OrderAnalyticsRow = {
+  createdAt: Date;
+  subtotal: string;
+  status: MarketplaceOrderStatus;
+  paymentStatus: MarketplacePaymentStatus;
+  storeId: string;
+  storeName: string;
+};
+
+/** Raw order rows for the marketplace analytics page — aggregated client-side. */
+export async function getOrderAnalyticsRows(
+  filters: OrderAnalyticsFilters = {}
+): Promise<OrderAnalyticsRow[]> {
+  const clauses: SQL[] = [];
+  if (filters.from) clauses.push(sql`${marketplaceOrders.createdAt} >= ${filters.from}`);
+  if (filters.storeId) clauses.push(eq(marketplaceOrders.storeId, filters.storeId));
+  if (filters.status) {
+    clauses.push(eq(marketplaceOrders.status, filters.status as MarketplaceOrderStatus));
+  }
+  if (filters.paymentStatus) {
+    clauses.push(
+      eq(marketplaceOrders.paymentStatus, filters.paymentStatus as MarketplacePaymentStatus)
+    );
+  }
+
+  return db
+    .select({
+      createdAt: marketplaceOrders.createdAt,
+      subtotal: marketplaceOrders.subtotal,
+      status: marketplaceOrders.status,
+      paymentStatus: marketplaceOrders.paymentStatus,
+      storeId: marketplaceOrders.storeId,
+      storeName: marketplaceStores.name,
+    })
+    .from(marketplaceOrders)
+    .innerJoin(marketplaceStores, eq(marketplaceOrders.storeId, marketplaceStores.id))
+    .where(clauses.length > 0 ? and(...clauses) : undefined)
+    .orderBy(marketplaceOrders.createdAt);
+}

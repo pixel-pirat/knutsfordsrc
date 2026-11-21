@@ -8,7 +8,7 @@ type DayData = { day: string; count: number; revenue: string };
 
 const chartConfig = {
   count: {
-    label: "Permits",
+    label: "Count",
     color: "var(--color-gold)",
   },
 } satisfies ChartConfig;
@@ -16,9 +16,11 @@ const chartConfig = {
 function ChartTooltip({
   active,
   payload,
+  unitLabel,
 }: {
   active?: boolean;
   payload?: { payload: DayData }[];
+  unitLabel: string;
 }) {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
@@ -26,7 +28,8 @@ function ChartTooltip({
   return (
     <div className="rounded-lg bg-ink px-3 py-2 text-xs text-white shadow-lg">
       <p className="font-semibold">
-        {d.count} permit{d.count === 1 ? "" : "s"}
+        {d.count} {unitLabel}
+        {d.count === 1 ? "" : "s"}
       </p>
       <p className="text-neutral-300">{formatCurrency(d.revenue)}</p>
       <p className="text-neutral-400 dark:text-neutral-500">{d.day}</p>
@@ -34,7 +37,7 @@ function ChartTooltip({
   );
 }
 
-export function PermitsChart({ data }: { data: DayData[] }) {
+export function PermitsChart({ data, unitLabel = "permit" }: { data: DayData[]; unitLabel?: string }) {
   return (
     <ChartContainer config={chartConfig} className="aspect-auto h-52 w-full">
       <AreaChart data={data} margin={{ left: -20, right: 8, top: 8, bottom: 0 }}>
@@ -61,7 +64,10 @@ export function PermitsChart({ data }: { data: DayData[] }) {
           width={28}
           tick={{ fontSize: 10 }}
         />
-        <Tooltip content={<ChartTooltip />} cursor={{ stroke: "var(--color-gold)", strokeOpacity: 0.2 }} />
+        <Tooltip
+          content={<ChartTooltip unitLabel={unitLabel} />}
+          cursor={{ stroke: "var(--color-gold)", strokeOpacity: 0.2 }}
+        />
         <Area
           type="monotone"
           dataKey="count"

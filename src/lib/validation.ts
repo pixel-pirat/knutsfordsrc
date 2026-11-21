@@ -601,3 +601,18 @@ export const gameScoreSubmissionSchema = z.object({
   game: z.enum(["draughts", "breakout", "snake", "2048", "typing", "piano"]),
   score: z.number().int().min(0).max(999_999),
 });
+
+export const expenseSchema = z.object({
+  description: z.string().trim().min(1, "Enter a description").max(200),
+  amount: z.coerce
+    .number()
+    .positive("Enter the amount spent")
+    .max(10_000_000, "Enter a valid amount"),
+  category: z.string().trim().max(100).optional().or(z.literal("")),
+  notes: z.string().trim().max(1000).optional().or(z.literal("")),
+  incurredAt: z.coerce.date().optional(),
+});
+
+export const bulkStudentIdsSchema = z.object({
+  ids: z.array(z.uuid()).min(1, "Select at least one student"),
+});
