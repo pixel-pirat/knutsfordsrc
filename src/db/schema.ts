@@ -214,6 +214,24 @@ export const expenses = pgTable("expenses", {
     .defaultNow(),
 });
 
+export const loginAttempts = pgTable(
+  "login_attempts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    scope: text("scope").notNull(),
+    identifier: text("identifier").notNull(),
+    ip: text("ip").notNull(),
+    success: boolean("success").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("login_attempts_identifier_idx").on(t.scope, t.identifier, t.createdAt),
+    index("login_attempts_ip_idx").on(t.scope, t.ip, t.createdAt),
+  ]
+);
+
 export const settings = pgTable("settings", {
   key: text("key").primaryKey(),
   value: text("value").notNull(),
@@ -1235,3 +1253,5 @@ export type GameScore = typeof gameScores.$inferSelect;
 export type NewGameScore = typeof gameScores.$inferInsert;
 export type Expense = typeof expenses.$inferSelect;
 export type NewExpense = typeof expenses.$inferInsert;
+export type LoginAttempt = typeof loginAttempts.$inferSelect;
+export type NewLoginAttempt = typeof loginAttempts.$inferInsert;

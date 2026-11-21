@@ -2,6 +2,12 @@ import { NextResponse } from "next/server";
 import { loginSchema } from "@/lib/validation";
 import { verifyPassword, createSession } from "@/lib/auth";
 import { getStudentByIndexNumber } from "@/db/queries";
+import {
+  checkLoginRateLimit,
+  recordLoginAttempt,
+  getClientIp,
+  formatRetryAfter,
+} from "@/lib/rateLimit";
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
@@ -15,6 +21,16 @@ export async function POST(request: Request) {
   }
 
   const { indexNumber, password } = parsed.data;
+  const ip = getClientIp(request);
+  const identifier = indexNumber.toLowerCase();
+
+  const rateLimit = await checkLoginRateLimit("student", identifier, ip);
+  if (rateLimit.limited) {
+    return NextResponse.json(
+      { error: `Too many login attempts. Try again in ${formatRetryAfter(rateLimit.retryAfterSeconds)}.` },
+      { status: 429, headers: { "Retry-After": String(rateLimit.retryAfterSeconds) } }
+    );
+  }
 
   const student = await getStudentByIndexNumber(indexNumber);
   const invalidResponse = NextResponse.json(
@@ -22,9 +38,13 @@ export async function POST(request: Request) {
     { status: 401 }
   );
 
-  if (!student) return invalidResponse;
+  if (!student) {
+    await recordLoginAttempt("student", identifier, ip, false);
+    return invalidResponse;
+  }
 
   if (!student.passwordHash) {
+    await recordLoginAttempt("student", identifier, ip, false);
     return NextResponse.json(
       {
         error:
@@ -35,8 +55,12 @@ export async function POST(request: Request) {
   }
 
   const valid = await verifyPassword(password, student.passwordHash);
-  if (!valid) return invalidResponse;
+  if (!valid) {
+    await recordLoginAttempt("student", identifier, ip, false);
+    return invalidResponse;
+  }
 
+  await recordLoginAttempt("student", identifier, ip, true);
   await createSession({ studentId: student.id });
 
   return NextResponse.json({

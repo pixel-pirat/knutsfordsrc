@@ -3,6 +3,12 @@ import { adminLoginSchema } from "@/lib/validation";
 import { verifyPassword } from "@/lib/crypto";
 import { createAdminSession } from "@/lib/adminAuth";
 import { getAdminByEmail } from "@/db/adminQueries";
+import {
+  checkLoginRateLimit,
+  recordLoginAttempt,
+  getClientIp,
+  formatRetryAfter,
+} from "@/lib/rateLimit";
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
@@ -15,6 +21,17 @@ export async function POST(request: Request) {
   }
 
   const { email, password } = parsed.data;
+  const ip = getClientIp(request);
+  const identifier = email.toLowerCase();
+
+  const rateLimit = await checkLoginRateLimit("admin", identifier, ip);
+  if (rateLimit.limited) {
+    return NextResponse.json(
+      { error: `Too many login attempts. Try again in ${formatRetryAfter(rateLimit.retryAfterSeconds)}.` },
+      { status: 429, headers: { "Retry-After": String(rateLimit.retryAfterSeconds) } }
+    );
+  }
+
   const admin = await getAdminByEmail(email);
 
   const invalidResponse = NextResponse.json(
@@ -22,8 +39,12 @@ export async function POST(request: Request) {
     { status: 401 }
   );
 
-  if (!admin) return invalidResponse;
+  if (!admin) {
+    await recordLoginAttempt("admin", identifier, ip, false);
+    return invalidResponse;
+  }
   if (!admin.active) {
+    await recordLoginAttempt("admin", identifier, ip, false);
     return NextResponse.json(
       { error: "This account has been deactivated" },
       { status: 403 }
@@ -31,8 +52,12 @@ export async function POST(request: Request) {
   }
 
   const valid = await verifyPassword(password, admin.passwordHash);
-  if (!valid) return invalidResponse;
+  if (!valid) {
+    await recordLoginAttempt("admin", identifier, ip, false);
+    return invalidResponse;
+  }
 
+  await recordLoginAttempt("admin", identifier, ip, true);
   await createAdminSession({ adminId: admin.id });
 
   return NextResponse.json({
