@@ -70,14 +70,14 @@ export function ExpensesTable({
         </CardHeader>
 
         <CardContent className="p-0">
-          <Table className="table-fixed">
+          <Table className="md:table-fixed">
             <TableHeader>
               <TableRow className="hover:bg-transparent!">
                 <TableHead className="w-[26%] px-3.5">Description</TableHead>
-                <TableHead className="w-[15%] px-3.5">Category</TableHead>
+                <TableHead className="hidden w-[15%] px-3.5 md:table-cell">Category</TableHead>
                 <TableHead className="w-[13%] px-3.5">Amount</TableHead>
-                <TableHead className="w-[14%] px-3.5">Date</TableHead>
-                <TableHead className="w-[16%] px-3.5">Logged By</TableHead>
+                <TableHead className="hidden w-[14%] px-3.5 md:table-cell">Date</TableHead>
+                <TableHead className="hidden w-[16%] px-3.5 md:table-cell">Logged By</TableHead>
                 <TableHead className="w-[16%] px-3.5 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -94,20 +94,20 @@ export function ExpensesTable({
                   <TableCell className="truncate px-3.5 font-medium text-ink dark:text-neutral-100">
                     {e.description}
                   </TableCell>
-                  <TableCell className="px-3.5">
+                  <TableCell className="hidden px-3.5 md:table-cell">
                     {e.category ? <Badge variant="outline">{e.category}</Badge> : "—"}
                   </TableCell>
                   <TableCell className="px-3.5 text-neutral-700 dark:text-neutral-300">
                     {formatCurrency(e.amount)}
                   </TableCell>
-                  <TableCell className="px-3.5 text-neutral-500 dark:text-neutral-400">
+                  <TableCell className="hidden px-3.5 text-neutral-500 md:table-cell dark:text-neutral-400">
                     {new Date(e.incurredAt).toLocaleDateString("en-GB", {
                       day: "numeric",
                       month: "short",
                       year: "numeric",
                     })}
                   </TableCell>
-                  <TableCell className="truncate px-3.5 text-neutral-500 dark:text-neutral-400">
+                  <TableCell className="hidden truncate px-3.5 text-neutral-500 md:table-cell dark:text-neutral-400">
                     {e.creatorName ?? "—"}
                   </TableCell>
                   <TableCell className="px-3.5 text-right">

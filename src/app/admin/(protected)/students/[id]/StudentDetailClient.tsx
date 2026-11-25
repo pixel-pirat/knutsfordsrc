@@ -195,22 +195,22 @@ export function StudentDetailClient({
         </div>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="min-w-0 space-y-6 lg:col-span-2">
           <div className="rounded-2xl bg-white dark:bg-neutral-900 p-6 ring-1 ring-black/5 dark:ring-white/10 sm:p-8">
             <h2 className="text-sm font-bold text-ink dark:text-neutral-100">Profile</h2>
             <dl className="mt-4 grid grid-cols-2 gap-4 text-sm">
               <div>
                 <dt className="text-xs text-neutral-400 dark:text-neutral-500">Email</dt>
-                <dd className="text-neutral-700 dark:text-neutral-300">{student.email ?? "—"}</dd>
+                <dd className="break-words text-neutral-700 dark:text-neutral-300">{student.email ?? "—"}</dd>
               </div>
               <div>
                 <dt className="text-xs text-neutral-400 dark:text-neutral-500">Phone</dt>
-                <dd className="text-neutral-700 dark:text-neutral-300">{student.phone ?? "—"}</dd>
+                <dd className="break-words text-neutral-700 dark:text-neutral-300">{student.phone ?? "—"}</dd>
               </div>
               <div>
                 <dt className="text-xs text-neutral-400 dark:text-neutral-500">Programme</dt>
-                <dd className="text-neutral-700 dark:text-neutral-300">{student.program ?? "—"}</dd>
+                <dd className="break-words text-neutral-700 dark:text-neutral-300">{student.program ?? "—"}</dd>
               </div>
               <div>
                 <dt className="text-xs text-neutral-400 dark:text-neutral-500">Level</dt>
@@ -259,10 +259,10 @@ export function StudentDetailClient({
                 <TableRow>
                   <TableHead>Reference</TableHead>
                   <TableHead>Amount</TableHead>
-                  <TableHead>Payment</TableHead>
-                  <TableHead>Issued By</TableHead>
-                  <TableHead>Issued</TableHead>
-                  <TableHead>Expires</TableHead>
+                  <TableHead className="hidden md:table-cell">Payment</TableHead>
+                  <TableHead className="hidden lg:table-cell">Issued By</TableHead>
+                  <TableHead className="hidden lg:table-cell">Issued</TableHead>
+                  <TableHead className="hidden lg:table-cell">Expires</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
@@ -284,16 +284,16 @@ export function StudentDetailClient({
                     >
                       <TableCell className="font-medium text-ink dark:text-neutral-100">{p.referenceNumber}</TableCell>
                       <TableCell className="text-neutral-700 dark:text-neutral-300">{formatCurrency(p.amount)}</TableCell>
-                      <TableCell className="text-neutral-500 dark:text-neutral-400">{p.paymentMethod ?? "—"}</TableCell>
-                      <TableCell className="text-neutral-700 dark:text-neutral-300">{p.issuer?.name ?? "—"}</TableCell>
-                      <TableCell className="text-neutral-500 dark:text-neutral-400">
+                      <TableCell className="hidden text-neutral-500 md:table-cell dark:text-neutral-400">{p.paymentMethod ?? "—"}</TableCell>
+                      <TableCell className="hidden text-neutral-700 lg:table-cell dark:text-neutral-300">{p.issuer?.name ?? "—"}</TableCell>
+                      <TableCell className="hidden text-neutral-500 lg:table-cell dark:text-neutral-400">
                         {new Date(p.issuedAt).toLocaleDateString("en-GB", {
                           day: "numeric",
                           month: "short",
                           year: "numeric",
                         })}
                       </TableCell>
-                      <TableCell className="text-neutral-500 dark:text-neutral-400">
+                      <TableCell className="hidden text-neutral-500 lg:table-cell dark:text-neutral-400">
                         {p.expiresAt
                           ? new Date(p.expiresAt).toLocaleDateString("en-GB", {
                               day: "numeric",

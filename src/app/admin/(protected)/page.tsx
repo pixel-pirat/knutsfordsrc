@@ -135,7 +135,7 @@ export default async function AdminOverviewPage({
         <StatCard icon={ShieldCheck} label="Active Admins" value={activeAdmins} />
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="rounded-2xl bg-white dark:bg-neutral-900 p-6 ring-1 ring-black/5 dark:ring-white/10 lg:col-span-2">
           <h2 className="text-sm font-bold tracking-wide text-neutral-400 dark:text-neutral-500">
             PERMITS ISSUED — {rangeLabel(range).toUpperCase()}
@@ -155,7 +155,7 @@ export default async function AdminOverviewPage({
         </div>
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="rounded-2xl bg-white dark:bg-neutral-900 p-6 ring-1 ring-black/5 dark:ring-white/10">
           <h2 className="text-sm font-bold tracking-wide text-neutral-400 dark:text-neutral-500">
             PAYMENT METHOD BREAKDOWN

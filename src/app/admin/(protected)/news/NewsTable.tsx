@@ -70,7 +70,7 @@ export function NewsTable({ news }: { news: NewsRow[] }) {
           <TableHeader>
             <TableRow>
               <TableHead>Title</TableHead>
-              <TableHead>Published</TableHead>
+              <TableHead className="hidden sm:table-cell">Published</TableHead>
               <TableHead>Status</TableHead>
               <TableHead />
             </TableRow>
@@ -86,7 +86,7 @@ export function NewsTable({ news }: { news: NewsRow[] }) {
             {news.map((post) => (
               <TableRow key={post.id} className="cursor-pointer" onClick={() => openPost(post.id)}>
                 <TableCell className="font-medium text-ink dark:text-neutral-100">{post.title}</TableCell>
-                <TableCell className="text-neutral-500 dark:text-neutral-400">
+                <TableCell className="hidden text-neutral-500 sm:table-cell dark:text-neutral-400">
                   {formatDate(post.publishedAt)}
                 </TableCell>
                 <TableCell>

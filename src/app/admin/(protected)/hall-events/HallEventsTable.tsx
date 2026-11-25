@@ -88,9 +88,9 @@ export function HallEventsTable({ events }: { events: HallEventRow[] }) {
           <TableHeader>
             <TableRow>
               <TableHead>Event</TableHead>
-              <TableHead>Hall</TableHead>
-              <TableHead>Starts</TableHead>
-              <TableHead>Bookings</TableHead>
+              <TableHead className="hidden sm:table-cell">Hall</TableHead>
+              <TableHead className="hidden sm:table-cell">Starts</TableHead>
+              <TableHead className="hidden md:table-cell">Bookings</TableHead>
               <TableHead>Status</TableHead>
               <TableHead />
             </TableRow>
@@ -116,13 +116,13 @@ export function HallEventsTable({ events }: { events: HallEventRow[] }) {
                     </span>
                   )}
                 </TableCell>
-                <TableCell className="text-neutral-500 dark:text-neutral-400">
+                <TableCell className="hidden text-neutral-500 sm:table-cell dark:text-neutral-400">
                   {event.hallName ?? "All Halls"}
                 </TableCell>
-                <TableCell className="text-neutral-500 dark:text-neutral-400">
+                <TableCell className="hidden text-neutral-500 sm:table-cell dark:text-neutral-400">
                   {formatDateTime(event.startsAt)}
                 </TableCell>
-                <TableCell className="text-neutral-500 dark:text-neutral-400">
+                <TableCell className="hidden text-neutral-500 md:table-cell dark:text-neutral-400">
                   {event.bookingRequired ? (
                     <span>
                       {event.bookingCount}

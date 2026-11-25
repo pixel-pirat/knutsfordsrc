@@ -68,7 +68,7 @@ export function YearGroupsTable({ yearGroups }: { yearGroups: YearGroupRow[] }) 
           <TableHeader>
             <TableRow>
               <TableHead>Label</TableHead>
-              <TableHead>Description</TableHead>
+              <TableHead className="hidden sm:table-cell">Description</TableHead>
               <TableHead>Status</TableHead>
               <TableHead />
             </TableRow>
@@ -84,7 +84,7 @@ export function YearGroupsTable({ yearGroups }: { yearGroups: YearGroupRow[] }) 
             {yearGroups.map((yg) => (
               <TableRow key={yg.id} className="cursor-pointer" onClick={() => openYearGroup(yg.id)}>
                 <TableCell className="font-medium text-ink dark:text-neutral-100">{yg.label}</TableCell>
-                <TableCell className="max-w-sm truncate text-neutral-500 dark:text-neutral-400">
+                <TableCell className="hidden max-w-sm truncate text-neutral-500 sm:table-cell dark:text-neutral-400">
                   {yg.description ?? "—"}
                 </TableCell>
                 <TableCell>

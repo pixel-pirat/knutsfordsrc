@@ -132,12 +132,12 @@ export default async function StoreApplicationsPage({
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-black/5 text-left text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:border-white/10 dark:text-neutral-500">
-                <th className="px-5 py-3">Student</th>
-                <th className="px-5 py-3">Store</th>
-                <th className="px-5 py-3">Category</th>
-                <th className="px-5 py-3">Submitted</th>
-                <th className="px-5 py-3">Status</th>
-                <th className="px-5 py-3" />
+                <th className="px-3 py-3 sm:px-5">Student</th>
+                <th className="hidden px-3 py-3 sm:table-cell sm:px-5">Store</th>
+                <th className="hidden px-3 py-3 md:table-cell sm:px-5">Category</th>
+                <th className="hidden px-3 py-3 lg:table-cell sm:px-5">Submitted</th>
+                <th className="px-3 py-3 sm:px-5">Status</th>
+                <th className="px-3 py-3 sm:px-5" />
               </tr>
             </thead>
             <tbody>
@@ -145,7 +145,7 @@ export default async function StoreApplicationsPage({
                 <tr>
                   <td
                     colSpan={6}
-                    className="px-5 py-12 text-center text-neutral-400 dark:text-neutral-500"
+                    className="px-3 py-12 text-center text-neutral-400 sm:px-5 dark:text-neutral-500"
                   >
                     No applications match these filters.
                   </td>
@@ -156,7 +156,7 @@ export default async function StoreApplicationsPage({
                   key={application.id}
                   className="border-b border-black/5 last:border-0 dark:border-white/10"
                 >
-                  <td className="px-5 py-4">
+                  <td className="px-3 py-4 sm:px-5">
                     <p className="font-semibold text-ink dark:text-neutral-100">
                       {application.studentFirstName} {application.studentLastName}
                     </p>
@@ -164,7 +164,7 @@ export default async function StoreApplicationsPage({
                       {application.indexNumber}
                     </p>
                   </td>
-                  <td className="px-5 py-4 text-neutral-700 dark:text-neutral-300">
+                  <td className="hidden px-3 py-4 text-neutral-700 sm:table-cell sm:px-5 dark:text-neutral-300">
                     <Link
                       href={`/admin/market/applications/${application.id}`}
                       className="font-medium hover:text-gold-dark hover:underline dark:hover:text-gold-light"
@@ -172,13 +172,13 @@ export default async function StoreApplicationsPage({
                       {application.storeName}
                     </Link>
                   </td>
-                  <td className="px-5 py-4 text-neutral-500 dark:text-neutral-400">
+                  <td className="hidden px-3 py-4 text-neutral-500 md:table-cell sm:px-5 dark:text-neutral-400">
                     {CATEGORY_LABELS[application.category] ?? application.category}
                   </td>
-                  <td className="px-5 py-4 text-neutral-500 dark:text-neutral-400">
+                  <td className="hidden px-3 py-4 text-neutral-500 lg:table-cell sm:px-5 dark:text-neutral-400">
                     {formatMarketplaceDate(application.submittedAt)}
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-3 py-4 sm:px-5">
                     <Badge
                       variant="outline"
                       className={APPLICATION_STATUS_STYLES[application.status]}
@@ -187,7 +187,7 @@ export default async function StoreApplicationsPage({
                         application.status}
                     </Badge>
                   </td>
-                  <td className="px-5 py-4 text-right">
+                  <td className="px-3 py-4 text-right sm:px-5">
                     <Link
                       href={`/admin/market/applications/${application.id}`}
                       className="text-xs font-semibold text-gold-dark hover:underline dark:text-gold-light"

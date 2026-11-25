@@ -23,16 +23,16 @@ export default async function AdminSportsSchedulePage() {
         </p>
       </div>
 
-      <div className="rounded-2xl bg-white dark:bg-neutral-900 ring-1 ring-black/5 dark:ring-white/10">
+      <div className="overflow-x-auto rounded-2xl bg-white dark:bg-neutral-900 ring-1 ring-black/5 dark:ring-white/10">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-black/5 text-left text-xs font-bold uppercase tracking-wide text-neutral-400 dark:border-white/10 dark:text-neutral-500">
-              <th className="px-5 py-3.5 font-bold">Fixture</th>
-              <th className="px-5 py-3.5 font-bold">Tournament</th>
-              <th className="px-5 py-3.5 font-bold">Stage</th>
-              <th className="px-5 py-3.5 font-bold">Kick-off</th>
-              <th className="px-5 py-3.5 font-bold">Venue</th>
-              <th className="px-5 py-3.5 font-bold">Status</th>
+              <th className="px-3 py-3.5 font-bold sm:px-5">Fixture</th>
+              <th className="hidden px-3 py-3.5 font-bold sm:table-cell sm:px-5">Tournament</th>
+              <th className="hidden px-3 py-3.5 font-bold md:table-cell sm:px-5">Stage</th>
+              <th className="px-3 py-3.5 font-bold sm:px-5">Kick-off</th>
+              <th className="hidden px-3 py-3.5 font-bold md:table-cell sm:px-5">Venue</th>
+              <th className="px-3 py-3.5 font-bold sm:px-5">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-black/5 dark:divide-white/10">
@@ -48,10 +48,10 @@ export default async function AdminSportsSchedulePage() {
             )}
             {schedule.map((m) => (
               <tr key={m.id}>
-                <td className="px-5 py-3.5 font-medium text-ink dark:text-neutral-100">
+                <td className="px-3 py-3.5 font-medium text-ink sm:px-5 dark:text-neutral-100">
                   {m.nameA ?? "TBD"} <span className="text-neutral-400">vs</span> {m.nameB ?? "TBD"}
                 </td>
-                <td className="px-5 py-3.5 text-neutral-500 dark:text-neutral-400">
+                <td className="hidden px-3 py-3.5 text-neutral-500 sm:table-cell sm:px-5 dark:text-neutral-400">
                   <Link
                     href={`/admin/sports/tournaments/${m.tournamentId}`}
                     className="hover:text-gold-dark dark:hover:text-gold-light hover:underline"
@@ -59,14 +59,14 @@ export default async function AdminSportsSchedulePage() {
                     {m.tournamentName}
                   </Link>
                 </td>
-                <td className="px-5 py-3.5 text-neutral-500 dark:text-neutral-400">
+                <td className="hidden px-3 py-3.5 text-neutral-500 md:table-cell sm:px-5 dark:text-neutral-400">
                   {m.stage === "group"
                     ? m.groupLabel
                       ? `Group ${m.groupLabel}`
                       : "League"
                     : `Knockout · round ${m.round}`}
                 </td>
-                <td className="px-5 py-3.5 text-neutral-500 dark:text-neutral-400">
+                <td className="px-3 py-3.5 text-neutral-500 sm:px-5 dark:text-neutral-400">
                   {m.scheduledAt
                     ? new Date(m.scheduledAt).toLocaleString("en-GB", {
                         day: "numeric",
@@ -77,10 +77,10 @@ export default async function AdminSportsSchedulePage() {
                       })
                     : "Not set"}
                 </td>
-                <td className="px-5 py-3.5 text-neutral-500 dark:text-neutral-400">
+                <td className="hidden px-3 py-3.5 text-neutral-500 md:table-cell sm:px-5 dark:text-neutral-400">
                   {m.venue ?? "—"}
                 </td>
-                <td className="px-5 py-3.5 text-neutral-500 dark:text-neutral-400">
+                <td className="px-3 py-3.5 text-neutral-500 sm:px-5 dark:text-neutral-400">
                   {m.status === "completed"
                     ? `${m.scoreA ?? "–"} : ${m.scoreB ?? "–"}`
                     : "Pending"}

@@ -117,9 +117,9 @@ export function AchievementsTable({
           <TableHeader>
             <TableRow>
               <TableHead>Title</TableHead>
-              <TableHead>Credit</TableHead>
-              <TableHead>Year Group</TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead className="hidden sm:table-cell">Credit</TableHead>
+              <TableHead className="hidden md:table-cell">Year Group</TableHead>
+              <TableHead className="hidden sm:table-cell">Date</TableHead>
               <TableHead />
             </TableRow>
           </TableHeader>
@@ -134,13 +134,13 @@ export function AchievementsTable({
             {achievements.map((a) => (
               <TableRow key={a.id} className="cursor-pointer" onClick={() => openAchievement(a.id)}>
                 <TableCell className="font-medium text-ink dark:text-neutral-100">{a.title}</TableCell>
-                <TableCell className="text-neutral-700 dark:text-neutral-300">
+                <TableCell className="hidden text-neutral-700 sm:table-cell dark:text-neutral-300">
                   {a.profile?.name ?? "Whole year group"}
                 </TableCell>
-                <TableCell className="text-neutral-500 dark:text-neutral-400">
+                <TableCell className="hidden text-neutral-500 md:table-cell dark:text-neutral-400">
                   {a.yearGroup?.label ?? "—"}
                 </TableCell>
-                <TableCell className="text-neutral-500 dark:text-neutral-400">
+                <TableCell className="hidden text-neutral-500 sm:table-cell dark:text-neutral-400">
                   {formatDate(a.achievedAt)}
                 </TableCell>
                 <TableCell className="text-right">

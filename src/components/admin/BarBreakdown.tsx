@@ -26,7 +26,7 @@ export function BarBreakdown({
       {shown.map((d) => (
         <li key={d.key}>
           <div className="flex items-center justify-between gap-3 text-sm">
-            <span className="truncate font-medium text-ink dark:text-neutral-100">{d.label}</span>
+            <span className="min-w-0 truncate font-medium text-ink dark:text-neutral-100">{d.label}</span>
             <span className="shrink-0 text-neutral-500 dark:text-neutral-400">
               {d.count}
               {formatSecondary ? ` · ${formatSecondary(d)}` : ""}

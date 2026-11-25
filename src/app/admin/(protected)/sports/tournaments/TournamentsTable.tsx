@@ -70,9 +70,9 @@ export function TournamentsTable({
           <TableHeader>
             <TableRow>
               <TableHead>Tournament</TableHead>
-              <TableHead>Format</TableHead>
-              <TableHead>Participants</TableHead>
-              <TableHead>Matches</TableHead>
+              <TableHead className="hidden sm:table-cell">Format</TableHead>
+              <TableHead className="hidden md:table-cell">Participants</TableHead>
+              <TableHead className="hidden md:table-cell">Matches</TableHead>
               <TableHead>Status</TableHead>
               <TableHead />
             </TableRow>
@@ -103,13 +103,13 @@ export function TournamentsTable({
                     {t.championName ? ` · Champion: ${t.championName}` : ""}
                   </span>
                 </TableCell>
-                <TableCell className="text-neutral-500 dark:text-neutral-400">
+                <TableCell className="hidden text-neutral-500 sm:table-cell dark:text-neutral-400">
                   {formatLabel(t.format)}
                 </TableCell>
-                <TableCell className="text-neutral-500 dark:text-neutral-400">
+                <TableCell className="hidden text-neutral-500 md:table-cell dark:text-neutral-400">
                   {t.participantCount}
                 </TableCell>
-                <TableCell className="text-neutral-500 dark:text-neutral-400">
+                <TableCell className="hidden text-neutral-500 md:table-cell dark:text-neutral-400">
                   {t.matchCount}
                 </TableCell>
                 <TableCell>

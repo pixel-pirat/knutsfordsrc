@@ -78,9 +78,9 @@ export function HallsTable({
           <TableHeader>
             <TableRow>
               <TableHead>Hall</TableHead>
-              <TableHead>Warden</TableHead>
-              <TableHead>Members</TableHead>
-              <TableHead>Events</TableHead>
+              <TableHead className="hidden sm:table-cell">Warden</TableHead>
+              <TableHead className="hidden md:table-cell">Members</TableHead>
+              <TableHead className="hidden md:table-cell">Events</TableHead>
               <TableHead>Status</TableHead>
               <TableHead />
             </TableRow>
@@ -111,14 +111,14 @@ export function HallsTable({
                     </span>
                   )}
                 </TableCell>
-                <TableCell className="text-neutral-500 dark:text-neutral-400">
+                <TableCell className="hidden text-neutral-500 sm:table-cell dark:text-neutral-400">
                   {hall.wardenName ?? "—"}
                 </TableCell>
-                <TableCell className="text-neutral-500 dark:text-neutral-400">
+                <TableCell className="hidden text-neutral-500 md:table-cell dark:text-neutral-400">
                   {hall.memberCount}
                   {hall.capacity ? ` / ${hall.capacity}` : ""}
                 </TableCell>
-                <TableCell className="text-neutral-500 dark:text-neutral-400">
+                <TableCell className="hidden text-neutral-500 md:table-cell dark:text-neutral-400">
                   {hall.eventCount}
                 </TableCell>
                 <TableCell>

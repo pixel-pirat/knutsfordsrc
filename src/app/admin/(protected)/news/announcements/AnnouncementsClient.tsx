@@ -219,7 +219,7 @@ export function AnnouncementsClient({
             <TableRow>
               <TableHead className="w-24">Order</TableHead>
               <TableHead>Headline</TableHead>
-              <TableHead>Schedule</TableHead>
+              <TableHead className="hidden md:table-cell">Schedule</TableHead>
               <TableHead>Status</TableHead>
               <TableHead />
             </TableRow>
@@ -270,7 +270,7 @@ export function AnnouncementsClient({
                       </span>
                     )}
                   </TableCell>
-                  <TableCell className="text-xs text-neutral-500 dark:text-neutral-400">
+                  <TableCell className="hidden text-xs text-neutral-500 md:table-cell dark:text-neutral-400">
                     {scheduleLabel(row)}
                   </TableCell>
                   <TableCell>
@@ -279,7 +279,7 @@ export function AnnouncementsClient({
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-3">
+                    <div className="flex flex-col items-end gap-1.5 sm:flex-row sm:items-center sm:justify-end sm:gap-3">
                       <Button variant="outline" size="sm" onClick={() => openEdit(row)}>
                         Edit
                       </Button>

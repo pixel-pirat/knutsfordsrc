@@ -131,14 +131,14 @@ export default async function MarketOrdersPage({
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-black/5 text-left text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:border-white/10 dark:text-neutral-500">
-                <th className="px-5 py-3">Order</th>
-                <th className="px-5 py-3">Store / Seller</th>
-                <th className="px-5 py-3">Buyer</th>
-                <th className="px-5 py-3">Placed</th>
-                <th className="px-5 py-3">Status</th>
-                <th className="px-5 py-3">Payment</th>
-                <th className="px-5 py-3 text-right">Total</th>
-                <th className="px-5 py-3" />
+                <th className="px-3 sm:px-5 py-3">Order</th>
+                <th className="hidden px-3 sm:px-5 py-3 md:table-cell">Store / Seller</th>
+                <th className="hidden px-3 sm:px-5 py-3 lg:table-cell">Buyer</th>
+                <th className="hidden px-3 sm:px-5 py-3 lg:table-cell">Placed</th>
+                <th className="px-3 sm:px-5 py-3">Status</th>
+                <th className="hidden px-3 sm:px-5 py-3 md:table-cell">Payment</th>
+                <th className="px-3 sm:px-5 py-3 text-right">Total</th>
+                <th className="px-3 sm:px-5 py-3" />
               </tr>
             </thead>
             <tbody>
@@ -146,7 +146,7 @@ export default async function MarketOrdersPage({
                 <tr>
                   <td
                     colSpan={8}
-                    className="px-5 py-14 text-center text-neutral-400 dark:text-neutral-500"
+                    className="px-3 sm:px-5 py-14 text-center text-neutral-400 dark:text-neutral-500"
                   >
                     <ClipboardList className="mx-auto mb-2 h-7 w-7" />
                     {hasFilters
@@ -161,7 +161,7 @@ export default async function MarketOrdersPage({
                   key={order.id}
                   className="border-b border-black/5 last:border-0 dark:border-white/10"
                 >
-                  <td className="px-5 py-4">
+                  <td className="px-3 sm:px-5 py-4">
                     <Link
                       href={`/admin/market/orders/${order.orderNumber}`}
                       className="font-semibold text-ink hover:text-gold-dark hover:underline dark:text-neutral-100 dark:hover:text-gold-light"
@@ -172,7 +172,7 @@ export default async function MarketOrdersPage({
                       {order.itemCount} item{order.itemCount === 1 ? "" : "s"}
                     </p>
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="hidden px-3 sm:px-5 py-4 md:table-cell">
                     <Link
                       href={`/admin/market/stores/${order.storeId}`}
                       className="font-medium text-ink hover:text-gold-dark hover:underline dark:text-neutral-100 dark:hover:text-gold-light"
@@ -189,7 +189,7 @@ export default async function MarketOrdersPage({
                       </p>
                     )}
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="hidden px-3 sm:px-5 py-4 lg:table-cell">
                     <p className="font-medium text-ink dark:text-neutral-100">
                       {order.buyerName}
                     </p>
@@ -197,21 +197,21 @@ export default async function MarketOrdersPage({
                       {order.buyerPhone}
                     </p>
                   </td>
-                  <td className="px-5 py-4 text-neutral-600 dark:text-neutral-300">
+                  <td className="hidden px-3 sm:px-5 py-4 text-neutral-600 lg:table-cell dark:text-neutral-300">
                     {formatMarketplaceDate(order.createdAt)}
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-3 sm:px-5 py-4">
                     <OrderStatusBadge status={order.status} />
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="hidden px-3 sm:px-5 py-4 md:table-cell">
                     <PaymentStatusBadge
                       paymentStatus={order.paymentStatus}
                     />
                   </td>
-                  <td className="px-5 py-4 text-right font-semibold text-ink dark:text-neutral-100">
+                  <td className="px-3 sm:px-5 py-4 text-right font-semibold text-ink dark:text-neutral-100">
                     {formatCurrency(order.subtotal)}
                   </td>
-                  <td className="px-5 py-4 text-right">
+                  <td className="px-3 sm:px-5 py-4 text-right">
                     <Link
                       href={`/admin/market/orders/${order.orderNumber}`}
                       className="text-xs font-semibold text-gold-dark hover:underline dark:text-gold-light"

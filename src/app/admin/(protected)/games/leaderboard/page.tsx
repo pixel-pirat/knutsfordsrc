@@ -58,13 +58,13 @@ export default async function GamesLeaderboardPage({
         ))}
       </nav>
 
-      <div className="rounded-2xl bg-white ring-1 ring-black/5 dark:bg-neutral-900 dark:ring-white/10">
+      <div className="overflow-x-auto rounded-2xl bg-white ring-1 ring-black/5 dark:bg-neutral-900 dark:ring-white/10">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-black/5 text-left text-xs font-bold uppercase tracking-wide text-neutral-400 dark:border-white/10 dark:text-neutral-500">
-              <th className="px-5 py-3.5 w-12">#</th>
-              <th className="px-5 py-3.5">Student</th>
-              <th className="px-5 py-3.5 text-right">
+              <th className="w-12 px-3 py-3.5 sm:px-5">#</th>
+              <th className="px-3 py-3.5 sm:px-5">Student</th>
+              <th className="px-3 py-3.5 text-right sm:px-5">
                 {activeTab === "overall" ? "Total score" : "Best score"}
               </th>
             </tr>
@@ -72,23 +72,23 @@ export default async function GamesLeaderboardPage({
           <tbody className="divide-y divide-black/5 dark:divide-white/10">
             {rows.length === 0 && (
               <tr>
-                <td colSpan={3} className="px-5 py-10 text-center text-neutral-400 dark:text-neutral-500">
+                <td colSpan={3} className="px-3 py-10 text-center text-neutral-400 sm:px-5 dark:text-neutral-500">
                   No scores recorded yet.
                 </td>
               </tr>
             )}
             {rows.map((row, index) => (
               <tr key={row.studentId}>
-                <td className="px-5 py-3.5 font-bold text-neutral-400 dark:text-neutral-500">
+                <td className="px-3 py-3.5 font-bold text-neutral-400 sm:px-5 dark:text-neutral-500">
                   {index + 1}
                 </td>
-                <td className="px-5 py-3.5 font-medium text-ink dark:text-neutral-100">
+                <td className="px-3 py-3.5 font-medium text-ink sm:px-5 dark:text-neutral-100">
                   {row.firstName} {row.lastName}
-                  <span className="ml-1.5 text-xs text-neutral-400 dark:text-neutral-500">
+                  <span className="block text-xs text-neutral-400 sm:ml-1.5 sm:inline dark:text-neutral-500">
                     {row.indexNumber}
                   </span>
                 </td>
-                <td className="px-5 py-3.5 text-right font-bold text-ink dark:text-neutral-100">
+                <td className="px-3 py-3.5 text-right font-bold text-ink sm:px-5 dark:text-neutral-100">
                   {"best" in row ? row.best : row.total}
                 </td>
               </tr>

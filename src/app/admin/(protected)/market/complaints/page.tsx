@@ -132,13 +132,13 @@ export default async function MarketComplaintsPage({
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-black/5 text-left text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:border-white/10 dark:text-neutral-500">
-                <th className="px-5 py-3">Reference</th>
-                <th className="px-5 py-3">Category</th>
-                <th className="px-5 py-3">Buyer</th>
-                <th className="px-5 py-3">Store / Seller</th>
-                <th className="px-5 py-3">Filed</th>
-                <th className="px-5 py-3">Status</th>
-                <th className="px-5 py-3" />
+                <th className="px-3 py-3 sm:px-5">Reference</th>
+                <th className="hidden px-3 py-3 md:table-cell sm:px-5">Category</th>
+                <th className="hidden px-3 py-3 sm:table-cell sm:px-5">Buyer</th>
+                <th className="hidden px-3 py-3 lg:table-cell sm:px-5">Store / Seller</th>
+                <th className="hidden px-3 py-3 lg:table-cell sm:px-5">Filed</th>
+                <th className="px-3 py-3 sm:px-5">Status</th>
+                <th className="px-3 py-3 sm:px-5" />
               </tr>
             </thead>
             <tbody>
@@ -146,7 +146,7 @@ export default async function MarketComplaintsPage({
                 <tr>
                   <td
                     colSpan={7}
-                    className="px-5 py-14 text-center text-neutral-400 dark:text-neutral-500"
+                    className="px-3 py-14 text-center text-neutral-400 sm:px-5 dark:text-neutral-500"
                   >
                     <Flag className="mx-auto mb-2 h-7 w-7" />
                     {hasFilters
@@ -161,7 +161,7 @@ export default async function MarketComplaintsPage({
                   key={complaint.id}
                   className="border-b border-black/5 last:border-0 dark:border-white/10"
                 >
-                  <td className="px-5 py-4">
+                  <td className="px-3 py-4 sm:px-5">
                     <Link
                       href={`/admin/market/complaints/${complaint.referenceNumber}`}
                       className="font-semibold text-ink hover:text-gold-dark hover:underline dark:text-neutral-100 dark:hover:text-gold-light"
@@ -172,14 +172,14 @@ export default async function MarketComplaintsPage({
                       {complaint.subject}
                     </p>
                   </td>
-                  <td className="px-5 py-4 text-neutral-600 dark:text-neutral-300">
+                  <td className="hidden px-3 py-4 text-neutral-600 md:table-cell sm:px-5 dark:text-neutral-300">
                     {COMPLAINT_CATEGORY_LABELS[complaint.category] ??
                       complaint.category}
                   </td>
-                  <td className="px-5 py-4 font-medium text-ink dark:text-neutral-100">
+                  <td className="hidden px-3 py-4 font-medium text-ink sm:table-cell sm:px-5 dark:text-neutral-100">
                     {complaint.complainantName}
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="hidden px-3 py-4 lg:table-cell sm:px-5">
                     <Link
                       href={`/admin/market/stores/${complaint.storeId}`}
                       className="font-medium text-ink hover:text-gold-dark hover:underline dark:text-neutral-100 dark:hover:text-gold-light"
@@ -190,10 +190,10 @@ export default async function MarketComplaintsPage({
                       {complaint.sellerName} · {complaint.sellerIndexNumber}
                     </p>
                   </td>
-                  <td className="px-5 py-4 text-neutral-600 dark:text-neutral-300">
+                  <td className="hidden px-3 py-4 text-neutral-600 lg:table-cell sm:px-5 dark:text-neutral-300">
                     {formatMarketplaceDate(complaint.createdAt)}
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-3 py-4 sm:px-5">
                     <ComplaintStatusBadge status={complaint.status} />
                     {complaint.assignedAdminName && (
                       <p className="mt-1 text-xs text-neutral-400 dark:text-neutral-500">
@@ -201,7 +201,7 @@ export default async function MarketComplaintsPage({
                       </p>
                     )}
                   </td>
-                  <td className="px-5 py-4 text-right">
+                  <td className="px-3 py-4 text-right sm:px-5">
                     <Link
                       href={`/admin/market/complaints/${complaint.referenceNumber}`}
                       className="text-xs font-semibold text-gold-dark hover:underline dark:text-gold-light"

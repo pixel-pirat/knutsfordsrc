@@ -110,9 +110,9 @@ export function ProfilesTable({
           <TableHeader>
             <TableRow>
               <TableHead>Executive</TableHead>
-              <TableHead>Position</TableHead>
-              <TableHead>Year Group</TableHead>
-              <TableHead>Linked Account</TableHead>
+              <TableHead className="hidden sm:table-cell">Position</TableHead>
+              <TableHead className="hidden md:table-cell">Year Group</TableHead>
+              <TableHead className="hidden lg:table-cell">Linked Account</TableHead>
               <TableHead />
             </TableRow>
           </TableHeader>
@@ -132,11 +132,11 @@ export function ProfilesTable({
                     <span className="font-medium text-ink dark:text-neutral-100">{p.name}</span>
                   </div>
                 </TableCell>
-                <TableCell className="text-neutral-700 dark:text-neutral-300">{p.position}</TableCell>
-                <TableCell className="text-neutral-500 dark:text-neutral-400">
+                <TableCell className="hidden text-neutral-700 sm:table-cell dark:text-neutral-300">{p.position}</TableCell>
+                <TableCell className="hidden text-neutral-500 md:table-cell dark:text-neutral-400">
                   {p.yearGroup?.label ?? "—"}
                 </TableCell>
-                <TableCell className="text-neutral-500 dark:text-neutral-400">
+                <TableCell className="hidden text-neutral-500 lg:table-cell dark:text-neutral-400">
                   {p.adminUser ? p.adminUser.email : "—"}
                 </TableCell>
                 <TableCell className="text-right">

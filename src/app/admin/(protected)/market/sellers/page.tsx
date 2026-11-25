@@ -83,12 +83,12 @@ export default async function RegisteredSellersPage({
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-black/5 text-left text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:border-white/10 dark:text-neutral-500">
-                <th className="px-5 py-3">Student</th>
-                <th className="px-5 py-3">Store</th>
-                <th className="px-5 py-3">Category</th>
-                <th className="px-5 py-3">Approved</th>
-                <th className="px-5 py-3">Store status</th>
-                <th className="px-5 py-3" />
+                <th className="px-3 py-3 sm:px-5">Student</th>
+                <th className="hidden px-3 py-3 sm:table-cell sm:px-5">Store</th>
+                <th className="hidden px-3 py-3 lg:table-cell sm:px-5">Category</th>
+                <th className="hidden px-3 py-3 lg:table-cell sm:px-5">Approved</th>
+                <th className="px-3 py-3 sm:px-5">Store status</th>
+                <th className="px-3 py-3 sm:px-5" />
               </tr>
             </thead>
             <tbody>
@@ -96,7 +96,7 @@ export default async function RegisteredSellersPage({
                 <tr>
                   <td
                     colSpan={6}
-                    className="px-5 py-12 text-center text-neutral-400 dark:text-neutral-500"
+                    className="px-3 py-12 text-center text-neutral-400 sm:px-5 dark:text-neutral-500"
                   >
                     No approved sellers yet.
                   </td>
@@ -107,7 +107,7 @@ export default async function RegisteredSellersPage({
                   key={seller.applicationId}
                   className="border-b border-black/5 last:border-0 dark:border-white/10"
                 >
-                  <td className="px-5 py-4">
+                  <td className="px-3 py-4 sm:px-5">
                     <p className="font-semibold text-ink dark:text-neutral-100">
                       {seller.studentFirstName} {seller.studentLastName}
                     </p>
@@ -115,18 +115,18 @@ export default async function RegisteredSellersPage({
                       {seller.indexNumber}
                     </p>
                   </td>
-                  <td className="px-5 py-4 text-neutral-700 dark:text-neutral-300">
+                  <td className="hidden px-3 py-4 text-neutral-700 sm:table-cell sm:px-5 dark:text-neutral-300">
                     {seller.storeName}
                   </td>
-                  <td className="px-5 py-4 text-neutral-500 dark:text-neutral-400">
+                  <td className="hidden px-3 py-4 text-neutral-500 lg:table-cell sm:px-5 dark:text-neutral-400">
                     {CATEGORY_LABELS[seller.category] ?? seller.category}
                   </td>
-                  <td className="px-5 py-4 text-neutral-500 dark:text-neutral-400">
+                  <td className="hidden px-3 py-4 text-neutral-500 lg:table-cell sm:px-5 dark:text-neutral-400">
                     {seller.approvedAt
                       ? formatMarketplaceDate(seller.approvedAt)
                       : "—"}
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-3 py-4 sm:px-5">
                     {seller.storeId ? (
                       <Badge
                         variant="outline"
@@ -142,7 +142,7 @@ export default async function RegisteredSellersPage({
                       </span>
                     )}
                   </td>
-                  <td className="px-5 py-4 text-right">
+                  <td className="px-3 py-4 text-right sm:px-5">
                     {seller.storeId ? (
                       <Link
                         href={`/admin/market/stores/${seller.storeId}`}

@@ -91,9 +91,9 @@ export function SportEventsTable({ events }: { events: SportEventRow[] }) {
           <TableHeader>
             <TableRow>
               <TableHead>Event</TableHead>
-              <TableHead>Sport</TableHead>
-              <TableHead>Starts</TableHead>
-              <TableHead>Participation</TableHead>
+              <TableHead className="hidden sm:table-cell">Sport</TableHead>
+              <TableHead className="hidden sm:table-cell">Starts</TableHead>
+              <TableHead className="hidden md:table-cell">Participation</TableHead>
               <TableHead>Status</TableHead>
               <TableHead />
             </TableRow>
@@ -119,13 +119,13 @@ export function SportEventsTable({ events }: { events: SportEventRow[] }) {
                     </span>
                   )}
                 </TableCell>
-                <TableCell className="text-neutral-500 dark:text-neutral-400">
+                <TableCell className="hidden text-neutral-500 sm:table-cell dark:text-neutral-400">
                   {event.sport}
                 </TableCell>
-                <TableCell className="text-neutral-500 dark:text-neutral-400">
+                <TableCell className="hidden text-neutral-500 sm:table-cell dark:text-neutral-400">
                   {formatDateTime(event.startsAt)}
                 </TableCell>
-                <TableCell className="text-neutral-500 dark:text-neutral-400">
+                <TableCell className="hidden text-neutral-500 md:table-cell dark:text-neutral-400">
                   <span className="font-semibold text-ink dark:text-neutral-100">
                     {event.confirmedCount}
                   </span>{" "}
@@ -144,7 +144,7 @@ export function SportEventsTable({ events }: { events: SportEventRow[] }) {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
+                  <div className="flex flex-col items-end gap-1.5 sm:flex-row sm:items-center sm:justify-end sm:gap-2">
                     <Button
                       variant="outline"
                       size="sm"

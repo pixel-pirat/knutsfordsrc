@@ -126,13 +126,13 @@ export function PermitsTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Reference</TableHead>
+              <TableHead className="hidden sm:table-cell">Reference</TableHead>
               <TableHead>Student</TableHead>
               <TableHead>Amount</TableHead>
-              <TableHead>Payment</TableHead>
-              <TableHead>Issued By</TableHead>
-              <TableHead>Issued</TableHead>
-              <TableHead>Expires</TableHead>
+              <TableHead className="hidden md:table-cell">Payment</TableHead>
+              <TableHead className="hidden lg:table-cell">Issued By</TableHead>
+              <TableHead className="hidden lg:table-cell">Issued</TableHead>
+              <TableHead className="hidden lg:table-cell">Expires</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
@@ -152,24 +152,26 @@ export function PermitsTable({
                   className="cursor-pointer"
                   onClick={() => openPermit(p.id)}
                 >
-                  <TableCell className="font-medium text-ink dark:text-neutral-100">{p.referenceNumber}</TableCell>
+                  <TableCell className="hidden font-medium text-ink sm:table-cell dark:text-neutral-100">{p.referenceNumber}</TableCell>
                   <TableCell className="text-neutral-700 dark:text-neutral-300">
-                    {p.student?.firstName} {p.student?.lastName}
-                    <span className="ml-1.5 text-xs text-neutral-400 dark:text-neutral-500">
+                    <p className="max-w-[45vw] truncate font-medium text-ink sm:max-w-none dark:text-neutral-100">
+                      {p.student?.firstName} {p.student?.lastName}
+                    </p>
+                    <p className="truncate text-xs text-neutral-400 dark:text-neutral-500">
                       {p.student?.indexNumber}
-                    </span>
+                    </p>
                   </TableCell>
                   <TableCell className="text-neutral-700 dark:text-neutral-300">{formatCurrency(p.amount)}</TableCell>
-                  <TableCell className="text-neutral-500 dark:text-neutral-400">{p.paymentMethod ?? "—"}</TableCell>
-                  <TableCell className="text-neutral-700 dark:text-neutral-300">{p.issuer?.name}</TableCell>
-                  <TableCell className="text-neutral-500 dark:text-neutral-400">
+                  <TableCell className="hidden text-neutral-500 md:table-cell dark:text-neutral-400">{p.paymentMethod ?? "—"}</TableCell>
+                  <TableCell className="hidden text-neutral-700 lg:table-cell dark:text-neutral-300">{p.issuer?.name}</TableCell>
+                  <TableCell className="hidden text-neutral-500 lg:table-cell dark:text-neutral-400">
                     {new Date(p.issuedAt).toLocaleDateString("en-GB", {
                       day: "numeric",
                       month: "short",
                       year: "numeric",
                     })}
                   </TableCell>
-                  <TableCell className="text-neutral-500 dark:text-neutral-400">
+                  <TableCell className="hidden text-neutral-500 lg:table-cell dark:text-neutral-400">
                     {p.expiresAt
                       ? new Date(p.expiresAt).toLocaleDateString("en-GB", {
                           day: "numeric",

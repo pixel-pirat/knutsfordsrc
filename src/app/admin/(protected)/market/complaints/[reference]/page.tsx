@@ -55,7 +55,7 @@ export default async function AdminComplaintDetailPage({
         <ComplaintStatusBadge status={complaint.status} />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-5">
           <section className="rounded-2xl bg-white p-5 ring-1 ring-black/5 dark:bg-neutral-900 dark:ring-white/10">
             <h2 className="text-base font-extrabold text-ink dark:text-neutral-100">

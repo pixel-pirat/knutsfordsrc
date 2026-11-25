@@ -444,15 +444,15 @@ export function PermitDialog({
                     <dl className="mt-3 grid grid-cols-2 gap-2 text-xs text-neutral-500 dark:text-neutral-400">
                       <div>
                         <dt className="text-neutral-400 dark:text-neutral-500">Email</dt>
-                        <dd className="text-neutral-700 dark:text-neutral-300">{selected.email ?? "—"}</dd>
+                        <dd className="break-words text-neutral-700 dark:text-neutral-300">{selected.email ?? "—"}</dd>
                       </div>
                       <div>
                         <dt className="text-neutral-400 dark:text-neutral-500">Phone</dt>
-                        <dd className="text-neutral-700 dark:text-neutral-300">{selected.phone ?? "—"}</dd>
+                        <dd className="break-words text-neutral-700 dark:text-neutral-300">{selected.phone ?? "—"}</dd>
                       </div>
                       <div>
                         <dt className="text-neutral-400 dark:text-neutral-500">Programme</dt>
-                        <dd className="text-neutral-700 dark:text-neutral-300">{selected.program ?? "—"}</dd>
+                        <dd className="break-words text-neutral-700 dark:text-neutral-300">{selected.program ?? "—"}</dd>
                       </div>
                       <div>
                         <dt className="text-neutral-400 dark:text-neutral-500">Level</dt>

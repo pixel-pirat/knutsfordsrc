@@ -106,12 +106,12 @@ export default async function StoreManagementPage({
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-black/5 text-left text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:border-white/10 dark:text-neutral-500">
-                <th className="px-5 py-3">Store</th>
-                <th className="px-5 py-3">Owner</th>
-                <th className="px-5 py-3">Category</th>
-                <th className="px-5 py-3">Created</th>
-                <th className="px-5 py-3">Status</th>
-                <th className="px-5 py-3" />
+                <th className="px-3 py-3 sm:px-5">Store</th>
+                <th className="hidden px-3 py-3 sm:table-cell sm:px-5">Owner</th>
+                <th className="hidden px-3 py-3 lg:table-cell sm:px-5">Category</th>
+                <th className="hidden px-3 py-3 lg:table-cell sm:px-5">Created</th>
+                <th className="px-3 py-3 sm:px-5">Status</th>
+                <th className="px-3 py-3 sm:px-5" />
               </tr>
             </thead>
             <tbody>
@@ -119,7 +119,7 @@ export default async function StoreManagementPage({
                 <tr>
                   <td
                     colSpan={6}
-                    className="px-5 py-12 text-center text-neutral-400 dark:text-neutral-500"
+                    className="px-3 py-12 text-center text-neutral-400 sm:px-5 dark:text-neutral-500"
                   >
                     No stores match these filters.
                   </td>
@@ -130,7 +130,7 @@ export default async function StoreManagementPage({
                   key={store.id}
                   className="border-b border-black/5 last:border-0 dark:border-white/10"
                 >
-                  <td className="px-5 py-4">
+                  <td className="px-3 py-4 sm:px-5">
                     <Link
                       href={`/admin/market/stores/${store.id}`}
                       className="font-semibold text-ink hover:text-gold-dark hover:underline dark:text-neutral-100 dark:hover:text-gold-light"
@@ -138,7 +138,7 @@ export default async function StoreManagementPage({
                       {store.name}
                     </Link>
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="hidden px-3 py-4 sm:table-cell sm:px-5">
                     <p className="text-neutral-700 dark:text-neutral-300">
                       {store.studentFirstName} {store.studentLastName}
                     </p>
@@ -146,13 +146,13 @@ export default async function StoreManagementPage({
                       {store.indexNumber}
                     </p>
                   </td>
-                  <td className="px-5 py-4 text-neutral-500 dark:text-neutral-400">
+                  <td className="hidden px-3 py-4 text-neutral-500 lg:table-cell sm:px-5 dark:text-neutral-400">
                     {CATEGORY_LABELS[store.category] ?? store.category}
                   </td>
-                  <td className="px-5 py-4 text-neutral-500 dark:text-neutral-400">
+                  <td className="hidden px-3 py-4 text-neutral-500 lg:table-cell sm:px-5 dark:text-neutral-400">
                     {formatMarketplaceDate(store.createdAt)}
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-3 py-4 sm:px-5">
                     <Badge
                       variant="outline"
                       className={STORE_STATUS_STYLES[store.status]}
@@ -160,7 +160,7 @@ export default async function StoreManagementPage({
                       {STORE_STATUS_LABELS[store.status] ?? store.status}
                     </Badge>
                   </td>
-                  <td className="px-5 py-4 text-right">
+                  <td className="px-3 py-4 text-right sm:px-5">
                     <Link
                       href={`/admin/market/stores/${store.id}`}
                       className="text-xs font-semibold text-gold-dark hover:underline dark:text-gold-light"

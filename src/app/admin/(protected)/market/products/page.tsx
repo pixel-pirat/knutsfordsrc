@@ -189,16 +189,16 @@ export default async function MarketProductsPage({
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-black/5 text-left text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:border-white/10 dark:text-neutral-500">
-                <th className="px-5 py-3">Listing</th>
-                <th className="px-5 py-3">Store</th>
-                <th className="px-5 py-3">Seller</th>
-                <th className="px-5 py-3">Price</th>
-                <th className="px-5 py-3">
+                <th className="px-3 py-3 sm:px-5">Listing</th>
+                <th className="hidden px-3 py-3 sm:table-cell sm:px-5">Store</th>
+                <th className="hidden px-3 py-3 lg:table-cell sm:px-5">Seller</th>
+                <th className="px-3 py-3 sm:px-5">Price</th>
+                <th className="hidden px-3 py-3 md:table-cell sm:px-5">
                   {type === "product" ? "Stock" : "Duration"}
                 </th>
-                <th className="px-5 py-3">Listed</th>
-                <th className="px-5 py-3">Status</th>
-                <th className="px-5 py-3" />
+                <th className="hidden px-3 py-3 lg:table-cell sm:px-5">Listed</th>
+                <th className="px-3 py-3 sm:px-5">Status</th>
+                <th className="px-3 py-3 sm:px-5" />
               </tr>
             </thead>
             <tbody>
@@ -206,7 +206,7 @@ export default async function MarketProductsPage({
                 <tr>
                   <td
                     colSpan={8}
-                    className="px-5 py-12 text-center text-neutral-400 dark:text-neutral-500"
+                    className="px-3 py-12 text-center text-neutral-400 sm:px-5 dark:text-neutral-500"
                   >
                     No product listings match these filters.
                   </td>
@@ -216,7 +216,7 @@ export default async function MarketProductsPage({
                 <tr>
                   <td
                     colSpan={8}
-                    className="px-5 py-12 text-center text-neutral-400 dark:text-neutral-500"
+                    className="px-3 py-12 text-center text-neutral-400 sm:px-5 dark:text-neutral-500"
                   >
                     No service listings match these filters.
                   </td>
@@ -229,9 +229,9 @@ export default async function MarketProductsPage({
                     key={product.id}
                     className="border-b border-black/5 last:border-0 dark:border-white/10"
                   >
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                    <td className="px-3 py-4 sm:px-5">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-lg bg-neutral-100 sm:h-10 sm:w-10 dark:bg-neutral-800">
                           {product.imageUrl ? (
                             <Image
                               src={product.imageUrl}
@@ -248,11 +248,11 @@ export default async function MarketProductsPage({
                         <div className="min-w-0">
                           <Link
                             href={`/admin/market/products/product/${product.id}`}
-                            className="font-semibold text-ink hover:text-gold-dark hover:underline dark:text-neutral-100 dark:hover:text-gold-light"
+                            className="block max-w-[32vw] truncate font-semibold text-ink hover:text-gold-dark hover:underline sm:max-w-none dark:text-neutral-100 dark:hover:text-gold-light"
                           >
                             {product.name}
                           </Link>
-                          <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                          <p className="max-w-[32vw] truncate text-xs text-neutral-500 sm:max-w-none dark:text-neutral-400">
                             {product.category}
                             {!product.published &&
                               product.moderationStatus === "active" &&
@@ -261,7 +261,7 @@ export default async function MarketProductsPage({
                         </div>
                       </div>
                     </td>
-                    <td className="px-5 py-4 text-neutral-700 dark:text-neutral-300">
+                    <td className="hidden px-3 py-4 text-neutral-700 sm:table-cell sm:px-5 dark:text-neutral-300">
                       <Link
                         href={`/admin/market/stores/${product.storeId}`}
                         className="font-medium hover:text-gold-dark hover:underline dark:hover:text-gold-light"
@@ -275,7 +275,7 @@ export default async function MarketProductsPage({
                         </p>
                       )}
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="hidden px-3 py-4 lg:table-cell sm:px-5">
                       <p className="text-neutral-700 dark:text-neutral-300">
                         {product.studentFirstName} {product.studentLastName}
                       </p>
@@ -283,10 +283,10 @@ export default async function MarketProductsPage({
                         {product.indexNumber}
                       </p>
                     </td>
-                    <td className="px-5 py-4 text-neutral-700 dark:text-neutral-300">
+                    <td className="px-3 py-4 text-neutral-700 sm:px-5 dark:text-neutral-300">
                       {formatCurrency(product.discountPrice ?? product.price)}
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="hidden px-3 py-4 md:table-cell sm:px-5">
                       <p className="text-neutral-700 dark:text-neutral-300">
                         {product.stockQuantity}
                       </p>
@@ -295,10 +295,10 @@ export default async function MarketProductsPage({
                           product.availability}
                       </p>
                     </td>
-                    <td className="px-5 py-4 text-neutral-500 dark:text-neutral-400">
+                    <td className="hidden px-3 py-4 text-neutral-500 lg:table-cell sm:px-5 dark:text-neutral-400">
                       {formatMarketplaceDate(product.createdAt)}
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-3 py-4 sm:px-5">
                       <Badge
                         variant="outline"
                         className={
@@ -308,7 +308,7 @@ export default async function MarketProductsPage({
                         {MODERATION_STATUS_LABELS[product.moderationStatus]}
                       </Badge>
                     </td>
-                    <td className="px-5 py-4 text-right">
+                    <td className="px-3 py-4 text-right sm:px-5">
                       <Link
                         href={`/admin/market/products/product/${product.id}`}
                         className="text-xs font-semibold text-gold-dark hover:underline dark:text-gold-light"
@@ -325,9 +325,9 @@ export default async function MarketProductsPage({
                     key={service.id}
                     className="border-b border-black/5 last:border-0 dark:border-white/10"
                   >
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                    <td className="px-3 py-4 sm:px-5">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-lg bg-neutral-100 sm:h-10 sm:w-10 dark:bg-neutral-800">
                           {service.imageUrl ? (
                             <Image
                               src={service.imageUrl}
@@ -344,11 +344,11 @@ export default async function MarketProductsPage({
                         <div className="min-w-0">
                           <Link
                             href={`/admin/market/products/service/${service.id}`}
-                            className="font-semibold text-ink hover:text-gold-dark hover:underline dark:text-neutral-100 dark:hover:text-gold-light"
+                            className="block max-w-[32vw] truncate font-semibold text-ink hover:text-gold-dark hover:underline sm:max-w-none dark:text-neutral-100 dark:hover:text-gold-light"
                           >
                             {service.name}
                           </Link>
-                          <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                          <p className="max-w-[32vw] truncate text-xs text-neutral-500 sm:max-w-none dark:text-neutral-400">
                             {service.category}
                             {!service.published &&
                               service.moderationStatus === "active" &&
@@ -357,7 +357,7 @@ export default async function MarketProductsPage({
                         </div>
                       </div>
                     </td>
-                    <td className="px-5 py-4 text-neutral-700 dark:text-neutral-300">
+                    <td className="hidden px-3 py-4 text-neutral-700 sm:table-cell sm:px-5 dark:text-neutral-300">
                       <Link
                         href={`/admin/market/stores/${service.storeId}`}
                         className="font-medium hover:text-gold-dark hover:underline dark:hover:text-gold-light"
@@ -371,7 +371,7 @@ export default async function MarketProductsPage({
                         </p>
                       )}
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="hidden px-3 py-4 lg:table-cell sm:px-5">
                       <p className="text-neutral-700 dark:text-neutral-300">
                         {service.studentFirstName} {service.studentLastName}
                       </p>
@@ -379,7 +379,7 @@ export default async function MarketProductsPage({
                         {service.indexNumber}
                       </p>
                     </td>
-                    <td className="px-5 py-4 text-neutral-700 dark:text-neutral-300">
+                    <td className="px-3 py-4 text-neutral-700 sm:px-5 dark:text-neutral-300">
                       {formatCurrency(service.price)}
                       {service.pricingUnit ? (
                         <p className="text-xs text-neutral-500 dark:text-neutral-400">
@@ -387,7 +387,7 @@ export default async function MarketProductsPage({
                         </p>
                       ) : null}
                     </td>
-                    <td className="px-5 py-4 text-neutral-700 dark:text-neutral-300">
+                    <td className="hidden px-3 py-4 text-neutral-700 md:table-cell sm:px-5 dark:text-neutral-300">
                       {service.durationMinutes
                         ? `${service.durationMinutes} min`
                         : "—"}
@@ -396,10 +396,10 @@ export default async function MarketProductsPage({
                           service.deliveryMethod}
                       </p>
                     </td>
-                    <td className="px-5 py-4 text-neutral-500 dark:text-neutral-400">
+                    <td className="hidden px-3 py-4 text-neutral-500 lg:table-cell sm:px-5 dark:text-neutral-400">
                       {formatMarketplaceDate(service.createdAt)}
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-3 py-4 sm:px-5">
                       <Badge
                         variant="outline"
                         className={
@@ -409,7 +409,7 @@ export default async function MarketProductsPage({
                         {MODERATION_STATUS_LABELS[service.moderationStatus]}
                       </Badge>
                     </td>
-                    <td className="px-5 py-4 text-right">
+                    <td className="px-3 py-4 text-right sm:px-5">
                       <Link
                         href={`/admin/market/products/service/${service.id}`}
                         className="text-xs font-semibold text-gold-dark hover:underline dark:text-gold-light"

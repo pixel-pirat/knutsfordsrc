@@ -74,8 +74,8 @@ export function EventsTable({ events }: { events: EventRow[] }) {
           <TableHeader>
             <TableRow>
               <TableHead>Title</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead>Starts</TableHead>
+              <TableHead className="hidden sm:table-cell">Location</TableHead>
+              <TableHead className="hidden sm:table-cell">Starts</TableHead>
               <TableHead>Status</TableHead>
               <TableHead />
             </TableRow>
@@ -91,8 +91,8 @@ export function EventsTable({ events }: { events: EventRow[] }) {
             {events.map((event) => (
               <TableRow key={event.id} className="cursor-pointer" onClick={() => openEvent(event.id)}>
                 <TableCell className="font-medium text-ink dark:text-neutral-100">{event.title}</TableCell>
-                <TableCell className="text-neutral-500 dark:text-neutral-400">{event.location ?? "—"}</TableCell>
-                <TableCell className="text-neutral-500 dark:text-neutral-400">
+                <TableCell className="hidden text-neutral-500 sm:table-cell dark:text-neutral-400">{event.location ?? "—"}</TableCell>
+                <TableCell className="hidden text-neutral-500 sm:table-cell dark:text-neutral-400">
                   {formatDateTime(event.startsAt)}
                 </TableCell>
                 <TableCell>

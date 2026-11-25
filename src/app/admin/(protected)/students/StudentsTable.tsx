@@ -292,7 +292,7 @@ export function StudentsTable({
         )}
 
         <CardContent className="p-0">
-          <Table className="table-fixed">
+          <Table className="md:table-fixed">
             <TableHeader>
               <TableRow className="hover:bg-transparent!">
                 {canCreate && (
@@ -306,11 +306,11 @@ export function StudentsTable({
                   </TableHead>
                 )}
                 <TableHead className="w-[24%] px-3.5">Student</TableHead>
-                <TableHead className="w-[16%] px-3.5">Programme</TableHead>
-                <TableHead className="w-[8%] px-3.5">Level</TableHead>
-                <TableHead className="w-[12%] px-3.5">Hall</TableHead>
-                <TableHead className="w-[18%] px-3.5">Email</TableHead>
-                <TableHead className="w-[12%] px-3.5">Phone</TableHead>
+                <TableHead className="hidden w-[16%] px-3.5 md:table-cell">Programme</TableHead>
+                <TableHead className="hidden w-[8%] px-3.5 md:table-cell">Level</TableHead>
+                <TableHead className="hidden w-[12%] px-3.5 md:table-cell">Hall</TableHead>
+                <TableHead className="hidden w-[18%] px-3.5 md:table-cell">Email</TableHead>
+                <TableHead className="hidden w-[12%] px-3.5 md:table-cell">Phone</TableHead>
                 <TableHead className="w-[4%] px-3.5" />
               </TableRow>
             </TableHeader>
@@ -360,23 +360,26 @@ export function StudentsTable({
                         </p>
                         <p className="truncate text-xs text-neutral-400 dark:text-neutral-500">
                           {s.indexNumber}
+                          {s.program && (
+                            <span className="md:hidden"> · {s.program}</span>
+                          )}
                         </p>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="truncate px-3.5 text-neutral-700 dark:text-neutral-300">
+                  <TableCell className="hidden truncate px-3.5 text-neutral-700 md:table-cell dark:text-neutral-300">
                     {s.program ?? "—"}
                   </TableCell>
-                  <TableCell className="truncate px-3.5 text-neutral-700 dark:text-neutral-300">
+                  <TableCell className="hidden truncate px-3.5 text-neutral-700 md:table-cell dark:text-neutral-300">
                     {s.level ?? "—"}
                   </TableCell>
-                  <TableCell className="truncate px-3.5 text-neutral-700 dark:text-neutral-300">
+                  <TableCell className="hidden truncate px-3.5 text-neutral-700 md:table-cell dark:text-neutral-300">
                     {s.hallName ?? "—"}
                   </TableCell>
-                  <TableCell className="truncate px-3.5 text-neutral-500 dark:text-neutral-400">
+                  <TableCell className="hidden truncate px-3.5 text-neutral-500 md:table-cell dark:text-neutral-400">
                     {s.email ?? "—"}
                   </TableCell>
-                  <TableCell className="truncate px-3.5 text-neutral-500 dark:text-neutral-400">
+                  <TableCell className="hidden truncate px-3.5 text-neutral-500 md:table-cell dark:text-neutral-400">
                     {s.phone ?? "—"}
                   </TableCell>
                   <TableCell className="px-3.5 text-right" onClick={(e) => e.stopPropagation()}>

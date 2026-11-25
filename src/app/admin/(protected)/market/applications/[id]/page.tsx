@@ -68,7 +68,7 @@ export default async function ApplicationDetailPage({
         </Badge>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <section className="rounded-2xl bg-white p-6 ring-1 ring-black/5 dark:bg-neutral-900 dark:ring-white/10">
             <h2 className="text-sm font-bold text-ink dark:text-neutral-100">
@@ -233,7 +233,7 @@ function Detail({
       <dt className="text-xs font-semibold uppercase tracking-wide text-neutral-400 dark:text-neutral-500">
         {label}
       </dt>
-      <dd className="mt-0.5 text-sm text-neutral-700 dark:text-neutral-300">
+      <dd className="mt-0.5 break-words text-sm text-neutral-700 dark:text-neutral-300">
         {children}
       </dd>
     </div>

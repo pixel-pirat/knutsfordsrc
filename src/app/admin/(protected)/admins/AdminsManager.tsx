@@ -71,8 +71,8 @@ export function AdminsManager({ initialAdmins }: { initialAdmins: AdminRow[] }) 
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Permissions</TableHead>
+              <TableHead className="hidden sm:table-cell">Role</TableHead>
+              <TableHead className="hidden lg:table-cell">Permissions</TableHead>
               <TableHead>Status</TableHead>
               <TableHead />
             </TableRow>
@@ -85,13 +85,13 @@ export function AdminsManager({ initialAdmins }: { initialAdmins: AdminRow[] }) 
                 onClick={() => a.role !== "super_admin" && openDialog(a)}
               >
                 <TableCell>
-                  <p className="font-medium text-ink dark:text-neutral-100">{a.name}</p>
-                  <p className="text-xs text-neutral-400 dark:text-neutral-500">{a.email}</p>
+                  <p className="max-w-[38vw] truncate font-medium text-ink sm:max-w-none dark:text-neutral-100">{a.name}</p>
+                  <p className="max-w-[38vw] truncate text-xs text-neutral-400 sm:max-w-none dark:text-neutral-500">{a.email}</p>
                 </TableCell>
-                <TableCell className="capitalize text-neutral-700 dark:text-neutral-300">
+                <TableCell className="hidden capitalize text-neutral-700 sm:table-cell dark:text-neutral-300">
                   {a.role.replace("_", " ")}
                 </TableCell>
-                <TableCell className="text-neutral-500 dark:text-neutral-400">
+                <TableCell className="hidden text-neutral-500 lg:table-cell dark:text-neutral-400">
                   {a.role === "super_admin"
                     ? "All permissions"
                     : a.permissions.length > 0
